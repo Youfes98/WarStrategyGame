@@ -1,50 +1,29 @@
 ## UnitLayer.gd
-## Draws HoI4-style rectangular military counters per army.
-## Each counter shows: colored faction stripe, NATO unit symbols,
-## composition counts, army ID, and a strength bar.
+## Draws HoI4-style rectangular military counters and movement path lines.
 extends Node2D
 
 const MAP_WIDTH: float = 8192.0
 
-# Counter dimensions (in map-space pixels, scaled by zoom)
-const CHIP_W:       float = 72.0
-const CHIP_H:       float = 34.0
-const CHIP_PAD:     float = 4.0
+const CHIP_W:       float = 80.0
+const CHIP_H:       float = 38.0
+const CHIP_PAD:     float = 5.0
 const STRIPE_H:     float = 4.0
 const BAR_H:        float = 3.0
-const CHIP_SPACING: float = 78.0   # horizontal gap between stacked armies
+const CHIP_SPACING: float = 86.0
 
-# Colors
-const COL_BG:        Color = Color(0.08, 0.10, 0.14, 0.92)
-const COL_BG_HOVER:  Color = Color(0.12, 0.15, 0.22, 0.92)
-const COL_PLAYER:    Color = Color(0.20, 0.55, 0.95)
-const COL_ENEMY:     Color = Color(0.85, 0.20, 0.20)
-const COL_NEUTRAL:   Color = Color(0.50, 0.50, 0.50)
-const COL_SEL_RING:  Color = Color(1.0,  0.88, 0.22, 0.9)
-const COL_TEXT:      Color = Color(0.88, 0.90, 0.94)
-const COL_TEXT_DIM:  Color = Color(0.55, 0.58, 0.65)
-const COL_ADJ:       Color = Color(0.35, 0.75, 1.0,  0.18)
-const COL_ADJ_RIM:   Color = Color(0.40, 0.80, 1.0,  0.50)
-const COL_ARROW:     Color = Color(1.0,  0.92, 0.30, 0.70)
-const COL_GARRISON:  Color = Color(0.70, 0.20, 0.20, 0.70)
+const COL_BG:       Color = Color(0.06, 0.08, 0.12, 0.94)
+const COL_OUTLINE:  Color = Color(0.25, 0.35, 0.50, 0.70)
+const COL_PLAYER:   Color = Color(0.20, 0.55, 0.95)
+const COL_ENEMY:    Color = Color(0.85, 0.20, 0.20)
+const COL_SEL:      Color = Color(1.0,  0.85, 0.22, 0.95)
+const COL_TEXT:     Color = Color(0.90, 0.92, 0.96)
+const COL_TEXT_DIM: Color = Color(0.50, 0.55, 0.62)
+const COL_ADJ:      Color = Color(0.30, 0.70, 1.0,  0.12)
+const COL_ADJ_RIM:  Color = Color(0.35, 0.75, 1.0,  0.40)
+const COL_PATH:     Color = Color(0.90, 0.80, 0.20, 0.55)
+const COL_PATH_DOT: Color = Color(1.0,  0.90, 0.30, 0.70)
 
-# NATO-style symbols for unit types
-const UNIT_SYMBOLS: Dictionary = {
-	"infantry":  "X",
-	"armor":     ">>",
-	"artillery": "*",
-}
-
-const UNIT_SHORT: Dictionary = {
-	"infantry":  "Inf",
-	"armor":     "Arm",
-	"artillery": "Art",
-}
-
-var _font:      Font = null
-var _font_sm:   int  = 9
-var _font_md:   int  = 11
-var _font_lg:   int  = 13
+var _font: Font = null
 
 
 func _ready() -> void:
@@ -60,156 +39,175 @@ func _draw() -> void:
 	var player: String = GameState.player_iso
 	if player.is_empty():
 		return
-
 	var cam := get_viewport().get_camera_2d()
 	if cam == null:
 		return
-	var zoom: float = cam.zoom.x
 
-	# Scale chips so they stay readable at any zoom
-	var inv_zoom: float = 1.0 / maxf(zoom, 0.1)
-	var scale: float = clampf(inv_zoom, 0.4, 3.0)
+	var zoom: float = cam.zoom.x
+	var scale: float = clampf(1.0 / maxf(zoom, 0.1), 0.35, 3.5)
 
 	for x_off: float in [-MAP_WIDTH, 0.0, MAP_WIDTH]:
 		draw_set_transform(Vector2(x_off, 0.0), 0.0, Vector2(scale, scale))
-		_draw_all(player, scale)
+		_draw_world(player, scale)
 	draw_set_transform(Vector2.ZERO)
 
 
-func _draw_all(player: String, scale: float) -> void:
+func _draw_world(player: String, scale: float) -> void:
 	var sel_army: String = MilitarySystem.selected_army_id
 	var sel_iso:  String = MilitarySystem.selected_iso
-	var inv_s: float = 1.0 / scale
+	var inv_s:    float  = 1.0 / scale
 
-	# ── Adjacent territory highlights ─────────────────────────────────────
-	if sel_iso != "":
+	# Adjacent highlights
+	if not sel_iso.is_empty():
 		for nb: String in ProvinceDB.get_neighbors(sel_iso):
 			var c: Vector2 = ProvinceDB.get_centroid(nb) * inv_s
 			if c == Vector2.ZERO:
 				continue
-			draw_circle(c, 22.0, COL_ADJ)
-			draw_arc(c, 22.0, 0.0, TAU, 32, COL_ADJ_RIM, 1.5)
+			draw_circle(c, 20.0, COL_ADJ)
+			draw_arc(c, 20.0, 0.0, TAU, 32, COL_ADJ_RIM, 1.5)
 
-	# ── Group player armies by location ───────────────────────────────────
+	# Gather army data
 	var loc_armies: Dictionary = {}
+	var army_paths: Dictionary = {}
+
 	for uid: String in MilitarySystem.units:
 		var u: Dictionary = MilitarySystem.units[uid]
 		if u.owner != player:
 			continue
 		var loc: String = u.location
 		var aid: String = u.get("army_id", "")
+
 		if not loc_armies.has(loc):
 			loc_armies[loc] = {}
 		if not loc_armies[loc].has(aid):
 			loc_armies[loc][aid] = {"unit_count": 0, "strength_sum": 0.0}
-		var army_data: Dictionary = loc_armies[loc][aid]
-		var utype: String = u.get("type", "infantry")
-		army_data[utype] = army_data.get(utype, 0) + 1
-		army_data["unit_count"] = int(army_data["unit_count"]) + 1
-		army_data["strength_sum"] = float(army_data["strength_sum"]) + float(u.get("strength", 100))
 
-	# ── Draw army counters ────────────────────────────────────────────────
+		var ad: Dictionary = loc_armies[loc][aid]
+		var utype: String = u.get("type", "infantry")
+		ad[utype] = int(ad.get(utype, 0)) + 1
+		ad["unit_count"] = int(ad["unit_count"]) + 1
+		ad["strength_sum"] = float(ad["strength_sum"]) + float(u.get("strength", 100))
+
+		var path: Array = u.get("path", [])
+		if not path.is_empty() and not army_paths.has(aid):
+			army_paths[aid] = {"from": loc, "path": path}
+
+	# Draw movement paths
+	for aid: String in army_paths:
+		var info: Dictionary = army_paths[aid]
+		_draw_path(info["from"], info["path"], inv_s, aid == sel_army)
+
+	# Draw counters
 	for loc: String in loc_armies:
-		var centroid: Vector2 = ProvinceDB.get_centroid(loc)
+		var centroid: Vector2 = ProvinceDB.get_centroid(loc) * inv_s
 		if centroid == Vector2.ZERO:
 			continue
 
-		var base: Vector2 = centroid * inv_s
-		base.y -= CHIP_H * 0.8
-
+		var base: Vector2 = centroid - Vector2(0, CHIP_H * 0.9)
 		var army_ids: Array = loc_armies[loc].keys()
 		var n: int = army_ids.size()
 		var total_w: float = (n - 1) * CHIP_SPACING
 		var start_x: float = base.x - total_w * 0.5
 
 		for i: int in n:
-			var army_id: String = army_ids[i]
-			var army_data: Dictionary = loc_armies[loc][army_id]
+			var aid: String = army_ids[i]
+			var ad: Dictionary = loc_armies[loc][aid]
 			var pos: Vector2 = Vector2(start_x + i * CHIP_SPACING, base.y)
-			var is_selected: bool = (army_id == sel_army)
-
-			_draw_counter(pos, army_id, army_data, is_selected, COL_PLAYER)
-
-	# ── Movement arrows ───────────────────────────────────────────────────
-	var drawn: Dictionary = {}
-	for uid: String in MilitarySystem.units:
-		var u: Dictionary = MilitarySystem.units[uid]
-		if u.destination.is_empty() or u.owner != player:
-			continue
-		var key: String = "%s:%s" % [u.get("army_id", u.id), u.destination]
-		if drawn.has(key):
-			continue
-		drawn[key] = true
-		var from: Vector2 = ProvinceDB.get_centroid(u.location) * inv_s
-		var to:   Vector2 = ProvinceDB.get_centroid(u.destination) * inv_s
-		if from != Vector2.ZERO and to != Vector2.ZERO:
-			_draw_arrow(from, to)
+			_draw_counter(pos, aid, ad, aid == sel_army, army_paths.has(aid))
 
 
-func _draw_counter(pos: Vector2, army_id: String, data: Dictionary, selected: bool, faction_col: Color) -> void:
+func _draw_counter(pos: Vector2, army_id: String, data: Dictionary,
+		selected: bool, moving: bool) -> void:
 	var rect: Rect2 = Rect2(pos.x - CHIP_W * 0.5, pos.y - CHIP_H * 0.5, CHIP_W, CHIP_H)
 
-	# Selection glow
 	if selected:
-		draw_rect(rect.grow(3.0), COL_SEL_RING, false, 2.0)
+		draw_rect(rect.grow(3.0), COL_SEL, false, 2.5)
 
-	# Background
 	draw_rect(rect, COL_BG)
+	draw_rect(rect, COL_OUTLINE, false, 1.0)
 
-	# Faction stripe across top
-	draw_rect(Rect2(rect.position.x, rect.position.y, CHIP_W, STRIPE_H), faction_col)
+	var stripe_col: Color = COL_PLAYER.lightened(0.15) if moving else COL_PLAYER
+	draw_rect(Rect2(rect.position.x, rect.position.y, CHIP_W, STRIPE_H), stripe_col)
 
-	# ── Unit composition ──────────────────────────────────────────────────
-	var y_line1: float = rect.position.y + STRIPE_H + 2.0 + _font_md
-	var x_cursor: float = rect.position.x + CHIP_PAD
+	if _font == null:
+		return
 
-	# Build composition string: "X5 >>3 *2"
-	var comp_parts: Array[String] = []
+	var y1: float = rect.position.y + STRIPE_H + 14.0
+	var x: float = rect.position.x + CHIP_PAD
+
+	# Composition: "5 INF  3 ARM  2 ART"
+	var parts: Array[String] = []
 	for utype: String in ["infantry", "armor", "artillery"]:
 		var count: int = int(data.get(utype, 0))
 		if count > 0:
-			comp_parts.append("%s%d" % [UNIT_SYMBOLS.get(utype, "?"), count])
+			parts.append("%d %s" % [count, MilitarySystem.UNIT_TYPES[utype]["icon"]])
+	draw_string(_font, Vector2(x, y1), "  ".join(parts),
+		HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - CHIP_PAD * 2), 10, COL_TEXT)
 
-	var comp_text: String = " ".join(comp_parts)
-	if _font:
-		draw_string(_font, Vector2(x_cursor, y_line1), comp_text,
-			HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - CHIP_PAD * 2), _font_md, COL_TEXT)
+	# Army label + status
+	var y2: float = y1 + 12.0
+	var label: String = army_id.replace("a", "Army ")
+	if moving:
+		label += " (moving)"
+	draw_string(_font, Vector2(x, y2), label,
+		HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - CHIP_PAD * 2), 9, COL_TEXT_DIM)
 
-	# Army ID (small, right-aligned)
-	var army_label: String = army_id.to_upper().replace("A0", "#")
-	if _font:
-		draw_string(_font, Vector2(rect.position.x + CHIP_W - CHIP_PAD - 24.0, y_line1),
-			army_label, HORIZONTAL_ALIGNMENT_RIGHT, 24, _font_sm, COL_TEXT_DIM)
-
-	# ── Total unit count (line 2) ─────────────────────────────────────────
-	var total: int = int(data.get("unit_count", 0))
-	var y_line2: float = y_line1 + _font_sm + 1.0
-	if _font:
-		draw_string(_font, Vector2(x_cursor, y_line2), "%d units" % total,
-			HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - CHIP_PAD * 2), _font_sm, COL_TEXT_DIM)
-
-	# ── Strength bar ──────────────────────────────────────────────────────
+	# Strength bar
 	var bar_y: float = rect.position.y + CHIP_H + 2.0
-	draw_rect(Rect2(rect.position.x, bar_y, CHIP_W, BAR_H), Color(0.15, 0.15, 0.15, 0.8))
+	draw_rect(Rect2(rect.position.x, bar_y, CHIP_W, BAR_H), Color(0.12, 0.12, 0.12, 0.85))
 
-	var avg_str: float = 0.0
-	if total > 0:
-		avg_str = float(data.get("strength_sum", 0.0)) / float(total)
-	var fill_w: float = CHIP_W * (avg_str / 100.0)
+	var total: int = maxi(int(data.get("unit_count", 0)), 1)
+	var avg: float = float(data.get("strength_sum", 0.0)) / float(total)
+	var fill: float = CHIP_W * (avg / 100.0)
 	var bar_col: Color
-	if avg_str > 60.0:
-		bar_col = Color(0.15, 0.75, 0.25)
-	elif avg_str > 30.0:
-		bar_col = Color(0.85, 0.70, 0.10)
+	if avg > 60.0:    bar_col = Color(0.15, 0.72, 0.25)
+	elif avg > 30.0:  bar_col = Color(0.82, 0.68, 0.10)
+	else:             bar_col = Color(0.82, 0.18, 0.15)
+	draw_rect(Rect2(rect.position.x, bar_y, fill, BAR_H), bar_col)
+
+
+func _draw_path(from: String, path: Array, inv_s: float, is_selected: bool) -> void:
+	if path.is_empty():
+		return
+	var col: Color = COL_PATH.lightened(0.3) if is_selected else COL_PATH
+	var dot_col: Color = COL_SEL if is_selected else COL_PATH_DOT
+	var w: float = 2.0 if is_selected else 1.5
+
+	var prev: Vector2 = ProvinceDB.get_centroid(from) * inv_s
+	if prev == Vector2.ZERO:
+		return
+
+	for i: int in path.size():
+		var next: Vector2 = ProvinceDB.get_centroid(path[i]) * inv_s
+		if next == Vector2.ZERO:
+			continue
+		_draw_dashed_line(prev, next, col, w, 8.0, 4.0)
+		draw_circle(next, 3.0, dot_col)
+		prev = next
+
+	# Arrowhead at destination
+	var dest: Vector2 = ProvinceDB.get_centroid(path[path.size() - 1]) * inv_s
+	var before: Vector2
+	if path.size() >= 2:
+		before = ProvinceDB.get_centroid(path[path.size() - 2]) * inv_s
 	else:
-		bar_col = Color(0.85, 0.20, 0.15)
-	draw_rect(Rect2(rect.position.x, bar_y, fill_w, BAR_H), bar_col)
+		before = ProvinceDB.get_centroid(from) * inv_s
+	if dest != Vector2.ZERO and before != Vector2.ZERO:
+		var dir: Vector2 = (dest - before).normalized()
+		var perp: Vector2 = Vector2(-dir.y, dir.x)
+		draw_line(dest, dest - dir * 10.0 + perp * 5.0, dot_col, 2.0, true)
+		draw_line(dest, dest - dir * 10.0 - perp * 5.0, dot_col, 2.0, true)
 
 
-func _draw_arrow(from: Vector2, to: Vector2) -> void:
-	draw_line(from, to, COL_ARROW, 2.0, true)
-	var dir:  Vector2 = (to - from).normalized()
-	var perp: Vector2 = Vector2(-dir.y, dir.x)
-	var tip:  Vector2 = to - dir * 12.0
-	draw_line(tip, tip - dir * 10.0 + perp * 5.0, COL_ARROW, 2.0, true)
-	draw_line(tip, tip - dir * 10.0 - perp * 5.0, COL_ARROW, 2.0, true)
+func _draw_dashed_line(from: Vector2, to: Vector2, col: Color,
+		width: float, dash: float, gap: float) -> void:
+	var dir: Vector2 = to - from
+	var length: float = dir.length()
+	if length < 1.0:
+		return
+	dir = dir / length
+	var at: float = 0.0
+	while at < length:
+		var end_at: float = minf(at + dash, length)
+		draw_line(from + dir * at, from + dir * end_at, col, width, true)
+		at = end_at + gap

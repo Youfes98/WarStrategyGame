@@ -42,10 +42,11 @@ var _selected_country: String = ""
 var _hover_id:         String = ""
 var _mil_sel_iso:      String = ""
 
-var _dragging:    bool    = false
-var _drag_origin: Vector2 = Vector2.ZERO
-var _cam_origin:  Vector2 = Vector2.ZERO
-var _last_hover_pos: Vector2 = Vector2(-9999, -9999)
+var _dragging:          bool    = false
+var _drag_origin:       Vector2 = Vector2.ZERO
+var _cam_origin:        Vector2 = Vector2.ZERO
+var _last_hover_pos:    Vector2 = Vector2(-9999, -9999)
+var _right_click_start: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -235,11 +236,17 @@ func _input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
 		match mb.button_index:
 			MOUSE_BUTTON_RIGHT:
-				_dragging = mb.pressed
-				if _dragging:
+				if mb.pressed:
+					_dragging = true
+					_right_click_start = mb.position
 					var cam := get_viewport().get_camera_2d()
 					_drag_origin = mb.position
 					_cam_origin  = cam.position if cam else Vector2.ZERO
+				else:
+					_dragging = false
+					# Short right-click = move order; long drag = pan
+					if mb.position.distance_to(_right_click_start) < 8.0:
+						_handle_move_order(mb.position)
 				get_viewport().set_input_as_handled()
 			MOUSE_BUTTON_WHEEL_UP:
 				if mb.pressed:
@@ -316,6 +323,16 @@ func _wrap_x(mp: Vector2) -> Vector2:
 	if x < 0.0:
 		x += MAP_WIDTH
 	return Vector2(x, mp.y)
+
+func _handle_move_order(vp: Vector2) -> void:
+	if MilitarySystem.selected_army_id.is_empty():
+		return
+	var mp: Vector2 = _wrap_x(_to_map(vp))
+	var rid: String = ProvinceDB.get_iso_at_map_pos(mp)
+	if rid.is_empty():
+		return
+	MilitarySystem.handle_move_order(rid)
+
 
 func _zoom(vp: Vector2, dir: int) -> void:
 	var cam := get_viewport().get_camera_2d()
