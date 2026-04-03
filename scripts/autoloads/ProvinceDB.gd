@@ -245,3 +245,43 @@ func _make_color_key(rgb: Array) -> String:
 
 func _color_to_key(color: Color) -> String:
 	return "%d_%d_%d" % [roundi(color.r * 255), roundi(color.g * 255), roundi(color.b * 255)]
+
+
+## Terrain type for a province (baked into provinces.json by pipeline).
+func get_province_terrain(pid: String) -> String:
+	return province_data.get(pid, {}).get("terrain", "plains")
+
+
+## Whether a province is coastal (has "coastal" flag baked by pipeline).
+func is_coastal(pid: String) -> bool:
+	return province_data.get(pid, {}).get("coastal", false)
+
+
+## Find the nearest coastal province owned by a country.
+func get_nearest_coast(country_iso: String) -> String:
+	var pids: Array = country_provinces.get(country_iso, [])
+	for pid: String in pids:
+		if is_coastal(pid):
+			return pid
+	return ""
+
+
+## Get the capital province for a country (closest province to capital coords).
+func get_capital_province(country_iso: String) -> String:
+	var cdata: Dictionary = country_map_data.get(country_iso, {})
+	var cap_centroid: Array = cdata.get("centroid", [])
+	if cap_centroid.size() < 2:
+		return get_main_province(country_iso)
+	var cap_pos: Vector2 = Vector2(cap_centroid[0], cap_centroid[1])
+	var pids: Array = country_provinces.get(country_iso, [])
+	if pids.is_empty():
+		return country_iso
+	var best_pid: String = pids[0]
+	var best_dist: float = INF
+	for pid: String in pids:
+		var pc: Array = province_data[pid].get("centroid", [0, 0])
+		var dist: float = cap_pos.distance_squared_to(Vector2(pc[0], pc[1]))
+		if dist < best_dist:
+			best_dist = dist
+			best_pid = pid
+	return best_pid

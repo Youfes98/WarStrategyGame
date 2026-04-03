@@ -170,6 +170,11 @@ func _refresh() -> void:
 			if not (u.get("path", []) as Array).is_empty():
 				in_transit[u.type] += 1
 
+	# Current recruit location
+	var recruit_loc: String = MilitarySystem.recruit_iso
+	if recruit_loc.is_empty() and not MilitarySystem.selected_army_ids.is_empty():
+		recruit_loc = MilitarySystem._get_army_location(MilitarySystem.selected_army_ids[0])
+
 	# Update all sections
 	for domain: String in _sections:
 		var sec: Dictionary = _sections[domain]
@@ -187,7 +192,11 @@ func _refresh() -> void:
 			var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000.0)
 			var btn: Button = sec["btns"][type_key]
 			btn.text = "+ %s" % cost_str
-			btn.disabled = not MilitarySystem.can_recruit(type_key)
+			# Disable if can't afford OR wrong location
+			if not recruit_loc.is_empty():
+				btn.disabled = not MilitarySystem.can_recruit_at(type_key, recruit_loc)
+			else:
+				btn.disabled = not MilitarySystem.can_recruit(type_key)
 
 	var sel_aid: String = MilitarySystem.selected_army_id
 	_split_btn.disabled = sel_aid.is_empty() or MilitarySystem.is_army_moving(sel_aid)

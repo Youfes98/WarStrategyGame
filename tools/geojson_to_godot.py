@@ -378,6 +378,75 @@ def main():
     # ── Build province adjacency ───────────────────────────────────────────────
     province_adj = build_adjacency(img, color_to_pid)
 
+    # ── Bake terrain type + coastal flag into each province ──────────────────
+    terrain_path = ASSETS_DIR / "terrain_types.png"
+    if terrain_path.exists():
+        print("  Baking terrain classification into provinces...")
+        terrain_img = Image.open(terrain_path)
+        tw, th = terrain_img.size
+        terrain_px = terrain_img.load()
+        TERRAIN_CLASSES = {
+            0: "ocean", 30: "plains", 60: "forest", 90: "desert",
+            120: "mountain", 150: "tundra", 180: "jungle",
+        }
+        def classify_terrain(r_val):
+            best, best_dist = "plains", 999
+            for tv, name in TERRAIN_CLASSES.items():
+                d = abs(r_val - tv)
+                if d < best_dist:
+                    best_dist = d
+                    best = name
+            return best
+
+        for prov in provinces:
+            cx, cy = int(prov["centroid"][0]), int(prov["centroid"][1])
+            cx = max(0, min(cx, tw - 1))
+            cy = max(0, min(cy, th - 1))
+            px = terrain_px[cx, cy]
+            r_val = px[0] if isinstance(px, tuple) else px
+            terrain = classify_terrain(r_val)
+            if terrain == "ocean":
+                terrain = "plains"  # province on land, default to plains
+            prov["terrain"] = terrain
+
+        # Coastal detection: check if province has ocean neighbors in adjacency
+        ocean_provinces = set()
+        # A province is coastal if any of its adjacency neighbors is ocean
+        # OR if its polygon is near the map edge / water
+        for pid, neighbors in province_adj.items():
+            pass  # We'll use a pixel-based approach instead
+
+        # Pixel-based coastal detection: sample a few points around centroid
+        prov_img_px = img.load()
+        for prov in provinces:
+            cx, cy = int(prov["centroid"][0]), int(prov["centroid"][1])
+            is_coastal = False
+            # Check pixels in a radius around centroid for ocean (black = 0,0,0)
+            for dx in range(-30, 31, 10):
+                for dy in range(-30, 31, 10):
+                    px_x = max(0, min(cx + dx, MAP_WIDTH - 1))
+                    px_y = max(0, min(cy + dy, MAP_HEIGHT - 1))
+                    r, g, b = prov_img_px[px_x, px_y][:3]
+                    if r == 0 and g == 0 and b == 0:
+                        is_coastal = True
+                        break
+                if is_coastal:
+                    break
+            prov["coastal"] = is_coastal
+
+        coastal_count = sum(1 for p in provinces if p.get("coastal", False))
+        terrain_counts = {}
+        for p in provinces:
+            t = p.get("terrain", "plains")
+            terrain_counts[t] = terrain_counts.get(t, 0) + 1
+        print(f"  Terrain: {terrain_counts}")
+        print(f"  Coastal provinces: {coastal_count}")
+    else:
+        print("  WARNING: terrain_types.png not found, skipping terrain bake")
+        for prov in provinces:
+            prov["terrain"] = "plains"
+            prov["coastal"] = False
+
     # ── Write output files ─────────────────────────────────────────────────────
     with open(PROVINCES_JSON, "w", encoding="utf-8") as f:
         json.dump(provinces, f, indent=2, ensure_ascii=False)

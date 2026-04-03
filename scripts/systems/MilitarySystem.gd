@@ -34,6 +34,24 @@ const STARTING_UNITS: Dictionary = {
 	"D": [["infantry", 1]],
 }
 
+## Terrain movement cost multipliers (Dijkstra weights)
+const TERRAIN_MOVE_COST: Dictionary = {
+	"plains": 1.0, "forest": 1.3, "desert": 1.5,
+	"mountain": 2.0, "jungle": 1.8, "tundra": 1.5,
+}
+
+## Terrain defense multipliers (applied to defender power)
+const TERRAIN_DEFENSE: Dictionary = {
+	"plains": 1.0, "forest": 1.2, "desert": 0.9,
+	"mountain": 1.5, "jungle": 1.3, "tundra": 1.1,
+}
+
+## Supply distance thresholds
+const SUPPLY_FULL:     int = 3   # provinces from owned territory — no penalty
+const SUPPLY_LOW:      int = 6   # reduced supply
+const SUPPLY_CRITICAL: int = 9   # critical
+# Beyond SUPPLY_CRITICAL = starvation
+
 var units:             Dictionary    = {}
 var selected_iso:      String        = ""
 var selected_army_ids: Array[String] = []
@@ -190,30 +208,58 @@ func is_army_selected(army_id: String) -> bool:
 	return army_id in selected_army_ids
 
 
+## Dijkstra pathfinding weighted by terrain cost.
 func find_path(from: String, to: String, mover_iso: String = "") -> Array:
 	if from == to:
 		return []
-	var queue: Array = [[from]]
-	var visited: Dictionary = {from: true}
-	while not queue.is_empty():
-		var current_path: Array = queue.pop_front()
-		var current: String = current_path[current_path.size() - 1]
+	# dist[node] = best cost so far, prev[node] = previous node
+	var dist: Dictionary = {from: 0.0}
+	var prev: Dictionary = {}
+	# Priority queue: [[cost, node_id]]
+	var pq: Array = [[0.0, from]]
+	var visited: Dictionary = {}
+
+	while not pq.is_empty():
+		# Pop lowest cost (simple linear scan — fine for <1000 nodes explored)
+		var best_idx: int = 0
+		for i: int in range(1, pq.size()):
+			if pq[i][0] < pq[best_idx][0]:
+				best_idx = i
+		var entry: Array = pq[best_idx]
+		pq.remove_at(best_idx)
+		var cost: float = entry[0]
+		var current: String = entry[1]
+
+		if visited.has(current):
+			continue
+		visited[current] = true
+
+		if current == to:
+			# Reconstruct path
+			var path: Array = []
+			var node: String = to
+			while node != from:
+				path.push_front(node)
+				node = prev[node]
+			return path
+
 		for neighbor: String in ProvinceDB.get_neighbors(current):
 			if visited.has(neighbor):
 				continue
-			# Check military access: only enter own territory, war targets, or allied land
 			if not mover_iso.is_empty() and not _can_enter(mover_iso, neighbor):
-				# Exception: allow entering the final destination if at war (attacking)
 				if neighbor != to or not _can_attack(mover_iso, neighbor):
 					continue
-			var new_path: Array = current_path.duplicate()
-			new_path.append(neighbor)
-			if neighbor == to:
-				return new_path.slice(1)
-			visited[neighbor] = true
-			queue.append(new_path)
-			if visited.size() > 500:
-				return []
+			var terrain: String = ProvinceDB.get_province_terrain(neighbor)
+			var move_cost: float = TERRAIN_MOVE_COST.get(terrain, 1.0)
+			var new_cost: float = cost + move_cost
+			if not dist.has(neighbor) or new_cost < dist[neighbor]:
+				dist[neighbor] = new_cost
+				prev[neighbor] = current
+				pq.append([new_cost, neighbor])
+
+		if visited.size() > 800:
+			break
+
 	return []
 
 
@@ -354,6 +400,8 @@ func _order_army_move(army_id: String, path: Array) -> void:
 
 
 func _on_day(_date: Dictionary) -> void:
+	_tick_morale_and_supply()
+
 	var army_progress: Dictionary = {}
 	for id: String in units:
 		var u: Dictionary = units[id]
@@ -479,84 +527,123 @@ func get_garrison_power(territory_id: String) -> float:
 
 func _resolve_battle(attacker_ids: Array, territory_iso: String,
 		attacker_iso: String, defender_iso: String) -> bool:
-	# Attacker power from actual units
+	var terrain: String = ProvinceDB.get_province_terrain(territory_iso)
+	var terrain_def: float = TERRAIN_DEFENSE.get(terrain, 1.0)
+
+	# ── Phase 1: Calculate attacker power ──
 	var atk_power: float = 0.0
+	var atk_supply: float = _get_supply_modifier(territory_iso, attacker_iso)
 	for id: String in attacker_ids:
 		if not units.has(id):
 			continue
 		var u: Dictionary = units[id]
-		atk_power += float(UNIT_TYPES.get(u.type, {}).get("power", 10)) \
-					 * (float(u.strength) / 100.0)
+		var base: float = float(UNIT_TYPES.get(u.type, {}).get("power", 10))
+		var str_mod: float = float(u.strength) / 100.0
+		var mor_mod: float = float(u.get("morale", 100)) / 100.0
+		var type_bonus: float = _get_type_terrain_bonus(u.type, terrain, true)
+		atk_power += base * str_mod * mor_mod * type_bonus
 
-	# Defender power from actual units in the territory (not phantom garrison)
+	# Artillery bombardment phase: artillery gets +30% as pre-battle fire
+	for id: String in attacker_ids:
+		if not units.has(id):
+			continue
+		var u: Dictionary = units[id]
+		if u.type == "artillery":
+			atk_power += float(UNIT_TYPES["artillery"]["power"]) * 0.3 * float(u.strength) / 100.0
+
+	atk_power *= atk_supply
+
+	# ── Phase 2: Calculate defender power ──
 	var defender_ids: Array = []
 	var def_power: float = 0.0
+	var def_supply: float = _get_supply_modifier(territory_iso, defender_iso)
 	for id: String in units:
 		var u: Dictionary = units[id]
 		if u.owner == defender_iso and u.location == territory_iso:
 			defender_ids.append(id)
-			def_power += float(UNIT_TYPES.get(u.type, {}).get("power", 10)) \
-						 * (float(u.strength) / 100.0)
+			var base: float = float(UNIT_TYPES.get(u.type, {}).get("power", 10))
+			var str_mod: float = float(u.strength) / 100.0
+			var mor_mod: float = float(u.get("morale", 100)) / 100.0
+			var type_bonus: float = _get_type_terrain_bonus(u.type, terrain, false)
+			def_power += base * str_mod * mor_mod * type_bonus
 
-	# If no actual defending units, use a small garrison based on country strength
 	var has_real_defenders: bool = not defender_ids.is_empty()
 	if not has_real_defenders:
-		def_power = get_garrison_power(territory_iso) * 0.3   # weaker without real troops
+		def_power = get_garrison_power(territory_iso) * 0.3
 
-	var atk_roll: float = atk_power * randf_range(0.75, 1.25)
-	var def_roll: float = def_power * randf_range(0.85, 1.20)
+	# Apply terrain defense bonus and supply
+	def_power *= terrain_def * def_supply
+
+	# ── Phase 3: Roll with narrower randomness ──
+	var atk_roll: float = atk_power * randf_range(0.85, 1.15)
+	var def_roll: float = def_power * randf_range(0.90, 1.10)
 	var attacker_won: bool = atk_roll > def_roll
+	var power_ratio: float = maxf(atk_roll, 0.1) / maxf(def_roll, 0.1)
 
+	# ── Phase 4: Apply casualties based on power ratio ──
 	if attacker_won:
 		GameState.territory_owner[territory_iso] = attacker_iso
-		# Attacker casualties
-		var casualty: float = clampf(def_roll / atk_roll * 0.35, 0.05, 0.45)
+		# Winner takes lighter casualties when decisive
+		var atk_cas: float = clampf(0.25 / power_ratio, 0.03, 0.35)
 		for id: String in attacker_ids:
 			if not units.has(id):
 				continue
 			var u: Dictionary = units[id]
-			u.strength = clampi(int(float(u.strength) * (1.0 - casualty)), 10, 100)
+			u.strength = clampi(int(float(u.strength) * (1.0 - atk_cas)), 10, 100)
+			u.morale = clampf(float(u.get("morale", 100)) + 10.0, 0.0, 100.0)  # Victory morale boost
 			var remaining: Array = (u.path as Array).slice(1) if (u.path as Array).size() > 0 else []
 			u.location = territory_iso
 			u.path = remaining
 			u.days_remaining = _get_army_travel_days(u.get("army_id", "")) if not remaining.is_empty() else 0
-		# Defender casualties — destroy or weaken defending units
+
 		if has_real_defenders:
-			var def_casualty: float = clampf(atk_roll / def_roll * 0.55, 0.15, 0.80)
+			var def_cas: float = clampf(0.35 * power_ratio, 0.15, 0.80)
 			var dead: Array = []
 			for id: String in defender_ids:
 				if not units.has(id):
 					continue
 				var u: Dictionary = units[id]
-				u.strength = clampi(int(float(u.strength) * (1.0 - def_casualty)), 0, 100)
+				u.strength = clampi(int(float(u.strength) * (1.0 - def_cas)), 0, 100)
+				u.morale = clampf(float(u.get("morale", 100)) - 20.0, 0.0, 100.0)  # Defeat morale hit
 				if u.strength <= 0:
 					dead.append(id)
+				elif u.morale < 20.0:
+					# Rout: retreat to friendly province
+					var retreat_to: String = _find_retreat_province(territory_iso, defender_iso)
+					if retreat_to.is_empty():
+						dead.append(id)  # Encircled — destroyed
+					else:
+						u.location = retreat_to
+						u.path = []
+						u.days_remaining = 0
 			for id: String in dead:
 				units.erase(id)
 	else:
-		# Attacker lost — take heavy casualties, clear path
-		var casualty: float = clampf(def_roll / atk_roll * 0.55, 0.15, 0.80)
+		# Attacker lost
+		var atk_cas: float = clampf(0.35 * (1.0 / power_ratio), 0.15, 0.75)
 		var dead: Array = []
 		for id: String in attacker_ids:
 			if not units.has(id):
 				continue
 			var u: Dictionary = units[id]
-			u.strength = clampi(int(float(u.strength) * (1.0 - casualty)), 0, 100)
+			u.strength = clampi(int(float(u.strength) * (1.0 - atk_cas)), 0, 100)
+			u.morale = clampf(float(u.get("morale", 100)) - 20.0, 0.0, 100.0)
 			u.path = []
 			u.days_remaining = 0
-			if u.strength <= 0:
+			if u.strength <= 0 or u.morale < 10.0:
 				dead.append(id)
 		for id: String in dead:
 			units.erase(id)
-		# Defenders take lighter casualties
+
 		if has_real_defenders:
-			var def_casualty: float = clampf(atk_roll / def_roll * 0.25, 0.05, 0.40)
+			var def_cas: float = clampf(0.15 / (1.0 / power_ratio), 0.03, 0.30)
 			var def_dead: Array = []
 			for id: String in defender_ids:
 				if not units.has(id):
 					continue
 				var u: Dictionary = units[id]
-				u.strength = clampi(int(float(u.strength) * (1.0 - def_casualty)), 0, 100)
+				u.strength = clampi(int(float(u.strength) * (1.0 - def_cas)), 0, 100)
+				u.morale = clampf(float(u.get("morale", 100)) + 5.0, 0.0, 100.0)  # Successful defense morale
 				if u.strength <= 0:
 					def_dead.append(id)
 			for id: String in def_dead:
@@ -564,6 +651,132 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 
 	battle_resolved.emit(territory_iso, attacker_iso, defender_iso, attacker_won)
 	return attacker_won
+
+
+## Unit type vs terrain bonuses (attacker/defender)
+func _get_type_terrain_bonus(unit_type: String, terrain: String, is_attacker: bool) -> float:
+	match unit_type:
+		"armor":
+			# Armor dominates in open terrain, suffers in mountains/jungle
+			if terrain == "plains" or terrain == "desert":
+				return 1.3 if is_attacker else 1.0
+			if terrain == "mountain" or terrain == "jungle":
+				return 0.7 if is_attacker else 0.8
+		"infantry":
+			# Infantry excels in defensive terrain
+			if terrain == "mountain" or terrain == "jungle" or terrain == "forest":
+				return 1.0 if is_attacker else 1.2
+		"artillery":
+			# Artillery less effective in forests/jungles (obstructed fire)
+			if terrain == "forest" or terrain == "jungle":
+				return 0.8
+	return 1.0
+
+
+## Find a friendly province to retreat to
+func _find_retreat_province(from: String, unit_owner: String) -> String:
+	for nb: String in ProvinceDB.get_neighbors(from):
+		var nb_owner: String = GameState.territory_owner.get(nb, ProvinceDB.get_parent_iso(nb))
+		if nb_owner == unit_owner:
+			return nb
+	return ""  # Encircled — no retreat possible
+
+
+## ── Morale & Supply System ────────────────────────────────────────────────────
+
+func _tick_morale_and_supply() -> void:
+	var dead_units: Array = []
+	for uid: String in units:
+		var u: Dictionary = units[uid]
+		var loc: String = u.location
+		var unit_owner: String = u.owner
+		var morale: float = float(u.get("morale", 100))
+		var strength: float = float(u.get("strength", 100))
+
+		# Supply distance: BFS from unit to nearest owned territory
+		var supply_dist: int = _get_supply_distance(loc, unit_owner)
+		u["supply_distance"] = supply_dist
+
+		# Territory status
+		var ter_owner: String = GameState.territory_owner.get(loc, ProvinceDB.get_parent_iso(loc))
+		var in_friendly: bool = ter_owner == unit_owner
+		var in_enemy: bool = not in_friendly and not ter_owner.is_empty()
+
+		# ── Morale changes ──
+		if in_friendly:
+			morale += 2.0  # Recovery in friendly territory
+			var capital: String = ProvinceDB.get_capital_province(unit_owner)
+			if loc == capital:
+				morale += 3.0  # Extra recovery at capital
+		elif in_enemy:
+			morale -= 0.5  # Slow drain in enemy territory
+
+		# Supply-based morale drain
+		if supply_dist > SUPPLY_FULL and supply_dist <= SUPPLY_LOW:
+			morale -= 1.0
+		elif supply_dist > SUPPLY_LOW and supply_dist <= SUPPLY_CRITICAL:
+			morale -= 3.0
+		elif supply_dist > SUPPLY_CRITICAL:
+			morale -= 6.0  # Starvation morale collapse
+
+		# ── Supply-based strength attrition ──
+		if supply_dist > SUPPLY_LOW and supply_dist <= SUPPLY_CRITICAL:
+			strength -= 1.0  # Light attrition
+		elif supply_dist > SUPPLY_CRITICAL:
+			strength -= 3.0  # Heavy attrition (starvation)
+
+		# Clamp values
+		u["morale"] = clampf(morale, 0.0, 100.0)
+		u["strength"] = clampi(int(strength), 0, 100)
+
+		if u["strength"] <= 0:
+			dead_units.append(uid)
+
+	# Remove dead units
+	for uid: String in dead_units:
+		units.erase(uid)
+	if not dead_units.is_empty():
+		units_changed.emit()
+
+
+## BFS supply distance: shortest path from location to any owned province.
+func _get_supply_distance(from_loc: String, unit_owner: String) -> int:
+	# If already in owned territory, distance = 0
+	var from_owner: String = GameState.territory_owner.get(from_loc, ProvinceDB.get_parent_iso(from_loc))
+	if from_owner == unit_owner:
+		return 0
+
+	var visited: Dictionary = {from_loc: true}
+	var frontier: Array = [from_loc]
+	var distance: int = 0
+
+	while not frontier.is_empty() and distance < 15:
+		distance += 1
+		var next_frontier: Array = []
+		for pid: String in frontier:
+			for nb: String in ProvinceDB.get_neighbors(pid):
+				if visited.has(nb):
+					continue
+				visited[nb] = true
+				var nb_owner: String = GameState.territory_owner.get(nb, ProvinceDB.get_parent_iso(nb))
+				if nb_owner == unit_owner:
+					return distance
+				next_frontier.append(nb)
+		frontier = next_frontier
+
+	return 15  # Max distance = encircled / no supply
+
+
+## Get supply modifier for combat (1.0 = full, <1.0 = penalized)
+func _get_supply_modifier(loc: String, unit_owner: String) -> float:
+	var dist: int = _get_supply_distance(loc, unit_owner)
+	if dist <= SUPPLY_FULL:
+		return 1.0
+	elif dist <= SUPPLY_LOW:
+		return 0.85
+	elif dist <= SUPPLY_CRITICAL:
+		return 0.6
+	return 0.35  # Starving army
 
 
 func split_army(army_id: String) -> String:
@@ -596,11 +809,56 @@ func merge_armies(army_a: String, army_b: String) -> void:
 	UIManager.push_notification("Armies merged.", "info")
 
 
+## Get the valid recruitment location for a unit type, or "" if can't recruit here.
+func get_recruit_location(type: String, preferred: String = "") -> String:
+	var player: String = GameState.player_iso
+	if player.is_empty():
+		return ""
+	var domain: String = UNIT_TYPES.get(type, {}).get("domain", "land")
+	var capital: String = ProvinceDB.get_capital_province(player)
+
+	match domain:
+		"sea":
+			# Naval: must be at a coastal province you own
+			if not preferred.is_empty() and ProvinceDB.is_coastal(preferred):
+				var ter_owner: String = GameState.territory_owner.get(preferred, "")
+				if ter_owner == player:
+					return preferred
+			# Fallback: nearest owned coast
+			var coast: String = ProvinceDB.get_nearest_coast(player)
+			return coast if not coast.is_empty() else ""
+		"air", "land":
+			# All units: capital province only (until buildings exist)
+			return capital
+
+	return capital
+
+
 func can_recruit(type: String) -> bool:
 	if GameState.player_iso.is_empty():
 		return false
 	var cost: float = UNIT_TYPES.get(type, {}).get("cost", 9999.0)
-	return float(GameState.get_country(GameState.player_iso).get("treasury", 0.0)) >= cost
+	if float(GameState.get_country(GameState.player_iso).get("treasury", 0.0)) < cost:
+		return false
+	# Check location requirement
+	return not get_recruit_location(type).is_empty()
+
+
+## Check if a specific unit type can be recruited at a specific location.
+func can_recruit_at(type: String, location: String) -> bool:
+	if GameState.player_iso.is_empty():
+		return false
+	var cost: float = UNIT_TYPES.get(type, {}).get("cost", 9999.0)
+	if float(GameState.get_country(GameState.player_iso).get("treasury", 0.0)) < cost:
+		return false
+	var player: String = GameState.player_iso
+	var domain: String = UNIT_TYPES.get(type, {}).get("domain", "land")
+	var capital: String = ProvinceDB.get_capital_province(player)
+	match domain:
+		"sea":
+			return ProvinceDB.is_coastal(location) and GameState.territory_owner.get(location, "") == player
+		_:
+			return location == capital
 
 
 func recruit_unit(type: String, at_province: String = "") -> bool:
@@ -608,11 +866,12 @@ func recruit_unit(type: String, at_province: String = "") -> bool:
 		return false
 	var player: String = GameState.player_iso
 	var data: Dictionary = GameState.get_country(player)
+	var location: String = get_recruit_location(type, at_province)
+	if location.is_empty():
+		UIManager.push_notification("No valid location to recruit %s." % UNIT_TYPES[type]["label"], "warning")
+		return false
 	data["treasury"] = float(data.get("treasury", 0.0)) \
 					   - float(UNIT_TYPES[type].get("cost", 0.0))
-	var location: String = at_province
-	if location.is_empty():
-		location = _find_home_province(player)
 	var army_id: String = ""
 	if not selected_army_ids.is_empty():
 		var sel_loc: String = _get_army_location(selected_army_ids[0])
@@ -624,6 +883,8 @@ func recruit_unit(type: String, at_province: String = "") -> bool:
 		army_id = _new_army_id()
 	spawn_unit(type, player, location, army_id)
 	units_changed.emit()
+	var loc_name: String = ProvinceDB.province_data.get(location, {}).get("name", location)
+	UIManager.push_notification("%s recruited at %s." % [UNIT_TYPES[type]["label"], loc_name], "info")
 	return true
 
 
