@@ -348,33 +348,32 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 		else:
 			GameState.deselect()
 		return
-	if not GameState.player_iso.is_empty():
-		if MilitarySystem.handle_territory_click(rid, shift):
-			_highlight_province("")  # Clear highlight when selecting army
-			return
-	# Only set recruit_iso if no army was selected at this province
-	var parent: String = ProvinceDB.get_parent_iso(rid)
-	var ter_owner: String = GameState.territory_owner.get(rid, parent)
-	if ter_owner == GameState.player_iso and MilitarySystem.selected_army_ids.is_empty():
-		# Don't auto-show military panel — only set recruit location
-		# Player must explicitly click an army or use the panel
-		MilitarySystem.recruit_iso = rid
-	elif ter_owner != GameState.player_iso:
-		# Clicked foreign territory — clear recruit
-		MilitarySystem.recruit_iso = ""
-	# Show country card for the OWNER, not the original parent
-	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
-	emit_signal("country_clicked", card_iso)
-	GameState.select_country(card_iso)
-
-	# Highlight clicked province
+	# Always highlight the clicked province
 	_highlight_province(rid)
 
-	# Show province info panel if this is a province (not country-level)
+	# Always show province info panel (even when army is there)
 	if ProvinceDB.province_data.has(rid):
 		var pip: Node = get_tree().get_first_node_in_group("province_info_panel")
 		if pip != null and pip.has_method("show_province"):
 			pip.show_province(rid)
+
+	# Try to select army if player clicked own territory
+	if not GameState.player_iso.is_empty():
+		MilitarySystem.handle_territory_click(rid, shift)
+
+	# Set recruit location
+	var parent: String = ProvinceDB.get_parent_iso(rid)
+	var ter_owner: String = GameState.territory_owner.get(rid, parent)
+	if ter_owner == GameState.player_iso:
+		MilitarySystem.recruit_iso = rid
+	else:
+		MilitarySystem.recruit_iso = ""
+
+	# Show country card
+	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
+	emit_signal("country_clicked", card_iso)
+	GameState.select_country(card_iso)
+
 
 func _hit_test(mp: Vector2) -> String:
 	for iso: String in _polygons:

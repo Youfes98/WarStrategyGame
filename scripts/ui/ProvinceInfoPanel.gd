@@ -199,8 +199,38 @@ func _refresh() -> void:
 			lbl.add_theme_color_override("font_color", TEXT_COLOR)
 			_buildings_list.add_child(lbl)
 
-	# Build button (only if player owns this province)
+	# Actions (only if player owns this province)
 	if ter_owner == GameState.player_iso:
+		# Recruitment buttons for units this province can produce
+		var can_recruit_any: bool = false
+		if bs != null:
+			for unit_type: String in MilitarySystem.UNIT_TYPES:
+				if MilitarySystem.can_recruit_at(unit_type, _province_id):
+					can_recruit_any = true
+					var udata: Dictionary = MilitarySystem.UNIT_TYPES[unit_type]
+					var cost: float = float(udata.get("cost", 0))
+					var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000)
+					var recruit_btn := Button.new()
+					recruit_btn.text = "Recruit %s  %s" % [udata["label"], cost_str]
+					recruit_btn.add_theme_font_size_override("font_size", 9)
+					var treasury: float = float(GameState.get_country(GameState.player_iso).get("treasury", 0))
+					recruit_btn.disabled = treasury < cost
+					var ut: String = unit_type
+					var pid: String = _province_id
+					recruit_btn.pressed.connect(func() -> void:
+						MilitarySystem.recruit_unit(ut, pid)
+						_refresh())
+					_buildings_list.add_child(recruit_btn)
+
+		if not can_recruit_any:
+			var no_recruit := Label.new()
+			no_recruit.text = "No recruitment buildings"
+			no_recruit.add_theme_font_size_override("font_size", 9)
+			no_recruit.add_theme_color_override("font_color", DIM_COLOR)
+			_buildings_list.add_child(no_recruit)
+
+		_buildings_list.add_child(HSeparator.new())
+
 		var build_btn := Button.new()
 		build_btn.text = "Build Here (V)"
 		build_btn.add_theme_font_size_override("font_size", 10)
