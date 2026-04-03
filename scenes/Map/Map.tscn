@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://map_scene"]
+[gd_scene load_steps=5 format=3 uid="uid://map_scene"]
 
 [ext_resource type="Script" path="res://scripts/map/MapRenderer.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/map/MapCamera.gd"   id="2"]
 [ext_resource type="Script" path="res://scripts/map/BorderLayer.gd"  id="3"]
 [ext_resource type="Script" path="res://scripts/map/LabelLayer.gd"   id="4"]
-[ext_resource type="Script" path="res://scripts/map/UnitLayer.gd"    id="5"]
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1")
@@ -20,6 +19,4 @@ z_index  = 1
 script   = ExtResource("4")
 z_index  = 2
 
-[node name="UnitLayer" type="Node2D" parent="."]
-script   = ExtResource("5")
-z_index  = 3
+## UnitLayer removed — units now render in HUD CanvasLayer (UnitOverlay.gd)
