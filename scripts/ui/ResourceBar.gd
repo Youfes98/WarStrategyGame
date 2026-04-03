@@ -232,6 +232,14 @@ func _refresh(iso: String) -> void:
 	var pop: int = int(data.get("population", 0))
 	_pop_lbl.text = _fmt_pop(pop)
 	var pop_delta: int = int(data.get("_pop_monthly_change", 0))
+	if pop_delta == 0 and pop > 0:
+		# Estimate before first month tick
+		var gdp_b: float = float(data.get("gdp_raw_billions", 1.0))
+		var gdp_pc: float = gdp_b * 1_000_000_000.0 / maxf(pop, 1.0)
+		var annual: float = 0.01
+		if gdp_pc > 30000: annual = 0.003
+		elif gdp_pc > 10000: annual = 0.007
+		pop_delta = int(float(pop) * annual / 12.0)
 	if pop_delta > 0:
 		_pop_change.text = "+%s/mo" % _fmt_pop(pop_delta)
 		_pop_change.add_theme_color_override("font_color", Color(0.40, 0.78, 0.40))
