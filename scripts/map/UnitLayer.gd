@@ -113,7 +113,7 @@ func _draw_world(player: String, scale: float) -> void:
 			var aid: String = army_ids[i]
 			var ad: Dictionary = loc_armies[loc][aid]
 			var pos: Vector2 = Vector2(start_x + i * CHIP_SPACING, base.y)
-			_draw_counter(pos, aid, ad, aid == sel_army, army_paths.has(aid))
+			_draw_counter(pos, aid, ad, MilitarySystem.is_army_selected(aid), army_paths.has(aid))
 
 
 func _draw_counter(pos: Vector2, army_id: String, data: Dictionary,

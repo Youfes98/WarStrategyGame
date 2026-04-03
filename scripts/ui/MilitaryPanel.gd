@@ -89,7 +89,12 @@ func _ready() -> void:
 
 
 func _recruit(type_key: String) -> void:
-	MilitarySystem.recruit_unit(type_key, MilitarySystem.recruit_iso)
+	var recruit_loc: String = ""
+	if not MilitarySystem.selected_army_ids.is_empty():
+		recruit_loc = MilitarySystem._get_army_location(MilitarySystem.selected_army_ids[0])
+	elif not MilitarySystem.recruit_iso.is_empty():
+		recruit_loc = MilitarySystem.recruit_iso
+	MilitarySystem.recruit_unit(type_key, recruit_loc)
 
 
 func _on_split() -> void:

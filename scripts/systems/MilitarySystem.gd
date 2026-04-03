@@ -1,11 +1,12 @@
 ## MilitarySystem.gd
 ## Autoload — manages units, movement, combat, and army operations.
-## Features: BFS pathfinding, movement queues, army splitting, province recruitment.
-## Armies move at the speed of their slowest unit.
+## Features: BFS pathfinding, movement queues, army splitting, province recruitment,
+## multi-army selection (box select + shift-click), multi-army move orders.
 extends Node
 
 signal units_changed()
 signal territory_selected(iso: String)
+signal selection_changed()
 signal battle_resolved(territory_iso: String, attacker_iso: String, defender_iso: String, attacker_won: bool)
 
 const UNIT_TYPES: Dictionary = {
@@ -22,20 +23,24 @@ const STARTING_UNITS: Dictionary = {
 	"D": [["infantry", 1]],
 }
 
-var units:            Dictionary = {}
-var selected_iso:     String     = ""
-var selected_army_id: String     = ""
-var recruit_iso:      String     = ""   # last clicked owned province (for recruitment)
-var _next_id:         int        = 1
-var _next_army_id:    int        = 1
+var units:             Dictionary    = {}
+var selected_iso:      String        = ""
+var selected_army_ids: Array[String] = []
+var recruit_iso:       String        = ""
+var _next_id:          int           = 1
+var _next_army_id:     int           = 1
+
+var selected_army_id: String:
+	get:
+		if selected_army_ids.is_empty():
+			return ""
+		return selected_army_ids[0]
 
 
 func _ready() -> void:
 	GameState.player_country_set.connect(_on_player_set)
 	GameClock.tick_day.connect(_on_day)
 
-
-# ── Spawning ──────────────────────────────────────────────────────────────────
 
 func _on_player_set(iso: String) -> void:
 	var tier: String = GameState.get_country(iso).get("power_tier", "C")
@@ -44,7 +49,20 @@ func _on_player_set(iso: String) -> void:
 	for entry: Array in STARTING_UNITS.get(tier, [["infantry", 1]]):
 		for _i: int in entry[1]:
 			spawn_unit(entry[0], iso, spawn_loc, army_id)
+	_spawn_ai_armies()
 	units_changed.emit()
+
+
+func _spawn_ai_armies() -> void:
+	for ciso: String in GameState.countries:
+		if ciso == GameState.player_iso:
+			continue
+		var tier: String = GameState.get_country(ciso).get("power_tier", "D")
+		var army_id: String = _new_army_id()
+		var spawn_loc: String = _find_home_province(ciso)
+		for entry: Array in STARTING_UNITS.get(tier, [["infantry", 1]]):
+			for _i: int in entry[1]:
+				spawn_unit(entry[0], ciso, spawn_loc, army_id)
 
 
 func spawn_unit(type: String, unit_owner: String, location: String, army_id: String = "") -> String:
@@ -54,10 +72,8 @@ func spawn_unit(type: String, unit_owner: String, location: String, army_id: Str
 	_next_id += 1
 	units[id] = {
 		"id": id, "type": type, "owner": unit_owner,
-		"location": location,
-		"path": [],
-		"days_remaining": 0,
-		"strength": 100, "morale": 80,
+		"location": location, "path": [],
+		"days_remaining": 0, "strength": 100, "morale": 80,
 		"army_id": army_id,
 	}
 	return id
@@ -82,8 +98,6 @@ func _find_home_province(country_iso: String) -> String:
 			best_pid = pid
 	return best_pid
 
-
-# ── Army helpers ──────────────────────────────────────────────────────────────
 
 func _new_army_id() -> String:
 	var id: String = "a%04d" % _next_army_id
@@ -167,7 +181,9 @@ func is_army_moving(army_id: String) -> bool:
 	return false
 
 
-# ── BFS Pathfinding ───────────────────────────────────────────────────────────
+func is_army_selected(army_id: String) -> bool:
+	return army_id in selected_army_ids
+
 
 func find_path(from: String, to: String) -> Array:
 	if from == to:
@@ -191,76 +207,106 @@ func find_path(from: String, to: String) -> Array:
 	return []
 
 
-# ── Selection & Click Handling ────────────────────────────────────────────────
-
-func handle_territory_click(iso: String) -> bool:
+func handle_territory_click(iso: String, shift_held: bool = false) -> bool:
 	var player: String = GameState.player_iso
 	if player.is_empty():
 		return false
 
-	if selected_army_id != "":
-		var army_loc: String = _get_army_location(selected_army_id)
+	var parent: String = ProvinceDB.get_parent_iso(iso)
+	var ter_owner: String = GameState.territory_owner.get(iso, parent)
+	if ter_owner == player:
+		recruit_iso = iso
 
-		if iso == army_loc:
-			var armies_here: Array = _get_army_ids_at(iso, player)
-			var idx: int = armies_here.find(selected_army_id)
-			if idx >= 0 and idx < armies_here.size() - 1:
-				selected_army_id = armies_here[idx + 1]
-				territory_selected.emit(iso)
-				units_changed.emit()
-			else:
-				deselect()
-			return true
+	var armies_here: Array = _get_army_ids_at(iso, player)
 
-		var other_armies: Array = _get_army_ids_at(iso, player)
-		if other_armies.size() > 0:
-			selected_army_id = other_armies[0]
-			selected_iso = iso
-			territory_selected.emit(iso)
-			units_changed.emit()
-			return true
-
-		deselect()
+	if armies_here.is_empty():
+		if not shift_held:
+			deselect()
 		return false
 
-	var player_armies: Array = _get_army_ids_at(iso, player)
-	if player_armies.size() > 0:
-		selected_army_id = player_armies[0]
+	if shift_held:
+		for aid: String in armies_here:
+			if aid in selected_army_ids:
+				selected_army_ids.erase(aid)
+			else:
+				selected_army_ids.append(aid)
 		selected_iso = iso
-		territory_selected.emit(iso)
+		selection_changed.emit()
 		units_changed.emit()
 		return true
 
-	return false
+	if not selected_army_ids.is_empty():
+		var current: String = selected_army_ids[0]
+		if current in armies_here:
+			var idx: int = armies_here.find(current)
+			if idx < armies_here.size() - 1:
+				selected_army_ids = [armies_here[idx + 1]]
+			else:
+				deselect()
+			selection_changed.emit()
+			units_changed.emit()
+			return true
+
+	selected_army_ids = [armies_here[0]]
+	selected_iso = iso
+	territory_selected.emit(iso)
+	selection_changed.emit()
+	units_changed.emit()
+	return true
+
+
+func box_select(rect: Rect2) -> void:
+	var player: String = GameState.player_iso
+	if player.is_empty():
+		return
+	selected_army_ids.clear()
+	var seen: Dictionary = {}
+	for id: String in units:
+		var u: Dictionary = units[id]
+		if u.owner != player:
+			continue
+		var aid: String = u.get("army_id", "")
+		if seen.has(aid):
+			continue
+		var centroid: Vector2 = ProvinceDB.get_centroid(u.location)
+		if centroid != Vector2.ZERO and rect.has_point(centroid):
+			seen[aid] = true
+			selected_army_ids.append(aid)
+	if not selected_army_ids.is_empty():
+		selected_iso = _get_army_location(selected_army_ids[0])
+	selection_changed.emit()
+	units_changed.emit()
 
 
 func handle_move_order(target_iso: String) -> bool:
 	var player: String = GameState.player_iso
-	if player.is_empty() or selected_army_id.is_empty():
+	if player.is_empty() or selected_army_ids.is_empty():
 		return false
-
-	var army_loc: String = _get_army_location(selected_army_id)
-	if army_loc.is_empty() or army_loc == target_iso:
-		return false
-
 	if not _can_enter(player, target_iso):
 		UIManager.push_notification("Cannot enter neutral territory.", "warning")
 		return false
-
-	var path: Array = find_path(army_loc, target_iso)
-	if path.is_empty():
-		UIManager.push_notification("No path to target.", "warning")
+	var any_moved: bool = false
+	for aid: String in selected_army_ids:
+		var army_loc: String = _get_army_location(aid)
+		if army_loc.is_empty() or army_loc == target_iso:
+			continue
+		var path: Array = find_path(army_loc, target_iso)
+		if path.is_empty():
+			continue
+		_order_army_move(aid, path)
+		any_moved = true
+	if not any_moved:
+		UIManager.push_notification("No valid path for selected armies.", "warning")
 		return false
-
-	_order_army_move(selected_army_id, path)
 	deselect()
 	return true
 
 
 func deselect() -> void:
 	selected_iso = ""
-	selected_army_id = ""
+	selected_army_ids.clear()
 	territory_selected.emit("")
+	selection_changed.emit()
 	units_changed.emit()
 
 
@@ -274,11 +320,8 @@ func _order_army_move(army_id: String, path: Array) -> void:
 	units_changed.emit()
 
 
-# ── Daily Movement Tick ───────────────────────────────────────────────────────
-
 func _on_day(_date: Dictionary) -> void:
 	var army_progress: Dictionary = {}
-
 	for id: String in units:
 		var u: Dictionary = units[id]
 		if (u.path as Array).is_empty():
@@ -337,13 +380,9 @@ func _on_day(_date: Dictionary) -> void:
 			for uid: String in uid_list:
 				units[uid]["location"] = next_prov
 				units[uid]["path"] = remaining_path.duplicate()
-				if remaining_path.is_empty():
-					units[uid]["days_remaining"] = 0
-				else:
-					units[uid]["days_remaining"] = travel_days
+				units[uid]["days_remaining"] = travel_days if not remaining_path.is_empty() else 0
 			if remaining_path.is_empty() and attacker == GameState.player_iso:
-				var tname: String = _get_territory_name(next_prov)
-				notifications.append(["Army arrived in %s." % tname, "info"])
+				notifications.append(["Army arrived in %s." % _get_territory_name(next_prov), "info"])
 			changed = true
 
 	for n: Array in notifications:
@@ -358,8 +397,6 @@ func _get_territory_name(tid: String) -> String:
 		return pdata.get("name", tid)
 	return GameState.get_country(tid).get("name", tid)
 
-
-# ── Combat ────────────────────────────────────────────────────────────────────
 
 func get_garrison_power(territory_id: String) -> float:
 	var parent: String = ProvinceDB.get_parent_iso(territory_id)
@@ -379,7 +416,6 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 		var u: Dictionary = units[id]
 		atk_power += float(UNIT_TYPES.get(u.type, {}).get("power", 10)) \
 					 * (float(u.strength) / 100.0)
-
 	var def_power: float = get_garrison_power(territory_iso)
 	var atk_roll: float = atk_power * randf_range(0.75, 1.25)
 	var def_roll: float = def_power * randf_range(0.85, 1.20)
@@ -395,11 +431,8 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 			u.strength = clampi(int(float(u.strength) * (1.0 - casualty)), 10, 100)
 			var remaining: Array = (u.path as Array).slice(1) if (u.path as Array).size() > 0 else []
 			u.location = territory_iso
-			u.path = remaining.duplicate()
-			if remaining.is_empty():
-				u.days_remaining = 0
-			else:
-				u.days_remaining = _get_army_travel_days(u.get("army_id", ""))
+			u.path = remaining
+			u.days_remaining = _get_army_travel_days(u.get("army_id", "")) if not remaining.is_empty() else 0
 	else:
 		var casualty: float = clampf(def_roll / atk_roll * 0.55, 0.15, 0.80)
 		var dead: Array = []
@@ -414,12 +447,9 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 				dead.append(id)
 		for id: String in dead:
 			units.erase(id)
-
 	battle_resolved.emit(territory_iso, attacker_iso, defender_iso, attacker_won)
 	return attacker_won
 
-
-# ── Army Splitting ────────────────────────────────────────────────────────────
 
 func split_army(army_id: String) -> String:
 	var unit_ids: Array = _get_army_unit_ids(army_id)
@@ -451,8 +481,6 @@ func merge_armies(army_a: String, army_b: String) -> void:
 	UIManager.push_notification("Armies merged.", "info")
 
 
-# ── Recruitment ───────────────────────────────────────────────────────────────
-
 func can_recruit(type: String) -> bool:
 	if GameState.player_iso.is_empty():
 		return false
@@ -470,15 +498,19 @@ func recruit_unit(type: String, at_province: String = "") -> bool:
 	var location: String = at_province
 	if location.is_empty():
 		location = _find_home_province(player)
-	var army_id: String = _find_stationary_army(player, location)
+	var army_id: String = ""
+	if not selected_army_ids.is_empty():
+		var sel_loc: String = _get_army_location(selected_army_ids[0])
+		if sel_loc == location:
+			army_id = selected_army_ids[0]
+	if army_id.is_empty():
+		army_id = _find_stationary_army(player, location)
 	if army_id.is_empty():
 		army_id = _new_army_id()
 	spawn_unit(type, player, location, army_id)
 	units_changed.emit()
 	return true
 
-
-# ── Queries ───────────────────────────────────────────────────────────────────
 
 func get_units_at(iso: String) -> Array:
 	return _get_units_at(iso, "")

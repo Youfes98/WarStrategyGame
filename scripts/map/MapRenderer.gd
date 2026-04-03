@@ -47,6 +47,10 @@ var _drag_origin:       Vector2 = Vector2.ZERO
 var _cam_origin:        Vector2 = Vector2.ZERO
 var _last_hover_pos:    Vector2 = Vector2(-9999, -9999)
 var _right_click_start: Vector2 = Vector2.ZERO
+var _left_click_start:  Vector2 = Vector2.ZERO
+var _box_selecting:     bool    = false
+var _box_start:         Vector2 = Vector2.ZERO
+var _box_end:           Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -56,6 +60,7 @@ func _ready() -> void:
 	GameState.player_country_set.connect(_on_player_set)
 	MilitarySystem.territory_selected.connect(_on_mil_territory_selected)
 	MilitarySystem.battle_resolved.connect(_on_battle_resolved)
+	MilitarySystem.selection_changed.connect(_on_selection_changed)
 	GameState.war_state_changed.connect(_on_war_state_changed)
 	if not ProvinceDB.country_map_data.is_empty():
 		_build_map()
@@ -235,6 +240,17 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		match mb.button_index:
+			MOUSE_BUTTON_LEFT:
+				if mb.pressed:
+					_left_click_start = mb.position
+					_box_selecting = false
+				else:
+					if _box_selecting:
+						_box_selecting = false
+						_box_end = mb.position
+						_finish_box_select()
+						queue_redraw()
+						get_viewport().set_input_as_handled()
 			MOUSE_BUTTON_RIGHT:
 				if mb.pressed:
 					_dragging = true
@@ -244,7 +260,6 @@ func _input(event: InputEvent) -> void:
 					_cam_origin  = cam.position if cam else Vector2.ZERO
 				else:
 					_dragging = false
-					# Short right-click = move order; long drag = pan
 					if mb.position.distance_to(_right_click_start) < 8.0:
 						_handle_move_order(mb.position)
 				get_viewport().set_input_as_handled()
@@ -263,6 +278,13 @@ func _input(event: InputEvent) -> void:
 			if cam:
 				cam.position = _cam_origin - (mm.position - _drag_origin) / cam.zoom
 			get_viewport().set_input_as_handled()
+		elif mm.button_mask & MOUSE_BUTTON_MASK_LEFT:
+			if mm.position.distance_to(_left_click_start) > 12.0:
+				_box_selecting = true
+				_box_start = _left_click_start
+				_box_end = mm.position
+				queue_redraw()
+				get_viewport().set_input_as_handled()
 		else:
 			if mm.position.distance_squared_to(_last_hover_pos) > 16.0:
 				_last_hover_pos = mm.position
@@ -272,7 +294,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var k := event as InputEventKey
 		if k.pressed and k.keycode == KEY_ESCAPE:
-			if not MilitarySystem.selected_iso.is_empty():
+			if not MilitarySystem.selected_army_ids.is_empty():
 				MilitarySystem.deselect()
 			else:
 				GameState.deselect()
@@ -280,31 +302,29 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed and not _dragging:
-			_handle_click(mb.position)
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed and not _dragging and not _box_selecting:
+			_handle_click(mb.position, mb.shift_pressed)
 
-func _handle_click(vp: Vector2) -> void:
+func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	var mp: Vector2 = _wrap_x(_to_map(vp))
 	var rid: String = ProvinceDB.get_iso_at_map_pos(mp)
 	if rid.is_empty() and not _shader_mode:
 		rid = _hit_test(mp)
 	if rid.is_empty():
-		if not MilitarySystem.selected_iso.is_empty():
+		if not MilitarySystem.selected_army_ids.is_empty():
 			MilitarySystem.deselect()
 		else:
 			GameState.deselect()
 		return
 	if not GameState.player_iso.is_empty():
-		if MilitarySystem.handle_territory_click(rid):
+		if MilitarySystem.handle_territory_click(rid, shift):
 			return
-	# Track clicked province for recruitment (even if no army there)
+	# Show country card for the OWNER, not the original parent
 	var parent: String = ProvinceDB.get_parent_iso(rid)
 	var ter_owner: String = GameState.territory_owner.get(rid, parent)
-	if ter_owner == GameState.player_iso:
-		MilitarySystem.recruit_iso = rid
-	var ciso: String = parent
-	emit_signal("country_clicked", ciso)
-	GameState.select_country(ciso)
+	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
+	emit_signal("country_clicked", card_iso)
+	GameState.select_country(card_iso)
 
 func _hit_test(mp: Vector2) -> String:
 	for iso: String in _polygons:
@@ -329,8 +349,32 @@ func _wrap_x(mp: Vector2) -> Vector2:
 		x += MAP_WIDTH
 	return Vector2(x, mp.y)
 
+func _finish_box_select() -> void:
+	var a: Vector2 = _wrap_x(_to_map(_box_start))
+	var b: Vector2 = _wrap_x(_to_map(_box_end))
+	var min_pt: Vector2 = Vector2(minf(a.x, b.x), minf(a.y, b.y))
+	var max_pt: Vector2 = Vector2(maxf(a.x, b.x), maxf(a.y, b.y))
+	MilitarySystem.box_select(Rect2(min_pt, max_pt - min_pt))
+
+
+func _process(_delta: float) -> void:
+	if _box_selecting:
+		queue_redraw()
+
+
+func _draw() -> void:
+	if _box_selecting:
+		var a: Vector2 = _to_map(_box_start)
+		var b: Vector2 = _to_map(_box_end)
+		var rect: Rect2 = Rect2(
+			Vector2(minf(a.x, b.x), minf(a.y, b.y)),
+			Vector2(absf(b.x - a.x), absf(b.y - a.y)))
+		draw_rect(rect, Color(0.3, 0.7, 1.0, 0.15))
+		draw_rect(rect, Color(0.4, 0.8, 1.0, 0.6), false, 1.5)
+
+
 func _handle_move_order(vp: Vector2) -> void:
-	if MilitarySystem.selected_army_id.is_empty():
+	if MilitarySystem.selected_army_ids.is_empty():
 		return
 	var mp: Vector2 = _wrap_x(_to_map(vp))
 	var rid: String = ProvinceDB.get_iso_at_map_pos(mp)
@@ -359,7 +403,11 @@ func _on_country_selected(ciso: String) -> void:
 	_clear_selected()
 	_selected_country = ciso
 	if _shader_mode:
-		_set_country_lut(ciso, COLOR_SELECTED)
+		for pid: String in ProvinceDB.get_country_province_ids(ciso):
+			var ter_owner: String = GameState.territory_owner.get(pid, ciso)
+			if ter_owner == GameState.player_iso:
+				continue
+			_set_province_lut(pid, COLOR_SELECTED)
 		_flush_lut()
 	elif _polygons.has(ciso):
 		(_polygons[ciso] as Polygon2D).color = COLOR_SELECTED
@@ -375,7 +423,13 @@ func _clear_selected() -> void:
 	_selected_country = ""
 	if not prev.is_empty():
 		if _shader_mode:
-			_restore_country_lut(prev)
+			for pid: String in ProvinceDB.get_country_province_ids(prev):
+				var idx: int = ProvinceDB.get_province_index(pid)
+				if idx <= 0:
+					continue
+				var col: Color = _compute_color(pid)
+				_base_colors[idx] = col
+				_set_lut(idx, col)
 			_flush_lut()
 		elif _polygons.has(prev):
 			(_polygons[prev] as Polygon2D).color = ProvinceDB.get_map_color(prev)
@@ -418,6 +472,9 @@ func _on_mil_territory_selected(id: String) -> void:
 			_flush_lut()
 		elif _polygons.has(id):
 			(_polygons[id] as Polygon2D).color = COLOR_MIL_SEL
+
+func _on_selection_changed() -> void:
+	queue_redraw()
 
 func refresh_country_color(id: String) -> void:
 	if _shader_mode:
