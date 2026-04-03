@@ -11,6 +11,8 @@ var _name_lbl:     Label = null
 var _tier_lbl:     Label = null
 var _treasury_lbl: Label = null
 var _balance_lbl:  Label = null
+var _pop_lbl:      Label = null
+var _pop_change:   Label = null
 
 const BG_COLOR: Color = Color(0.06, 0.06, 0.08, 0.92)
 const TIER_COLORS: Dictionary = {
@@ -93,6 +95,28 @@ func _ready() -> void:
 	_balance_lbl = Label.new()
 	_balance_lbl.add_theme_font_size_override("font_size", 10)
 	t_col.add_child(_balance_lbl)
+
+	hbox.add_child(VSeparator.new())
+
+	# ── Population ──
+	var p_col := VBoxContainer.new()
+	p_col.add_theme_constant_override("separation", -2)
+	hbox.add_child(p_col)
+
+	var p_hdr := Label.new()
+	p_hdr.text = "POPULATION"
+	p_hdr.add_theme_font_size_override("font_size", 8)
+	p_hdr.add_theme_color_override("font_color", Color(0.45, 0.50, 0.55))
+	p_col.add_child(p_hdr)
+
+	_pop_lbl = Label.new()
+	_pop_lbl.add_theme_font_size_override("font_size", 14)
+	_pop_lbl.add_theme_color_override("font_color", Color(0.85, 0.85, 0.90))
+	p_col.add_child(_pop_lbl)
+
+	_pop_change = Label.new()
+	_pop_change.add_theme_font_size_override("font_size", 10)
+	p_col.add_child(_pop_change)
 
 	GameState.player_country_set.connect(_on_player_set)
 	GameState.country_data_changed.connect(_on_data_changed)
@@ -203,6 +227,26 @@ func _refresh(iso: String) -> void:
 	else:
 		_balance_lbl.text = "$0/mo"
 		_balance_lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
+
+	# Population
+	var pop: int = int(data.get("population", 0))
+	_pop_lbl.text = _fmt_pop(pop)
+	var pop_delta: int = int(data.get("_pop_monthly_change", 0))
+	if pop_delta > 0:
+		_pop_change.text = "+%s/mo" % _fmt_pop(pop_delta)
+		_pop_change.add_theme_color_override("font_color", Color(0.40, 0.78, 0.40))
+	elif pop_delta < 0:
+		_pop_change.text = "-%s/mo" % _fmt_pop(absi(pop_delta))
+		_pop_change.add_theme_color_override("font_color", Color(0.90, 0.35, 0.28))
+	else:
+		_pop_change.text = ""
+
+
+func _fmt_pop(p: int) -> String:
+	if p >= 1_000_000_000: return "%.2fB" % (float(p) / 1_000_000_000.0)
+	if p >= 1_000_000:     return "%.1fM" % (float(p) / 1_000_000.0)
+	if p >= 1_000:         return "%.0fK" % (float(p) / 1_000.0)
+	return str(p)
 
 
 func _fmt(b: float) -> String:

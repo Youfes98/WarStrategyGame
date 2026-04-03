@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=12 format=3 uid="uid://main_scene"]
 
 [ext_resource type="PackedScene" path="res://scenes/Map/Map.tscn"            id="1"]
 [ext_resource type="PackedScene" path="res://scenes/UI/CountryCard.tscn"     id="2"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script"      path="res://scripts/ui/ResourceBar.gd"      id="9"]
 [ext_resource type="Script"      path="res://scripts/map/UnitOverlay.gd"     id="10"]
 [ext_resource type="Script"      path="res://scripts/ui/RankingsPanel.gd"    id="11"]
+[ext_resource type="Script"      path="res://scripts/ui/PauseMenu.gd"       id="12"]
 
 [node name="Main" type="Node"]
 script = ExtResource("5")
@@ -77,6 +78,13 @@ offset_left   = 0.0
 offset_top    = 54.0
 offset_right  = 300.0
 offset_bottom = 480.0
+visible       = false
+
+[node name="PauseMenu" type="Control" parent="HUD"]
+script        = ExtResource("12")
+anchors_preset = 15
+anchor_right  = 1.0
+anchor_bottom = 1.0
 visible       = false
 
 [node name="PickBanner" type="PanelContainer" parent="HUD"]

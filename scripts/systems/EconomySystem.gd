@@ -192,6 +192,32 @@ func _tick_country(iso: String) -> void:
 
 	data["stability"] = clampf(new_stab, 0.0, 100.0)
 
+	# ── 4. POPULATION GROWTH ──────────────────────────────────────────────────
+	# Real-world annual growth rates vary: ~0.5% (developed) to ~3% (developing)
+	# Modifiers: stability, GDP level, war
+	var pop: float = float(data.get("population", 100000))
+	var base_growth_annual: float = 0.01   # 1% base annual
+	# Richer countries grow slower (demographic transition)
+	var gdp_per_cap: float = gdp_raw * 1_000_000_000.0 / maxf(pop, 1.0)
+	if gdp_per_cap > 30000:
+		base_growth_annual = 0.003   # rich: 0.3%
+	elif gdp_per_cap > 10000:
+		base_growth_annual = 0.007   # middle: 0.7%
+	# Low stability = population decline (emigration, conflict deaths)
+	var stab_mod_pop: float = (new_stab - 40.0) / 100.0   # -0.4 to +0.6
+	# War penalty
+	var at_war: bool = false
+	for other: String in GameState.countries:
+		if GameState.is_at_war(iso, other):
+			at_war = true
+			break
+	var war_mod: float = -0.005 if at_war else 0.0   # -0.5% annual during war
+
+	var monthly_growth: float = (base_growth_annual + stab_mod_pop * 0.005 + war_mod) / 12.0
+	var pop_change: float = pop * monthly_growth
+	data["population"] = int(maxf(pop + pop_change, 1000))
+	data["_pop_monthly_change"] = int(pop_change)
+
 	# Only notify UI for player / selected country
 	if iso == GameState.player_iso or iso == GameState.selected_iso:
 		GameState.country_data_changed.emit(iso)

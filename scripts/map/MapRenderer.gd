@@ -270,6 +270,8 @@ func _unhandled_input(event: InputEvent) -> void:
 						_finish_box_select()
 						queue_redraw()
 						get_viewport().set_input_as_handled()
+					elif not _dragging:
+						_handle_click(mb.position, mb.shift_pressed)
 			MOUSE_BUTTON_RIGHT:
 				if mb.pressed:
 					_dragging = true
@@ -308,21 +310,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			if mm.position.distance_squared_to(_last_hover_pos) > 16.0:
 				_last_hover_pos = mm.position
 				_handle_hover(mm.position)
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		var k := event as InputEventKey
-		if k.pressed and k.keycode == KEY_ESCAPE:
-			if not MilitarySystem.selected_army_ids.is_empty():
-				MilitarySystem.deselect()
-			else:
-				GameState.deselect()
-			get_viewport().set_input_as_handled()
-			return
-	if event is InputEventMouseButton:
-		var mb := event as InputEventMouseButton
-		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed and not _dragging and not _box_selecting:
-			_handle_click(mb.position, mb.shift_pressed)
 
 func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	var mp: Vector2 = _wrap_x(_to_map(vp))
