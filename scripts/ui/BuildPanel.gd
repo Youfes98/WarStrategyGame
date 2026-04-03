@@ -16,11 +16,11 @@ const RED:         Color = Color(0.85, 0.35, 0.30)
 const BAR_BG:      Color = Color(0.15, 0.15, 0.18, 0.80)
 const BAR_FILL:    Color = Color(0.30, 0.70, 0.35, 0.90)
 const CAT_COLORS: Dictionary = {
-	"military": Color(0.85, 0.40, 0.35),
-	"economic": Color(0.40, 0.80, 0.45),
-	"social":   Color(0.45, 0.70, 1.0),
-	"research": Color(0.85, 0.70, 0.30),
-	"special":  Color(0.70, 0.50, 0.85),
+	"military":       Color(0.85, 0.40, 0.35),
+	"economic":       Color(0.40, 0.80, 0.45),
+	"infrastructure": Color(0.45, 0.70, 1.0),
+	"research":       Color(0.85, 0.70, 0.30),
+	"special":        Color(0.70, 0.50, 0.85),
 }
 
 

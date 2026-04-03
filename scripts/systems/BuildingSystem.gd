@@ -8,7 +8,7 @@ signal construction_started(province_id: String, building_type: String)
 signal construction_cancelled(province_id: String, building_type: String)
 
 # ── Building Type Definitions ─────────────────────────────────────────────────
-# category: "military", "economic", "social", "research", "special"
+# category: "military", "economic", "infrastructure", "research", "special"
 # requires_coastal: must be on a coastal province
 # requires_capital: must be on capital province
 # unlocks_recruit: unit types this building enables for recruitment
@@ -69,13 +69,13 @@ const BUILDING_TYPES: Dictionary = {
 		"research_points": 1,
 	},
 	"hospital": {
-		"label": "Hospital", "category": "social",
+		"label": "Hospital", "category": "infrastructure",
 		"cost": 0.8, "build_months": 3,
 		"description": "Improves population growth and stability.",
 		"stability_bonus": 0.5, "pop_growth_bonus": 0.001,
 	},
 	"school": {
-		"label": "School", "category": "social",
+		"label": "School", "category": "infrastructure",
 		"cost": 0.5, "build_months": 2,
 		"description": "Increases literacy and stability.",
 		"stability_bonus": 0.2, "literacy_bonus": 0.1,

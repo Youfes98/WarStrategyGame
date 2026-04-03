@@ -217,8 +217,17 @@ func _draw_capital_stars(cam_pos: Vector2, vp_size: Vector2, ss: float) -> void:
 	var star_size: float = 4.0 * ss
 	var star_col: Color = Color(0.95, 0.85, 0.25, 0.85)
 	var outline_col: Color = Color(0.0, 0.0, 0.0, 0.60)
+	var player: String = GameState.player_iso
 
 	for iso: String in GameState.countries:
+		# Only show capital for: player, countries at war with player
+		if iso != player:
+			var show: bool = false
+			if not player.is_empty() and GameState.is_at_war(player, iso):
+				show = true
+			if not show:
+				continue
+
 		var cap_pid: String = ProvinceDB.get_capital_province(iso)
 		if cap_pid.is_empty():
 			continue
