@@ -141,16 +141,18 @@ func _refresh() -> void:
 			if not (u.get("path", []) as Array).is_empty():
 				in_transit[u.type] += 1
 
-	const COSTS: Dictionary = {"infantry": "$5B", "armor": "$15B", "artillery": "$10B"}
 	for type_key: String in _labels:
-		var tname: String = MilitarySystem.UNIT_TYPES[type_key]["label"]
+		var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
+		var tname: String = tdata["label"]
 		var total: int    = counts[type_key]
 		var moving: int   = in_transit[type_key]
 		var txt: String   = "%s  x%d" % [tname, total]
 		if moving > 0:
 			txt += "  (%d moving)" % moving
 		_labels[type_key].text = txt
-		_btns[type_key].text   = "+ %s" % COSTS[type_key]
+		var cost: float = float(tdata.get("cost", 0))
+		var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000.0)
+		_btns[type_key].text   = "+ %s" % cost_str
 		_btns[type_key].disabled = not MilitarySystem.can_recruit(type_key)
 
 	var sel_aid: String = MilitarySystem.selected_army_id

@@ -55,6 +55,7 @@ var _box_end:           Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	add_to_group("map_renderer")
 	ProvinceDB.data_loaded.connect(_on_data_loaded)
 	GameState.country_selected.connect(_on_country_selected)
 	GameState.country_deselected.connect(_on_country_deselected)
@@ -220,6 +221,12 @@ func _restore_province_lut(pid: String) -> void:
 
 func _restore_country_lut(ciso: String) -> void:
 	for pid: String in ProvinceDB.get_country_province_ids(ciso):
+		_restore_province_lut(pid)
+
+
+## Refresh all province colors (called after save/load to reflect ownership changes).
+func _refresh_all_colors() -> void:
+	for pid: String in ProvinceDB.province_data:
 		_restore_province_lut(pid)
 
 

@@ -7,6 +7,7 @@ signal country_confirmed(iso: String)
 
 @onready var _search_box:    LineEdit      = $Panel/VBox/SearchRow/SearchBox
 @onready var _list:          VBoxContainer = $Panel/VBox/Columns/Scroll/List
+@onready var _flag_tex:      TextureRect   = $Panel/VBox/Columns/Preview/Header/FlagTex
 @onready var _flag_label:    Label         = $Panel/VBox/Columns/Preview/Header/Flag
 @onready var _name_label:    Label         = $Panel/VBox/Columns/Preview/Header/NameTier/Name
 @onready var _tier_label:    Label         = $Panel/VBox/Columns/Preview/Header/NameTier/Tier
@@ -100,7 +101,17 @@ func _on_search(text: String) -> void:
 func _on_row_selected(iso: String) -> void:
 	_selected_iso = iso
 	var data: Dictionary = GameState.get_country(iso)
-	_flag_label.text  = data.get("flag_emoji", "")
+	# Load flag image
+	var iso2: String = data.get("iso2", "")
+	var flag_path: String = "res://assets/flags/%s.png" % iso2
+	if not iso2.is_empty() and ResourceLoader.exists(flag_path):
+		_flag_tex.texture = load(flag_path)
+		_flag_tex.visible = true
+		_flag_label.visible = false
+	else:
+		_flag_tex.visible = false
+		_flag_label.visible = true
+		_flag_label.text = data.get("flag_emoji", "")
 	_name_label.text  = data.get("name", iso)
 	var tier: String  = data.get("power_tier", "C")
 	_tier_label.text  = TIER_LABELS.get(tier, "")

@@ -184,6 +184,14 @@ def main():
     iso_index = {c["iso"]: i for i, c in enumerate(countries)}
     # ISO-2 → ISO-3 fallback for Natural Earth features that lack adm0_a3
     iso3_from_iso2 = {c.get("iso2", ""): c["iso"] for c in countries if c.get("iso2", "")}
+    # Natural Earth uses non-standard ISO codes for disputed/breakaway territories
+    TERRITORY_REMAP = {
+        "SOL": "SOM",  # Somaliland → Somalia
+        "KOS": "XKX",  # Kosovo (if present)
+        "CYN": "CYP",  # Northern Cyprus → Cyprus
+        "KAB": "MAR",  # Kabylian → Morocco (if ever tagged)
+        "SAH": "MAR",  # Western Sahara → Morocco (NE sometimes)
+    }
     print(f"Loaded {len(countries)} countries.\n")
 
     # ── Download GeoJSON ───────────────────────────────────────────────────────
@@ -222,6 +230,7 @@ def main():
         props = feat.get("properties", {})
         geo   = feat.get("geometry", {})
         iso3  = (props.get("adm0_a3") or "").strip()
+        iso3  = TERRITORY_REMAP.get(iso3, iso3)
         if not iso3 or iso3 not in iso_index:
             # Fallback: derive ISO-3 from ISO-2 country code
             iso2 = (props.get("iso_a2") or "").strip()
@@ -251,6 +260,7 @@ def main():
     for feat in admin1["features"]:
         props = feat.get("properties", {})
         iso3 = (props.get("adm0_a3") or "").strip()
+        iso3 = TERRITORY_REMAP.get(iso3, iso3)
         if not iso3 or iso3 not in iso_index:
             iso2 = (props.get("iso_a2") or "").strip()
             iso3 = iso3_from_iso2.get(iso2, "")

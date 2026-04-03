@@ -71,6 +71,14 @@ func _serialize_countries() -> Dictionary:
 			"debt_to_gdp": c.get("debt_to_gdp", 0.0),
 			"credit_rating": c.get("credit_rating", 50),
 			"infrastructure": c.get("infrastructure", 30),
+			"treasury": c.get("treasury", 0.0),
+			"tax_rate": c.get("tax_rate", 0.25),
+			"tax_min": c.get("tax_min", 0.10),
+			"tax_max": c.get("tax_max", 0.45),
+			"budget_military": c.get("budget_military", 20.0),
+			"budget_infrastructure": c.get("budget_infrastructure", 25.0),
+			"budget_social": c.get("budget_social", 30.0),
+			"budget_research": c.get("budget_research", 25.0),
 		}
 	return out
 
@@ -85,23 +93,29 @@ func _serialize_military() -> Dictionary:
 
 func _serialize_clock() -> Dictionary:
 	return {
-		"day": GameClock.day,
-		"month": GameClock.month,
-		"year": GameClock.year,
+		"year":  GameClock.date.year,
+		"month": GameClock.date.month,
+		"day":   GameClock.date.day,
+		"hour":  GameClock.date.hour,
 		"paused": GameClock.paused,
-		"speed": GameClock.speed_index if "speed_index" in GameClock else 1,
+		"speed": GameClock.speed,
 	}
 
 
 func _deserialize(data: Dictionary) -> void:
+	# Pause during load to prevent ticks while restoring state
+	var was_paused: bool = GameClock.paused
+	GameClock.paused = true
+
 	# Clock
 	var clk: Dictionary = data.get("clock", {})
-	if clk.has("day"):
-		GameClock.day   = int(clk.day)
-		GameClock.month = int(clk.month)
-		GameClock.year  = int(clk.year)
-	if clk.has("paused"):
-		GameClock.paused = bool(clk.paused)
+	if clk.has("year"):
+		GameClock.date.year  = int(clk.year)
+		GameClock.date.month = int(clk.month)
+		GameClock.date.day   = int(clk.day)
+		GameClock.date.hour  = int(clk.get("hour", 0))
+	if clk.has("speed"):
+		GameClock.speed = int(clk.speed)
 
 	# Territory ownership
 	var owners: Dictionary = data.get("territory_owner", {})
@@ -123,8 +137,8 @@ func _deserialize(data: Dictionary) -> void:
 
 	# Player
 	var piso: String = data.get("player_iso", "")
-	if not piso.is_empty() and piso != GameState.player_iso:
-		GameState.set_player_country(piso)
+	if not piso.is_empty():
+		GameState.player_iso = piso
 
 	# Military
 	var mil: Dictionary = data.get("military", {})
@@ -135,5 +149,62 @@ func _deserialize(data: Dictionary) -> void:
 	if mil.has("next_army_id"):
 		MilitarySystem._next_army_id = int(mil.next_army_id)
 
-	# Refresh visuals
+	# Restore pause state
+	GameClock.paused = bool(clk.get("paused", was_paused))
+
+	# Refresh all visuals
 	GameState.country_data_changed.emit(piso)
+	MilitarySystem.units_changed.emit()
+	MilitarySystem.selection_changed.emit()
+
+	# Refresh map colors for territory ownership changes
+	var map: Node = get_tree().get_first_node_in_group("map_renderer")
+	if map != null and map.has_method("_refresh_all_colors"):
+		map._refresh_all_colors()
+
+
+## ── Named saves ──────────────────────────────────────────────────────────────
+
+func save_game(slot_name: String) -> bool:
+	var path: String = SAVE_DIR + slot_name + ".json"
+	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(JSON.stringify(_serialize(), "\t"))
+	file.close()
+	return true
+
+
+func load_game(slot_name: String) -> bool:
+	var path: String = SAVE_DIR + slot_name + ".json"
+	if not FileAccess.file_exists(path):
+		return false
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	var json: JSON = JSON.new()
+	if json.parse(file.get_as_text()) != OK:
+		file.close()
+		return false
+	file.close()
+	_deserialize(json.get_data())
+	return true
+
+
+func list_saves() -> Array[String]:
+	var saves: Array[String] = []
+	var dir: DirAccess = DirAccess.open(SAVE_DIR)
+	if dir == null:
+		return saves
+	dir.list_dir_begin()
+	var fname: String = dir.get_next()
+	while not fname.is_empty():
+		if fname.ends_with(".json"):
+			saves.append(fname.get_basename())
+		fname = dir.get_next()
+	saves.sort()
+	return saves
+
+
+func delete_save(slot_name: String) -> void:
+	var path: String = SAVE_DIR + slot_name + ".json"
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(path)

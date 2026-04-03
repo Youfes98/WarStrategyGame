@@ -10,9 +10,13 @@ signal selection_changed()
 signal battle_resolved(territory_iso: String, attacker_iso: String, defender_iso: String, attacker_won: bool)
 
 const UNIT_TYPES: Dictionary = {
-	"infantry":  {"label": "Infantry",  "travel_days": 3, "cost": 5.0,  "upkeep": 0.10, "icon": "INF", "power": 10},
-	"armor":     {"label": "Armor",     "travel_days": 2, "cost": 15.0, "upkeep": 0.30, "icon": "ARM", "power": 25},
-	"artillery": {"label": "Artillery", "travel_days": 4, "cost": 10.0, "upkeep": 0.20, "icon": "ART", "power": 18},
+	# Real-world brigade-level costs in $B (2026 estimates)
+	# Infantry brigade (~5K troops): ~$0.5B to stand up, ~$0.24B/yr upkeep
+	# Armored brigade (~4K troops + 200 AFVs): ~$3B to equip, ~$1B/yr upkeep
+	# Artillery brigade (~2K troops + 100 systems): ~$1.2B to equip, ~$0.5B/yr upkeep
+	"infantry":  {"label": "Infantry",  "travel_days": 3, "cost": 0.5,  "upkeep": 0.02, "icon": "INF", "power": 10},
+	"armor":     {"label": "Armor",     "travel_days": 2, "cost": 3.0,  "upkeep": 0.08, "icon": "ARM", "power": 25},
+	"artillery": {"label": "Artillery", "travel_days": 4, "cost": 1.2,  "upkeep": 0.04, "icon": "ART", "power": 18},
 }
 
 const STARTING_UNITS: Dictionary = {
@@ -167,12 +171,6 @@ func get_army_path(army_id: String) -> Array:
 	return []
 
 
-func _can_enter(player: String, territory_id: String) -> bool:
-	var parent: String = ProvinceDB.get_parent_iso(territory_id)
-	var ter_owner: String = GameState.territory_owner.get(territory_id, parent)
-	return ter_owner == player or GameState.is_at_war(player, ter_owner)
-
-
 func is_army_moving(army_id: String) -> bool:
 	for id: String in units:
 		var u: Dictionary = units[id]
@@ -185,7 +183,7 @@ func is_army_selected(army_id: String) -> bool:
 	return army_id in selected_army_ids
 
 
-func find_path(from: String, to: String) -> Array:
+func find_path(from: String, to: String, mover_iso: String = "") -> Array:
 	if from == to:
 		return []
 	var queue: Array = [[from]]
@@ -196,6 +194,11 @@ func find_path(from: String, to: String) -> Array:
 		for neighbor: String in ProvinceDB.get_neighbors(current):
 			if visited.has(neighbor):
 				continue
+			# Check military access: only enter own territory, war targets, or allied land
+			if not mover_iso.is_empty() and not _can_enter(mover_iso, neighbor):
+				# Exception: allow entering the final destination if at war (attacking)
+				if neighbor != to or not _can_attack(mover_iso, neighbor):
+					continue
 			var new_path: Array = current_path.duplicate()
 			new_path.append(neighbor)
 			if neighbor == to:
@@ -205,6 +208,29 @@ func find_path(from: String, to: String) -> Array:
 			if visited.size() > 500:
 				return []
 	return []
+
+
+## Check if mover_iso can enter a territory for passage (own land or military access).
+func _can_enter(mover_iso: String, territory: String) -> bool:
+	var parent: String = ProvinceDB.get_parent_iso(territory)
+	var ter_owner: String = GameState.territory_owner.get(territory, parent)
+	if ter_owner.is_empty() or ter_owner == mover_iso:
+		return true
+	if GameState.is_at_war(mover_iso, ter_owner):
+		return true
+	var rel: Dictionary = GameState.get_relation(mover_iso, ter_owner)
+	if rel.get("military_access", false):
+		return true
+	return false
+
+
+## Check if mover can attack into a territory (must be at war with the owner).
+func _can_attack(mover_iso: String, territory: String) -> bool:
+	var parent: String = ProvinceDB.get_parent_iso(territory)
+	var ter_owner: String = GameState.territory_owner.get(territory, parent)
+	if ter_owner.is_empty() or ter_owner == mover_iso:
+		return true
+	return GameState.is_at_war(mover_iso, ter_owner)
 
 
 func handle_territory_click(iso: String, shift_held: bool = false) -> bool:
@@ -282,7 +308,7 @@ func handle_move_order(target_iso: String) -> bool:
 	var player: String = GameState.player_iso
 	if player.is_empty() or selected_army_ids.is_empty():
 		return false
-	if not _can_enter(player, target_iso):
+	if not _can_enter(player, target_iso) and not _can_attack(player, target_iso):
 		UIManager.push_notification("Cannot enter neutral territory.", "warning")
 		return false
 	var any_moved: bool = false
@@ -290,7 +316,7 @@ func handle_move_order(target_iso: String) -> bool:
 		var army_loc: String = _get_army_location(aid)
 		if army_loc.is_empty() or army_loc == target_iso:
 			continue
-		var path: Array = find_path(army_loc, target_iso)
+		var path: Array = find_path(army_loc, target_iso, player)
 		if path.is_empty():
 			continue
 		_order_army_move(aid, path)
@@ -357,6 +383,32 @@ func _on_day(_date: Dictionary) -> void:
 		var next_prov: String = path[0]
 		var attacker: String = first_u.owner
 		var defender: String = GameState.get_territory_owner(next_prov)
+
+		# Reroute if we can no longer enter the next province (e.g., war ended mid-path)
+		if not _can_enter(attacker, next_prov) and not _can_attack(attacker, next_prov):
+			var current_loc: String = first_u.location
+			var final_dest: String = path[path.size() - 1]
+			var new_path: Array = find_path(current_loc, final_dest, attacker)
+			if new_path.is_empty():
+				# No alternative route — halt
+				for uid: String in uid_list:
+					if units.has(uid):
+						units[uid]["path"] = []
+						units[uid]["days_remaining"] = 0
+				if attacker == GameState.player_iso:
+					notifications.append(["Army halted — no route to %s." % _get_territory_name(final_dest), "warning"])
+			else:
+				# Reroute around blocked territory
+				var travel_days: int = _get_army_travel_days(aid)
+				for uid: String in uid_list:
+					if units.has(uid):
+						units[uid]["path"] = new_path.duplicate()
+						units[uid]["days_remaining"] = travel_days
+				if attacker == GameState.player_iso:
+					notifications.append(["Army rerouting to %s." % _get_territory_name(final_dest), "info"])
+			changed = true
+			continue
+
 		var is_hostile: bool = (not defender.is_empty()
 			and defender != attacker
 			and GameState.is_at_war(attacker, defender))
@@ -372,8 +424,9 @@ func _on_day(_date: Dictionary) -> void:
 					notifications.append(["Defeated in %s. Units retreated." % tname, "warning"])
 			if not won:
 				for uid: String in uid_list:
-					units[uid]["path"] = []
-					units[uid]["days_remaining"] = 0
+					if units.has(uid):
+						units[uid]["path"] = []
+						units[uid]["days_remaining"] = 0
 		else:
 			var remaining_path: Array = path.slice(1)
 			var travel_days: int = _get_army_travel_days(aid)
@@ -398,6 +451,16 @@ func _get_territory_name(tid: String) -> String:
 	return GameState.get_country(tid).get("name", tid)
 
 
+## Total monthly upkeep for all units owned by a country ($B/month).
+func get_total_upkeep(iso: String) -> float:
+	var total: float = 0.0
+	for id: String in units:
+		var u: Dictionary = units[id]
+		if u.get("owner", "") == iso:
+			total += float(UNIT_TYPES.get(u.get("type", ""), {}).get("upkeep", 0.0))
+	return total
+
+
 func get_garrison_power(territory_id: String) -> float:
 	var parent: String = ProvinceDB.get_parent_iso(territory_id)
 	var ter_owner: String = GameState.territory_owner.get(territory_id, parent)
@@ -409,6 +472,7 @@ func get_garrison_power(territory_id: String) -> float:
 
 func _resolve_battle(attacker_ids: Array, territory_iso: String,
 		attacker_iso: String, defender_iso: String) -> bool:
+	# Attacker power from actual units
 	var atk_power: float = 0.0
 	for id: String in attacker_ids:
 		if not units.has(id):
@@ -416,13 +480,29 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 		var u: Dictionary = units[id]
 		atk_power += float(UNIT_TYPES.get(u.type, {}).get("power", 10)) \
 					 * (float(u.strength) / 100.0)
-	var def_power: float = get_garrison_power(territory_iso)
+
+	# Defender power from actual units in the territory (not phantom garrison)
+	var defender_ids: Array = []
+	var def_power: float = 0.0
+	for id: String in units:
+		var u: Dictionary = units[id]
+		if u.owner == defender_iso and u.location == territory_iso:
+			defender_ids.append(id)
+			def_power += float(UNIT_TYPES.get(u.type, {}).get("power", 10)) \
+						 * (float(u.strength) / 100.0)
+
+	# If no actual defending units, use a small garrison based on country strength
+	var has_real_defenders: bool = not defender_ids.is_empty()
+	if not has_real_defenders:
+		def_power = get_garrison_power(territory_iso) * 0.3   # weaker without real troops
+
 	var atk_roll: float = atk_power * randf_range(0.75, 1.25)
 	var def_roll: float = def_power * randf_range(0.85, 1.20)
 	var attacker_won: bool = atk_roll > def_roll
 
 	if attacker_won:
 		GameState.territory_owner[territory_iso] = attacker_iso
+		# Attacker casualties
 		var casualty: float = clampf(def_roll / atk_roll * 0.35, 0.05, 0.45)
 		for id: String in attacker_ids:
 			if not units.has(id):
@@ -433,7 +513,21 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 			u.location = territory_iso
 			u.path = remaining
 			u.days_remaining = _get_army_travel_days(u.get("army_id", "")) if not remaining.is_empty() else 0
+		# Defender casualties — destroy or weaken defending units
+		if has_real_defenders:
+			var def_casualty: float = clampf(atk_roll / def_roll * 0.55, 0.15, 0.80)
+			var dead: Array = []
+			for id: String in defender_ids:
+				if not units.has(id):
+					continue
+				var u: Dictionary = units[id]
+				u.strength = clampi(int(float(u.strength) * (1.0 - def_casualty)), 0, 100)
+				if u.strength <= 0:
+					dead.append(id)
+			for id: String in dead:
+				units.erase(id)
 	else:
+		# Attacker lost — take heavy casualties, clear path
 		var casualty: float = clampf(def_roll / atk_roll * 0.55, 0.15, 0.80)
 		var dead: Array = []
 		for id: String in attacker_ids:
@@ -447,6 +541,20 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 				dead.append(id)
 		for id: String in dead:
 			units.erase(id)
+		# Defenders take lighter casualties
+		if has_real_defenders:
+			var def_casualty: float = clampf(atk_roll / def_roll * 0.25, 0.05, 0.40)
+			var def_dead: Array = []
+			for id: String in defender_ids:
+				if not units.has(id):
+					continue
+				var u: Dictionary = units[id]
+				u.strength = clampi(int(float(u.strength) * (1.0 - def_casualty)), 0, 100)
+				if u.strength <= 0:
+					def_dead.append(id)
+			for id: String in def_dead:
+				units.erase(id)
+
 	battle_resolved.emit(territory_iso, attacker_iso, defender_iso, attacker_won)
 	return attacker_won
 
@@ -485,7 +593,7 @@ func can_recruit(type: String) -> bool:
 	if GameState.player_iso.is_empty():
 		return false
 	var cost: float = UNIT_TYPES.get(type, {}).get("cost", 9999.0)
-	return float(GameState.get_country(GameState.player_iso).get("gdp_raw_billions", 0.0)) >= cost
+	return float(GameState.get_country(GameState.player_iso).get("treasury", 0.0)) >= cost
 
 
 func recruit_unit(type: String, at_province: String = "") -> bool:
@@ -493,8 +601,8 @@ func recruit_unit(type: String, at_province: String = "") -> bool:
 		return false
 	var player: String = GameState.player_iso
 	var data: Dictionary = GameState.get_country(player)
-	data["gdp_raw_billions"] = float(data.get("gdp_raw_billions", 0.0)) \
-							   - float(UNIT_TYPES[type].get("cost", 0.0))
+	data["treasury"] = float(data.get("treasury", 0.0)) \
+					   - float(UNIT_TYPES[type].get("cost", 0.0))
 	var location: String = at_province
 	if location.is_empty():
 		location = _find_home_province(player)

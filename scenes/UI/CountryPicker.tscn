@@ -58,9 +58,15 @@ theme_override_constants/separation = 10
 
 [node name="Header" type="HBoxContainer" parent="Panel/VBox/Columns/Preview"]
 
+[node name="FlagTex" type="TextureRect" parent="Panel/VBox/Columns/Preview/Header"]
+custom_minimum_size = Vector2(48, 48)
+stretch_mode = 5
+expand_mode = 3
+
 [node name="Flag" type="Label" parent="Panel/VBox/Columns/Preview/Header"]
 theme_override_font_sizes/font_size = 36
 vertical_alignment = 1
+visible = false
 
 [node name="NameTier" type="VBoxContainer" parent="Panel/VBox/Columns/Preview/Header"]
 size_flags_horizontal = 3

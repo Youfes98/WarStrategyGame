@@ -161,13 +161,13 @@ func _refresh(iso: String) -> void:
 
 	# Treasury + button states
 	var pdata: Dictionary = GameState.get_country(player)
-	var gdp:   float      = float(pdata.get("gdp_raw_billions", 0.0))
+	var treasury: float   = float(pdata.get("treasury", 0.0))
 	if _budget_lbl:
-		_budget_lbl.text = _fmt_gdp(gdp)
-		var budget_col: Color = Color(0.8, 1.0, 0.8) if gdp >= 2.0 else Color(0.95, 0.45, 0.35)
+		_budget_lbl.text = _fmt_gdp(treasury)
+		var budget_col: Color = Color(0.8, 1.0, 0.8) if treasury >= 2.0 else Color(0.95, 0.45, 0.35)
 		_budget_lbl.add_theme_color_override("font_color", budget_col)
-	_action_btns["improve_relations"].disabled = gdp < 2.0 or at_war
-	_action_btns["offer_trade"].disabled       = gdp < 1.0 or trading or at_war
+	_action_btns["improve_relations"].disabled = treasury < 2.0 or at_war
+	_action_btns["offer_trade"].disabled       = treasury < 1.0 or trading or at_war
 	_action_btns["sanction"].disabled          = at_war
 
 
@@ -184,29 +184,29 @@ func _on_action(action: String) -> void:
 		return
 
 	var pdata:  Dictionary = GameState.get_country(player)
-	var gdp:    float      = float(pdata.get("gdp_raw_billions", 0.0))
+	var treasury: float   = float(pdata.get("treasury", 0.0))
 	var rel:    Dictionary = GameState.get_relation(player, iso)
 	var oname:  String     = GameState.get_country(iso).get("name", iso)
 
 	match action:
 		"improve_relations":
-			if gdp < 2.0:
-				UIManager.push_notification("Insufficient funds for diplomatic mission.", "warning")
+			if treasury < 2.0:
+				UIManager.push_notification("Insufficient treasury for diplomatic mission.", "warning")
 				return
-			pdata["gdp_raw_billions"] = gdp - 2.0
+			pdata["treasury"] = treasury - 2.0
 			rel["diplomatic_score"] = clampf(rel.get("diplomatic_score", 0.0) + 15.0, -100.0, 100.0)
 			GameState.country_data_changed.emit(player)
 			UIManager.push_notification(
 				"Diplomatic mission to %s improved relations (+15)." % oname, "info")
 
 		"offer_trade":
-			if gdp < 1.0:
-				UIManager.push_notification("Insufficient funds to establish trade deal.", "warning")
+			if treasury < 1.0:
+				UIManager.push_notification("Insufficient treasury to establish trade deal.", "warning")
 				return
 			if rel.get("trade_deal", false):
 				UIManager.push_notification("Trade deal with %s already active." % oname, "info")
 				return
-			pdata["gdp_raw_billions"] = gdp - 1.0
+			pdata["treasury"] = treasury - 1.0
 			rel["diplomatic_score"] = clampf(rel.get("diplomatic_score", 0.0) + 10.0, -100.0, 100.0)
 			rel["trade_deal"] = true
 			GameState.country_data_changed.emit(player)

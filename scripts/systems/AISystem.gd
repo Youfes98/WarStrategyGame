@@ -53,7 +53,7 @@ func _ai_turn(iso: String) -> void:
 func _pick_action(iso: String, data: Dictionary) -> String:
 	var weights: Dictionary = ACTION_WEIGHTS.duplicate()
 	var stability: float = float(data.get("stability", 50))
-	var gdp: float = float(data.get("gdp_raw_billions", 1.0))
+	var treasury: float = float(data.get("treasury", 0.0))
 	var tier: String = data.get("power_tier", "C")
 
 	# Adjust weights based on situation
@@ -65,9 +65,9 @@ func _pick_action(iso: String, data: Dictionary) -> String:
 	if tier in ["S", "A"]:
 		weights["aggressive_posture"] += 10
 		weights["diplomatic_drift"] += 10
-	if gdp < 10.0:
+	if treasury < 1.0:
 		weights["invest_infra"] += 15
-		weights["build_military"] -= 5
+		weights["build_military"] -= 10
 
 	# Check if at war — prioritize military
 	for other_iso: String in GameState.countries:
@@ -95,22 +95,28 @@ func _pick_action(iso: String, data: Dictionary) -> String:
 # ── Actions ───────────────────────────────────────────────────────────────────
 
 func _do_build_military(iso: String, data: Dictionary) -> void:
-	var gdp: float = float(data.get("gdp_raw_billions", 0.0))
-	var cost: float = 5.0
-	if gdp >= cost:
-		data["gdp_raw_billions"] = gdp - cost
+	var treasury: float = float(data.get("treasury", 0.0))
+	# Pick unit type based on tier and budget
+	var type: String = "infantry"
+	var tier: String = data.get("power_tier", "D")
+	if tier in ["S", "A"] and treasury >= 3.0 and randf() < 0.3:
+		type = "armor"
+	elif tier in ["S", "A", "B"] and treasury >= 1.2 and randf() < 0.2:
+		type = "artillery"
+	var cost: float = float(MilitarySystem.UNIT_TYPES[type].get("cost", 0.5))
+	if treasury >= cost:
+		data["treasury"] = treasury - cost
 		var home: String = ProvinceDB.get_main_province(iso)
-		MilitarySystem.spawn_unit("infantry", iso, home)
+		MilitarySystem.spawn_unit(type, iso, home)
 
 
 func _do_invest_infra(_iso: String, data: Dictionary) -> void:
 	var infra: int = int(data.get("infrastructure", 30))
-	var gdp: float = float(data.get("gdp_raw_billions", 0.0))
-	if gdp >= 2.0 and infra < 95:
+	var treasury: float = float(data.get("treasury", 0.0))
+	var invest_cost: float = 0.5   # $0.5B infrastructure investment
+	if treasury >= invest_cost and infra < 95:
 		data["infrastructure"] = mini(95, infra + randi_range(1, 3))
-		data["gdp_raw_billions"] = gdp - 2.0
-		# Infrastructure boosts GDP growth slightly
-		data["gdp_raw_billions"] = float(data.get("gdp_raw_billions", 0.0)) + randf_range(0.1, 0.5)
+		data["treasury"] = treasury - invest_cost
 
 
 func _do_stability_focus(_iso: String, data: Dictionary) -> void:

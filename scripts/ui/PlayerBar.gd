@@ -7,6 +7,7 @@ var _flag_lbl:  Label = null
 var _name_lbl:  Label = null
 var _tier_lbl:  Label = null
 var _gdp_lbl:   Label = null
+var _tax_lbl:   Label = null
 var _stab_lbl:  Label = null
 var _debt_lbl:  Label = null
 
@@ -34,6 +35,11 @@ func _ready() -> void:
 	_gdp_lbl = _make_label("GDP  —", 180)
 	_gdp_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(_gdp_lbl)
+
+	hbox.add_child(VSeparator.new())
+
+	_tax_lbl = _make_label("Tax  —", 80)
+	hbox.add_child(_tax_lbl)
 
 	hbox.add_child(VSeparator.new())
 
@@ -93,6 +99,9 @@ func _refresh(iso: String) -> void:
 	if absf(delta_pct) > 0.001:
 		change = "  ▲ +%.2f%%" % delta_pct if delta_pct > 0 else "  ▼ %.2f%%" % delta_pct
 	_gdp_lbl.text = "GDP  %s%s" % [_fmt_gdp(gdp), change]
+
+	var tax: float = float(data.get("tax_rate", 0.25)) * 100.0
+	_tax_lbl.text = "Tax  %.0f%%" % tax
 
 	var stab: float = float(data.get("stability", 50.0))
 	_stab_lbl.text = "Stability  %.0f / 100" % stab

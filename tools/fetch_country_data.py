@@ -354,6 +354,88 @@ def build_countries() -> tuple[list, dict]:
     return countries, adjacencies
 
 
+def add_naval_adjacencies(countries: list, adjacencies: dict, max_dist_km: float = 800.0):
+    """Add sea connections between countries within max_dist_km across water.
+    Only adds connections where at least one side is not landlocked."""
+    from math import radians, sin, cos, asin, sqrt
+
+    def haversine(lat1, lon1, lat2, lon2):
+        """Distance in km between two lat/lon points."""
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        return 6371 * 2 * asin(sqrt(a))
+
+    # Build lookup: iso → {lat, lon, landlocked}
+    iso_data = {}
+    for c in countries:
+        ll = c.get("latlng", [0, 0])
+        iso_data[c["iso"]] = {
+            "lat": ll[0], "lon": ll[1],
+            "landlocked": c.get("landlocked", False),
+        }
+
+    # Hand-picked naval routes that geography demands (straits, short crossings)
+    FORCED_NAVAL = [
+        # Straits and short crossings
+        ("GBR", "FRA"), ("GBR", "BEL"), ("GBR", "NLD"), ("GBR", "NOR"), ("GBR", "DNK"),
+        ("JPN", "KOR"), ("JPN", "RUS"), ("JPN", "CHN"), ("JPN", "TWN"),
+        ("TWN", "CHN"), ("TWN", "PHL"),
+        ("AUS", "IDN"), ("AUS", "PNG"), ("AUS", "NZL"), ("AUS", "TLS"),
+        ("CUB", "USA"), ("CUB", "MEX"), ("CUB", "JAM"), ("CUB", "HTI"),
+        ("MDG", "MOZ"),
+        ("LKA", "IND"),
+        ("PHL", "IDN"), ("PHL", "MYS"), ("PHL", "VNM"),
+        ("NZL", "AUS"),
+        ("ITA", "TUN"), ("ITA", "ALB"), ("ITA", "GRC"), ("ITA", "MLT"),
+        ("ESP", "MAR"),
+        ("GRC", "TUR"),
+        ("SWE", "FIN"), ("SWE", "DNK"), ("SWE", "EST"),
+        ("DNK", "SWE"), ("DNK", "DEU"),
+        ("EST", "FIN"),
+        ("IDN", "SGP"), ("IDN", "BRN"),
+        ("MYS", "SGP"), ("MYS", "BRN"),
+        ("BHR", "SAU"), ("BHR", "QAT"),
+        ("TTO", "VEN"),
+        ("DOM", "HTI"), ("DOM", "PRI"),
+    ]
+
+    added = 0
+    # Add forced routes
+    for a, b in FORCED_NAVAL:
+        if a in adjacencies and b in adjacencies:
+            if b not in adjacencies[a]:
+                adjacencies[a].append(b)
+                added += 1
+            if a not in adjacencies[b]:
+                adjacencies[b].append(a)
+                added += 1
+
+    # Auto-detect nearby non-landlocked countries
+    isos = [c["iso"] for c in countries if not c.get("landlocked", False)]
+    for i, iso_a in enumerate(isos):
+        da = iso_data.get(iso_a)
+        if da is None:
+            continue
+        for j in range(i + 1, len(isos)):
+            iso_b = isos[j]
+            db = iso_data.get(iso_b)
+            if db is None:
+                continue
+            # Skip if already adjacent
+            if iso_b in adjacencies.get(iso_a, []):
+                continue
+            dist = haversine(da["lat"], da["lon"], db["lat"], db["lon"])
+            if dist <= max_dist_km:
+                adjacencies.setdefault(iso_a, []).append(iso_b)
+                adjacencies.setdefault(iso_b, []).append(iso_a)
+                added += 1
+
+    print(f"Naval adjacencies: +{added} sea connections added")
+    return adjacencies
+
+
 def main():
     print("=== War Strategy Game — Data Pipeline Step 1 ===\n")
     try:
@@ -362,6 +444,8 @@ def main():
         print(f"\nERROR: Could not reach REST Countries API: {e}")
         print("Check your internet connection and try again.")
         sys.exit(1)
+
+    # Naval adjacency handled by ships/transport — no free sea connections
 
     with open(COUNTRIES_OUT, "w", encoding="utf-8") as f:
         json.dump(countries, f, indent=2, ensure_ascii=False)

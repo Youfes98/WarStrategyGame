@@ -31,6 +31,7 @@ var _picking_mode: bool = false
 
 var _vbox:        VBoxContainer = null
 var _flag_lbl:    Label = null
+var _flag_tex:    TextureRect = null
 var _name_lbl:    Label = null
 var _tier_lbl:    Label = null
 var _gov_lbl:     Label = null
@@ -102,9 +103,18 @@ func _build_header() -> void:
 	name_row.add_theme_constant_override("separation", 8)
 	header_vbox.add_child(name_row)
 
+	# Flag image (circular PNG)
+	_flag_tex = TextureRect.new()
+	_flag_tex.custom_minimum_size = Vector2(42, 42)
+	_flag_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_flag_tex.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	name_row.add_child(_flag_tex)
+
+	# Fallback emoji label (hidden when flag image loads)
 	_flag_lbl = Label.new()
 	_flag_lbl.add_theme_font_size_override("font_size", 28)
 	_flag_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_flag_lbl.visible = false
 	name_row.add_child(_flag_lbl)
 
 	var name_col := VBoxContainer.new()
@@ -322,12 +332,20 @@ func _on_panel_unlocked(_panel_name: String, _state: UIManager.PanelState) -> vo
 
 
 func _refresh(iso: String, data: Dictionary) -> void:
-	var flag: String = data.get("flag_emoji", "")
-	if flag.is_empty():
-		var iso2: String = data.get("iso2", "")
-		if iso2.length() == 2:
+	# Load flag image
+	var iso2: String = data.get("iso2", "")
+	var flag_path: String = "res://assets/flags/%s.png" % iso2
+	if not iso2.is_empty() and ResourceLoader.exists(flag_path):
+		_flag_tex.texture = load(flag_path)
+		_flag_tex.visible = true
+		_flag_lbl.visible = false
+	else:
+		_flag_tex.visible = false
+		_flag_lbl.visible = true
+		var flag: String = data.get("flag_emoji", "")
+		if flag.is_empty() and iso2.length() == 2:
 			flag = String.chr(0x1F1E6 + iso2.unicode_at(0) - 65) + String.chr(0x1F1E6 + iso2.unicode_at(1) - 65)
-	_flag_lbl.text = flag
+		_flag_lbl.text = flag
 	_name_lbl.text = data.get("name", iso)
 
 	var tier: String = data.get("power_tier", "C")

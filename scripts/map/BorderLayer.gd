@@ -9,7 +9,7 @@ const MAP_HEIGHT: float = 8192.0
 
 const COUNTRY_COLOR:  Color = Color(0.02, 0.02, 0.04, 0.70)
 const COUNTRY_WIDTH:  float = 2.5
-const PROVINCE_COLOR: Color = Color(0.0, 0.0, 0.0, 0.22)
+const PROVINCE_COLOR: Color = Color(0.0, 0.0, 0.0, 0.30)
 const PROVINCE_WIDTH: float = 1.0
 const CULL_MARGIN: float = 200.0
 
@@ -38,33 +38,32 @@ func _build_borders() -> void:
 	_country_borders.clear()
 	_province_borders.clear()
 
-	for pid: String in ProvinceDB.province_data:
-		var pdata: Dictionary = ProvinceDB.province_data[pid]
-		var parent: String = pdata.get("parent_iso", "")
-		var polygon: Array = pdata.get("polygon", [])
+	# Country borders: use country-level polygons (actual national outlines)
+	for iso: String in ProvinceDB.country_map_data:
+		var cdata: Dictionary = ProvinceDB.country_map_data[iso]
+		var polygon: Array = cdata.get("polygon", [])
 		if polygon.size() < 3:
 			continue
-
 		var points: PackedVector2Array = PackedVector2Array()
 		for pt in polygon:
 			points.append(Vector2(pt[0], pt[1]))
 		points.append(Vector2(polygon[0][0], polygon[0][1]))
+		var centroid_arr: Array = cdata.get("centroid", [0.0, 0.0])
+		var centroid: Vector2 = Vector2(centroid_arr[0], centroid_arr[1])
+		_country_borders.append({"points": points, "centroid": centroid})
 
-		var neighbors: Array = ProvinceDB.province_adjacencies.get(pid, [])
-		var has_foreign_neighbor: bool = false
-		for nb_id: String in neighbors:
-			var nb_data: Dictionary = ProvinceDB.province_data.get(nb_id, {})
-			var nb_parent: String = nb_data.get("parent_iso", "")
-			if nb_parent != parent and not nb_parent.is_empty():
-				has_foreign_neighbor = true
-				break
-
+	# Province borders: use province-level polygons (internal subdivisions)
+	for pid: String in ProvinceDB.province_data:
+		var pdata: Dictionary = ProvinceDB.province_data[pid]
+		var polygon: Array = pdata.get("polygon", [])
+		if polygon.size() < 3:
+			continue
+		var points: PackedVector2Array = PackedVector2Array()
+		for pt in polygon:
+			points.append(Vector2(pt[0], pt[1]))
+		points.append(Vector2(polygon[0][0], polygon[0][1]))
 		var centroid_arr: Array = pdata.get("centroid", [0.0, 0.0])
 		var centroid: Vector2 = Vector2(centroid_arr[0], centroid_arr[1])
-
-		if has_foreign_neighbor:
-			_country_borders.append({"points": points, "centroid": centroid})
-
 		_province_borders.append({"points": points, "centroid": centroid})
 
 	_built = true
@@ -112,17 +111,19 @@ func _draw() -> void:
 		country_w = maxf(country_w, 0.8)
 		province_w = maxf(province_w, 0.3)
 
-	var draw_province: bool = zoom > 1.5
+	# Province borders fade in: visible from 0.8, full at 2.5
+	var prov_fade: float = clampf((zoom - 0.8) / 1.7, 0.0, 1.0)
 
 	for x_off: float in [-MAP_WIDTH, 0.0, MAP_WIDTH]:
 		var offset: Vector2 = Vector2(x_off, 0.0)
 
-		if draw_province:
+		if prov_fade > 0.01:
+			var prov_col: Color = Color(PROVINCE_COLOR.r, PROVINCE_COLOR.g, PROVINCE_COLOR.b, PROVINCE_COLOR.a * prov_fade)
 			for border: Dictionary in _province_borders:
 				var c: Vector2 = (border["centroid"] as Vector2) + offset
 				if not view_rect.has_point(c):
 					continue
-				_draw_offset_polyline(border["points"] as PackedVector2Array, offset, PROVINCE_COLOR, province_w)
+				_draw_offset_polyline(border["points"] as PackedVector2Array, offset, prov_col, province_w)
 
 		for border: Dictionary in _country_borders:
 			var c: Vector2 = (border["centroid"] as Vector2) + offset

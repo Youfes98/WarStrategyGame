@@ -1,12 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=9 format=3 uid="uid://main_scene"]
 
 [ext_resource type="PackedScene" path="res://scenes/Map/Map.tscn"            id="1"]
 [ext_resource type="PackedScene" path="res://scenes/UI/CountryCard.tscn"     id="2"]
 [ext_resource type="Script"      path="res://scripts/ui/ClockDisplay.gd"     id="3"]
 [ext_resource type="Script"      path="res://scripts/ui/NotificationFeed.gd" id="4"]
 [ext_resource type="Script"      path="res://scripts/Main.gd"                id="5"]
-[ext_resource type="Script"      path="res://scripts/ui/PlayerBar.gd"        id="6"]
 [ext_resource type="Script"      path="res://scripts/ui/MilitaryPanel.gd"    id="7"]
+[ext_resource type="Script"      path="res://scripts/ui/BudgetPanel.gd"      id="8"]
+[ext_resource type="Script"      path="res://scripts/ui/ResourceBar.gd"      id="9"]
 
 [node name="Main" type="Node"]
 script = ExtResource("5")
@@ -14,6 +15,13 @@ script = ExtResource("5")
 [node name="Map" parent="." instance=ExtResource("1")]
 
 [node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ResourceBar" type="PanelContainer" parent="HUD"]
+script        = ExtResource("9")
+anchor_right  = 1.0
+offset_top    = 0.0
+offset_bottom = 54.0
+visible       = false
 
 [node name="CountryCard" parent="HUD" instance=ExtResource("2")]
 offset_right  = 260.0
@@ -36,14 +44,6 @@ offset_right  = -8.0
 offset_top    = 8.0
 offset_bottom = 100.0
 
-[node name="PlayerBar" type="PanelContainer" parent="HUD"]
-script        = ExtResource("6")
-anchor_top    = 1.0
-anchor_right  = 1.0
-anchor_bottom = 1.0
-offset_top    = -44.0
-visible       = false
-
 [node name="MilitaryPanel" type="PanelContainer" parent="HUD"]
 script        = ExtResource("7")
 anchor_top    = 1.0
@@ -52,6 +52,14 @@ offset_left   = 8.0
 offset_top    = -212.0
 offset_right  = 292.0
 offset_bottom = -52.0
+visible       = false
+
+[node name="BudgetPanel" type="PanelContainer" parent="HUD"]
+script        = ExtResource("8")
+offset_left   = 0.0
+offset_top    = 54.0
+offset_right  = 300.0
+offset_bottom = 480.0
 visible       = false
 
 [node name="PickBanner" type="PanelContainer" parent="HUD"]
