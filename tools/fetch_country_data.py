@@ -126,6 +126,70 @@ TIER_OVERRIDES: dict[str, str] = {
     "ERI": "D", "SLE": "D", "LBR": "D", "GNB": "D", "COD": "D",
 }
 
+GOVERNMENT_TYPES: dict[str, str] = {
+    # Official self-designations — what each country calls itself
+    # Presidential Republic
+    "USA": "Federal Presidential Republic", "BRA": "Federal Presidential Republic",
+    "MEX": "Federal Presidential Republic", "ARG": "Federal Presidential Republic",
+    "KOR": "Presidential Republic", "IDN": "Presidential Republic",
+    "PHL": "Presidential Republic", "COL": "Presidential Republic",
+    "CHL": "Presidential Republic", "PER": "Presidential Republic",
+    "NGA": "Federal Presidential Republic", "GHA": "Presidential Republic",
+    "KEN": "Presidential Republic", "ZAF": "Parliamentary Republic",
+    "TUR": "Presidential Republic", "UKR": "Presidential Republic",
+    # Parliamentary
+    "GBR": "Parliamentary Monarchy", "DEU": "Federal Parliamentary Republic",
+    "ITA": "Parliamentary Republic", "CAN": "Parliamentary Monarchy",
+    "AUS": "Parliamentary Monarchy", "JPN": "Parliamentary Monarchy",
+    "IND": "Federal Parliamentary Republic", "ISR": "Parliamentary Republic",
+    "NLD": "Parliamentary Monarchy", "BEL": "Parliamentary Monarchy",
+    "SWE": "Parliamentary Monarchy", "NOR": "Parliamentary Monarchy",
+    "DNK": "Parliamentary Monarchy", "FIN": "Parliamentary Republic",
+    "IRL": "Parliamentary Republic", "NZL": "Parliamentary Monarchy",
+    "GRC": "Parliamentary Republic", "CZE": "Parliamentary Republic",
+    "POL": "Parliamentary Republic", "HUN": "Parliamentary Republic",
+    "ROU": "Parliamentary Republic", "BGD": "Parliamentary Republic",
+    "MYS": "Federal Parliamentary Monarchy", "SGP": "Parliamentary Republic",
+    "PRT": "Parliamentary Republic", "ESP": "Parliamentary Monarchy",
+    "AUT": "Federal Parliamentary Republic", "CHE": "Federal Republic",
+    "IRQ": "Federal Parliamentary Republic", "LBN": "Parliamentary Republic",
+    "TUN": "Parliamentary Republic", "PAK": "Federal Parliamentary Republic",
+    "ETH": "Federal Parliamentary Republic", "THA": "Parliamentary Monarchy",
+    # Semi-Presidential
+    "FRA": "Semi-Presidential Republic",
+    # Kingdom / Monarchy
+    "JOR": "Constitutional Monarchy", "MAR": "Constitutional Monarchy",
+    "KWT": "Constitutional Monarchy", "BHR": "Constitutional Monarchy",
+    "SAU": "Kingdom", "ARE": "Federation",
+    "QAT": "Emirate", "OMN": "Sultanate",
+    "BRN": "Sultanate", "SWZ": "Kingdom",
+    # Republic (official designation)
+    "RUS": "Federal Republic", "BLR": "Presidential Republic",
+    "AZE": "Presidential Republic", "TKM": "Presidential Republic",
+    "TJK": "Presidential Republic", "UZB": "Presidential Republic",
+    "KAZ": "Presidential Republic", "EGY": "Presidential Republic",
+    "DZA": "Presidential Republic", "VEN": "Federal Presidential Republic",
+    "NIC": "Presidential Republic", "KHM": "Parliamentary Monarchy",
+    "RWA": "Presidential Republic", "UGA": "Presidential Republic",
+    "TCD": "Presidential Republic", "CMR": "Presidential Republic",
+    "COG": "Presidential Republic", "GNQ": "Presidential Republic",
+    "ERI": "Presidential Republic", "SYR": "Presidential Republic",
+    # People's Republic / Socialist
+    "CHN": "People's Republic", "VNM": "Socialist Republic",
+    "CUB": "Socialist Republic", "LAO": "People's Republic",
+    # Islamic Republic
+    "IRN": "Islamic Republic", "AFG": "Islamic Emirate",
+    # Transitional / Provisional
+    "MMR": "Provisional Government", "MLI": "Transitional Government",
+    "BFA": "Transitional Government", "NER": "Transitional Government",
+    "SDN": "Transitional Government", "GIN": "Transitional Government",
+    "SOM": "Federal Republic", "LBY": "Transitional Government",
+    "YEM": "Presidential Republic", "SSD": "Presidential Republic",
+    "HTI": "Presidential Republic", "CAF": "Presidential Republic",
+    # PSE
+    "PSE": "Presidential Republic",
+}
+
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
@@ -218,7 +282,7 @@ def build_countries() -> tuple[list, dict]:
             "infrastructure":    max(10, min(95, int(gdp_norm / 12 + 20))),
             "literacy_rate":     max(30, min(99, int(gdp_norm / 12 + 40))),
             # Government
-            "government_type":   "democracy",   # overridden by gov_types.json later
+            "government_type":   GOVERNMENT_TYPES.get(iso3, "Republic"),
         }
         countries.append(country)
 
