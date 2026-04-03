@@ -86,7 +86,8 @@ func _draw() -> void:
 			var area: float = e.area
 			# Skip if country is too small at this zoom to show a label
 			var screen_area: float = area * zoom * zoom
-			if screen_area < 80.0:
+			var min_area: float = 80.0 / maxf(zoom, 0.5)
+			if screen_area < min_area:
 				continue
 
 			var cname: String = e.name
