@@ -85,6 +85,7 @@ func _build_shader_map(prov_img: Image) -> void:
 	var country_idx_map: Dictionary = {}
 	var next_ci: int = 1
 	var filled: int = 0
+	var unmatched: int = 0
 	for pid: String in ProvinceDB.province_data:
 		var idx: int = ProvinceDB.get_province_index(pid)
 		if idx <= 0 or idx >= LUT_SIZE:
@@ -95,9 +96,15 @@ func _build_shader_map(prov_img: Image) -> void:
 			next_ci += 1
 		_country_lut_image.set_pixel(idx, 0, Color(float(country_idx_map[parent]) / 255.0, 0.0, 0.0))
 		var col: Color = ProvinceDB.get_display_color(pid)
+		# Check if parent country actually exists in country data
+		if not ProvinceDB.country_map_data.has(parent):
+			col = Color(0.45, 0.45, 0.45)  # visible grey fallback
+			unmatched += 1
 		_color_lut_image.set_pixel(idx, 0, col)
 		_base_colors[idx] = col
 		filled += 1
+	if unmatched > 0:
+		print("  WARNING: %d provinces have no matching country (shown as grey)" % unmatched)
 
 	_color_lut_tex   = ImageTexture.create_from_image(_color_lut_image)
 	_country_lut_tex = ImageTexture.create_from_image(_country_lut_image)

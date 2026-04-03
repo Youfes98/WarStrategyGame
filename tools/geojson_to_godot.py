@@ -246,6 +246,24 @@ def main():
     countries_with_admin1 = set(province_features.keys())
     print(f"Admin-1 data found for {len(countries_with_admin1)} countries.")
 
+    # Log unmatched features so we know what's being dropped
+    unmatched = 0
+    for feat in admin1["features"]:
+        props = feat.get("properties", {})
+        iso3 = (props.get("adm0_a3") or "").strip()
+        if not iso3 or iso3 not in iso_index:
+            iso2 = (props.get("iso_a2") or "").strip()
+            iso3 = iso3_from_iso2.get(iso2, "")
+        if not iso3 or iso3 not in iso_index:
+            name = props.get("name", "?")
+            a3 = props.get("adm0_a3", "?")
+            a2 = props.get("iso_a2", "?")
+            if unmatched < 20:
+                print(f"  UNMATCHED: {name} -- adm0_a3={a3}, iso_a2={a2}")
+            unmatched += 1
+    if unmatched:
+        print(f"  Total unmatched: {unmatched} admin-1 features (not in countries.json)")
+
     # ── Assign detect colors and build province list ───────────────────────────
     provinces: list = []
     color_to_pid: dict = {}
