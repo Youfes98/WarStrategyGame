@@ -15,6 +15,8 @@ var _pop_lbl:      Label = null
 var _pop_change:   Label = null
 var _treasury_col: VBoxContainer = null
 var _pop_col:      VBoxContainer = null
+var _pop_panel:    PanelContainer = null
+var _pop_detail:   Label = null
 
 const BG_COLOR: Color = Color(0.06, 0.06, 0.08, 0.92)
 const TIER_COLORS: Dictionary = {
@@ -122,6 +124,26 @@ func _ready() -> void:
 	_pop_change.add_theme_font_size_override("font_size", 10)
 	p_col.add_child(_pop_change)
 
+	# ── Population dropdown panel ──
+	_pop_panel = PanelContainer.new()
+	_pop_panel.visible = false
+	_pop_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var pop_style := StyleBoxFlat.new()
+	pop_style.bg_color = Color(0.06, 0.06, 0.08, 0.94)
+	pop_style.corner_radius_bottom_left = 6
+	pop_style.corner_radius_bottom_right = 6
+	pop_style.content_margin_left = 12
+	pop_style.content_margin_right = 12
+	pop_style.content_margin_top = 8
+	pop_style.content_margin_bottom = 8
+	_pop_panel.add_theme_stylebox_override("panel", pop_style)
+	_pop_detail = Label.new()
+	_pop_detail.add_theme_font_size_override("font_size", 11)
+	_pop_detail.add_theme_color_override("font_color", Color(0.80, 0.82, 0.88))
+	_pop_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_pop_panel.add_child(_pop_detail)
+	# Will be positioned in _show_pop_info
+
 	GameState.player_country_set.connect(_on_player_set)
 	GameState.country_data_changed.connect(_on_data_changed)
 	visible = false
@@ -161,11 +183,13 @@ func _gui_input(event: InputEvent) -> void:
 		if click_x < zone_1:
 			# Flag/Name → Rankings
 			if budget != null: budget.visible = false
+			_pop_panel.visible = false
 			if rankings != null and rankings.has_method("show_rankings"):
 				rankings.show_rankings()
 		elif click_x < zone_2:
 			# Treasury → Budget
 			if rankings != null: rankings.visible = false
+			_pop_panel.visible = false
 			if budget != null:
 				budget.visible = not budget.visible
 				if budget.visible and budget.has_method("_load_from_data"):
@@ -179,29 +203,49 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _show_pop_info() -> void:
+	# Toggle dropdown
+	if _pop_panel.visible:
+		_pop_panel.visible = false
+		return
+
+	# Add to HUD if not already
+	if _pop_panel.get_parent() == null:
+		get_parent().add_child(_pop_panel)
+
 	var data: Dictionary = GameState.get_country(GameState.player_iso)
 	var pop: int = int(data.get("population", 0))
 	var gdp: float = float(data.get("gdp_raw_billions", 1.0))
 	var gdp_pc: float = gdp * 1_000_000_000.0 / maxf(pop, 1.0)
 	var stab: float = float(data.get("stability", 50))
+	var literacy: int = int(data.get("literacy_rate", 50))
 	var growth_rate: float
 	if gdp_pc > 30000: growth_rate = 0.3
 	elif gdp_pc > 10000: growth_rate = 0.7
 	else: growth_rate = 1.0
-	# Stability effect
-	var stab_effect: String = "positive" if stab > 40 else "negative (emigration)"
+	var stab_effect: String = "Positive" if stab > 40 else "Negative (emigration)"
 	var at_war: bool = false
 	for other: String in GameState.countries:
 		if GameState.is_at_war(GameState.player_iso, other):
 			at_war = true
 			break
-	var war_text: String = "War penalty: -0.5%/yr" if at_war else "No war penalty"
 
-	UIManager.push_notification(
-		"Population: %s | GDP/capita: $%sK | Growth: %.1f%%/yr | Stability: %s | %s" % [
-			_fmt_pop(pop), str(int(gdp_pc / 1000)), growth_rate,
-			stab_effect, war_text
-		], "info")
+	_pop_detail.text = (
+		"POPULATION OVERVIEW\n\n" +
+		"Total: %s\n" % _fmt_pop(pop) +
+		"GDP per capita: $%sK\n" % str(int(gdp_pc / 1000)) +
+		"Annual growth: %.1f%%\n" % growth_rate +
+		"Literacy rate: %d%%\n" % literacy +
+		"Stability effect: %s\n" % stab_effect +
+		"%s" % ("War penalty: -0.5%/yr" if at_war else "No active war penalties")
+	)
+
+	# Position below the ResourceBar, right-aligned to pop column
+	_pop_panel.position = Vector2(
+		maxf(_pop_col.global_position.x - 20 if _pop_col else size.x - 200, 0),
+		size.y
+	)
+	_pop_panel.custom_minimum_size = Vector2(220, 0)
+	_pop_panel.visible = true
 
 
 func _refresh(iso: String) -> void:
