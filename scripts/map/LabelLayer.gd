@@ -109,7 +109,7 @@ func _draw() -> void:
 			# Overlap check
 			var blocked: bool = false
 			for r: Rect2 in used_rects:
-				if rect.grow(3.0).intersects(r):
+				if rect.grow(1.0).intersects(r):
 					blocked = true
 					break
 			if blocked:
@@ -117,6 +117,31 @@ func _draw() -> void:
 
 			used_rects.append(rect)
 			_label(pos, cname, TEXT_COLOR, fsize)
+
+	# ── Force-draw nearby labels when zoomed in ──────────────────────────────
+	if zoom > 1.5:
+		var vp_center: Vector2 = cam.get_screen_center_position()
+		for iso: String in ProvinceDB.country_map_data:
+			if iso == player_iso:
+				continue
+			var data: Dictionary = ProvinceDB.country_map_data[iso]
+			var centroid: Vector2 = ProvinceDB.get_centroid(iso)
+			if centroid == Vector2.ZERO:
+				continue
+			if centroid.distance_to(vp_center) > 800.0 / zoom:
+				continue
+			var cname: String = data.get("name", iso)
+			var fsize: int = base_size
+			var sz: Vector2 = _font.get_string_size(cname, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize)
+			var rect: Rect2 = Rect2(centroid.x - sz.x * 0.5, centroid.y - sz.y * 0.5, sz.x, sz.y)
+			var already: bool = false
+			for r: Rect2 in used_rects:
+				if rect.intersects(r):
+					already = true
+					break
+			if not already:
+				_label(centroid, cname, TEXT_COLOR, fsize)
+				used_rects.append(rect)
 
 	# ── Player empire label ───────────────────────────────────────────────────
 	if player_centroids.size() > 0:

@@ -126,28 +126,37 @@ TIER_OVERRIDES: dict[str, str] = {
     "ERI": "D", "SLE": "D", "LBR": "D", "GNB": "D", "COD": "D",
 }
 
-# Manual stability overrides — real-world 2026 baseline (0-100 scale)
+# Stability based on Fragile States Index 2024 (inverted & normalized to 0-100).
+# FSI scores: 0 = most stable, 120 = most fragile.
+# Our scale: stability = max(5, min(95, int(100 - fsi * 0.83)))
+# Manual adjustments for 2025-2026 context where FSI data lags.
 STABILITY_OVERRIDES: dict[str, int] = {
-    # Very stable (75-95)
-    "CHE": 92, "NOR": 90, "DNK": 90, "FIN": 89, "NZL": 88, "SWE": 87,
-    "CAN": 86, "AUS": 85, "NLD": 85, "IRL": 85, "AUT": 84, "DEU": 83,
-    "JPN": 82, "SGP": 82, "GBR": 80, "USA": 78, "FRA": 77, "KOR": 76,
-    "BEL": 78, "PRT": 78, "ESP": 76, "CZE": 75, "ITA": 73,
-    # Stable (55-74)
-    "JOR": 68, "ARE": 72, "QAT": 75, "KWT": 70, "OMN": 72, "BHR": 65,
-    "SAU": 67, "CHN": 70, "IND": 58, "BRA": 55, "MEX": 52, "IDN": 60,
-    "MYS": 65, "THA": 55, "VNM": 63, "MAR": 60, "TUN": 52, "GHA": 55,
-    "RWA": 60, "TUR": 55, "ISR": 56, "POL": 68, "HUN": 62, "ROU": 60,
-    "ARG": 48, "CHL": 65, "PER": 50, "COL": 52, "CUB": 55,
-    "RUS": 52, "KAZ": 58, "AZE": 55, "BLR": 50, "EGY": 50,
-    # Unstable (30-54)
-    "PAK": 38, "BGD": 42, "IRQ": 35, "LBN": 30, "NGA": 40,
-    "KEN": 45, "ETH": 32, "UKR": 35, "IRN": 45, "VEN": 30,
-    "NIC": 38, "DZA": 45, "MMR": 25, "PSE": 32,
-    # Very unstable / conflict (5-29)
-    "SYR": 15, "YEM": 10, "SOM": 8, "SSD": 10, "AFG": 18,
-    "LBY": 20, "CAF": 15, "COD": 22, "HTI": 12, "SDN": 15,
-    "MLI": 20, "BFA": 18, "NER": 22, "TCD": 25, "ERI": 28,
+    # Very stable — FSI < 25 (75-95)
+    "FIN": 93, "NOR": 92, "CHE": 92, "DNK": 91, "ISL": 93, "LUX": 91,
+    "NZL": 90, "SWE": 89, "IRL": 88, "AUS": 87, "CAN": 86, "NLD": 85,
+    "AUT": 85, "DEU": 83, "PRT": 82, "JPN": 82, "SGP": 84, "GBR": 80,
+    "BEL": 79, "CZE": 78, "USA": 76, "ESP": 76, "KOR": 75, "FRA": 75,
+    "ITA": 73, "POL": 72, "CHL": 72, "URY": 80, "EST": 81, "SVN": 80,
+    # Stable — FSI 25-50 (55-74)
+    "ARE": 74, "QAT": 75, "OMN": 72, "KWT": 70, "JOR": 66, "BHR": 64,
+    "SAU": 63, "MYS": 66, "CHN": 68, "RWA": 60, "BWA": 68, "CRI": 70,
+    "PAN": 65, "IDN": 62, "VNM": 62, "MAR": 59, "THA": 58,
+    "HUN": 65, "ROU": 63, "GRC": 70, "ARG": 55, "BRA": 55,
+    "GHA": 57, "SEN": 56, "TUR": 54, "ISR": 52, "CUB": 55,
+    "MEX": 50, "RUS": 48, "KAZ": 56, "AZE": 50, "BLR": 48,
+    # Moderately unstable — FSI 50-75 (35-54)
+    "EGY": 45, "DZA": 46, "TUN": 50, "IND": 48, "PER": 48, "COL": 48,
+    "PHL": 44, "UKR": 38, "IRN": 42, "BGD": 38, "PRY": 45,
+    "KEN": 42, "NGA": 38, "PAK": 35, "NIC": 38, "VEN": 32,
+    "KHM": 42, "UGA": 38, "TZA": 42, "ZMB": 40,
+    "LBN": 30, "IRQ": 33, "PSE": 30, "GTM": 35, "HND": 36,
+    # Unstable — FSI 75-95 (15-34)
+    "SYR": 28, "MMR": 22, "LBY": 25, "ETH": 25, "CMR": 30,
+    "MOZ": 28, "COG": 28, "GNQ": 30, "ERI": 25, "ZWE": 28,
+    "COD": 20, "BDI": 22, "GIN": 25, "TCD": 22, "NER": 24,
+    "BFA": 20, "MLI": 20, "HTI": 15, "CAF": 15,
+    # Very unstable / active conflict — FSI > 95 (5-14)
+    "SOM": 8, "YEM": 10, "SSD": 8, "SDN": 12, "AFG": 15,
 }
 
 GOVERNMENT_TYPES: dict[str, str] = {

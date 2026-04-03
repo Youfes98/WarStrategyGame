@@ -56,7 +56,9 @@ void fragment() {
         }
 
         if (has_noise) {
-            col += (texture(noise_tex, UV * 50.0).rgb - vec3(0.5)) * noise_str;
+            float noise_scale = mix(30.0, 80.0, clamp(px.x * 8192.0 * 2.0, 0.0, 1.0));
+            vec3 n = texture(noise_tex, UV * noise_scale).rgb - vec3(0.5);
+            col += n * noise_str * 1.5;
         }
 
         // ── Anti-aliased border detection ────────────────────────────────
