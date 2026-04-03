@@ -36,10 +36,11 @@ func _ready() -> void:
 
 func _on_player_set(iso: String) -> void:
 	var tier: String = GameState.get_country(iso).get("power_tier", "C")
+	var spawn_loc: String = ProvinceDB.get_main_province(iso)
 	var army_id: String = _new_army_id()
 	for entry: Array in STARTING_UNITS.get(tier, [["infantry", 1]]):
 		for _i: int in entry[1]:
-			spawn_unit(entry[0], iso, iso, army_id)
+			spawn_unit(entry[0], iso, spawn_loc, army_id)
 	units_changed.emit()
 
 
@@ -317,11 +318,12 @@ func recruit_unit(type: String) -> bool:
 	var data: Dictionary = GameState.get_country(player)
 	data["gdp_raw_billions"] = float(data.get("gdp_raw_billions", 0.0)) \
 							   - float(UNIT_TYPES[type].get("cost", 0.0))
-	# Join existing stationary army at home, or create a new one
-	var army_id: String = _find_stationary_army(player, player)
+	# Join existing stationary army at home province, or create a new one
+	var home: String = ProvinceDB.get_main_province(player)
+	var army_id: String = _find_stationary_army(player, home)
 	if army_id.is_empty():
 		army_id = _new_army_id()
-	spawn_unit(type, player, player, army_id)
+	spawn_unit(type, player, home, army_id)
 	units_changed.emit()
 	return true
 

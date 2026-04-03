@@ -99,7 +99,8 @@ func _do_build_military(iso: String, data: Dictionary) -> void:
 	var cost: float = 5.0
 	if gdp >= cost:
 		data["gdp_raw_billions"] = gdp - cost
-		MilitarySystem.spawn_unit("infantry", iso, iso)
+		var home: String = ProvinceDB.get_main_province(iso)
+		MilitarySystem.spawn_unit("infantry", iso, home)
 
 
 func _do_invest_infra(_iso: String, data: Dictionary) -> void:

@@ -198,6 +198,15 @@ func get_country_province_ids(country_iso: String) -> Array:
 	return country_provinces.get(country_iso, [])
 
 
+## Returns the capital/main province ID for a country (largest province).
+## Falls back to country ISO if no provinces loaded.
+func get_main_province(country_iso: String) -> String:
+	var pids: Array = country_provinces.get(country_iso, [])
+	if pids.is_empty():
+		return country_iso
+	return pids[0]   # first = largest (sorted by area in pipeline)
+
+
 ## Whether provinces data has been loaded.
 func has_provinces() -> bool:
 	return not province_data.is_empty()

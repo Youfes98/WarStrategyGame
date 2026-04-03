@@ -34,6 +34,7 @@ var _font_sm:   int  = 8
 
 
 func _ready() -> void:
+	z_index = 10
 	_font = ThemeDB.fallback_font
 	_font_size = 10
 	_font_sm   = 8
