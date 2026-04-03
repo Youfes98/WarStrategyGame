@@ -140,8 +140,9 @@ func _draw_counter(pos: Vector2, army_id: String, data: Dictionary,
 	for utype: String in ["infantry", "armor", "artillery"]:
 		var count: int = int(data.get(utype, 0))
 		if count > 0:
-			parts.append("%d %s" % [count, MilitarySystem.UNIT_TYPES[utype]["icon"]])
-	draw_string(_font, Vector2(x, y1), "  ".join(parts),
+			var short: String = {"infantry": "I", "armor": "A", "artillery": "R"}[utype]
+			parts.append("%d%s" % [count, short])
+	draw_string(_font, Vector2(x, y1), " ".join(parts),
 		HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - CHIP_PAD * 2), 10, COL_TEXT)
 
 	# Army label + status

@@ -445,7 +445,12 @@ func _set_hover(id: String) -> void:
 		if not id.is_empty() and id != _mil_sel_iso:
 			if ProvinceDB.get_parent_iso(id) != _selected_country:
 				var idx: int = ProvinceDB.get_province_index(id)
-				_set_lut(idx, _base_colors.get(idx, COLOR_OCEAN).lightened(0.18))
+				var base: Color = _base_colors.get(idx, COLOR_OCEAN)
+				var parent: String = ProvinceDB.get_parent_iso(id)
+				var ter_owner: String = GameState.territory_owner.get(id, parent)
+				var at_war: bool = not GameState.player_iso.is_empty() and not ter_owner.is_empty() and ter_owner != GameState.player_iso and GameState.is_at_war(GameState.player_iso, ter_owner)
+				if not at_war:
+					_set_lut(idx, base.lightened(0.18))
 		_flush_lut()
 	else:
 		if not _hover_id.is_empty() and _polygons.has(_hover_id):
