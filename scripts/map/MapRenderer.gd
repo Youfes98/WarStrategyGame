@@ -34,6 +34,7 @@ var _country_lut_image: Image = null
 var _country_lut_tex:   ImageTexture = null
 var _base_colors:       Dictionary = {}
 var _lut_dirty:         bool = false
+var _country_idx_map:   Dictionary = {}
 
 # Polygon fallback
 var _polygons: Dictionary = {}
@@ -112,6 +113,7 @@ func _build_shader_map(prov_img: Image) -> void:
 	if unmatched > 0:
 		print("  WARNING: %d provinces have no matching country (shown as grey)" % unmatched)
 
+	_country_idx_map = country_idx_map
 	_color_lut_tex   = ImageTexture.create_from_image(_color_lut_image)
 	_country_lut_tex = ImageTexture.create_from_image(_country_lut_image)
 
@@ -461,7 +463,23 @@ func _set_hover(id: String) -> void:
 			(_polygons[id] as Polygon2D).color = ProvinceDB.get_map_color(id).lightened(0.12)
 
 func _on_battle_resolved(tid: String, _a: String, _d: String, _w: bool) -> void:
+	var new_ter_owner: String = GameState.territory_owner.get(tid, "")
+	if not new_ter_owner.is_empty():
+		_update_country_lut(tid, new_ter_owner)
 	refresh_country_color(tid)
+
+
+func _update_country_lut(province_id: String, new_owner_iso: String) -> void:
+	if _country_lut_image == null:
+		return
+	var idx: int = ProvinceDB.get_province_index(province_id)
+	if idx <= 0 or idx >= LUT_SIZE:
+		return
+	if not _country_idx_map.has(new_owner_iso):
+		_country_idx_map[new_owner_iso] = _country_idx_map.size() + 1
+	var ci: int = _country_idx_map[new_owner_iso]
+	_country_lut_image.set_pixel(idx, 0, Color(float(ci) / 255.0, 0.0, 0.0))
+	_country_lut_tex.update(_country_lut_image)
 
 func _on_war_state_changed(a: String, b: String, _w: bool) -> void:
 	_update_base(a)

@@ -83,8 +83,10 @@ func _ready() -> void:
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vbox.add_child(_hint)
 
-	GameState.player_country_set.connect(func(_iso: String) -> void: visible = true; _refresh())
+	visible = false
+	GameState.player_country_set.connect(func(_iso: String) -> void: _refresh())
 	MilitarySystem.units_changed.connect(_refresh)
+	MilitarySystem.selection_changed.connect(_on_selection_changed)
 	MilitarySystem.territory_selected.connect(_on_territory_selected)
 
 
@@ -166,6 +168,11 @@ func _refresh() -> void:
 					seen[aid] = true
 					armies_here += 1
 	_merge_btn.disabled = armies_here < 2
+
+
+func _on_selection_changed() -> void:
+	visible = not MilitarySystem.selected_army_ids.is_empty()
+	_refresh()
 
 
 func _on_territory_selected(iso: String) -> void:
