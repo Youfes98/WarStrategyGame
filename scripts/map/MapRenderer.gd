@@ -10,7 +10,7 @@ signal country_clicked(iso: String)
 const MAP_WIDTH:  float = 16384.0
 const MAP_HEIGHT: float = 8192.0
 const ZOOM_MIN:   float = 0.15
-const ZOOM_MAX:   float = 8.0
+const ZOOM_MAX:   float = 16.0
 const ZOOM_STEP:  float = 0.15
 const LUT_SIZE:   int   = 8192
 
@@ -160,37 +160,30 @@ func _build_shader_map(prov_img: Image) -> void:
 
 
 func _load_terrain_layers() -> void:
-	# Terrain base
-	if FileAccess.file_exists("res://assets/map/terrain.png"):
-		var img: Image = (load("res://assets/map/terrain.png") as Texture2D).get_image()
-		var tex: ImageTexture = ImageTexture.create_from_image(img)
-		_shader_material.set_shader_parameter("terrain_tex", tex)
-		_shader_material.set_shader_parameter("has_terrain", true)
-		print("  Terrain layer loaded")
-
-	# Heightmap
-	if FileAccess.file_exists("res://assets/map/heightmap.png"):
-		var img: Image = (load("res://assets/map/heightmap.png") as Texture2D).get_image()
-		var tex: ImageTexture = ImageTexture.create_from_image(img)
-		_shader_material.set_shader_parameter("heightmap_tex", tex)
-		_shader_material.set_shader_parameter("has_heightmap", true)
-		print("  Heightmap layer loaded")
-
-	# Noise
-	if FileAccess.file_exists("res://assets/map/noise.png"):
-		var img: Image = (load("res://assets/map/noise.png") as Texture2D).get_image()
-		var tex: ImageTexture = ImageTexture.create_from_image(img)
-		_shader_material.set_shader_parameter("noise_tex", tex)
-		_shader_material.set_shader_parameter("has_noise", true)
-		print("  Noise layer loaded")
-
-	# Detail micro-texture
-	if FileAccess.file_exists("res://assets/map/detail.png"):
-		var img: Image = (load("res://assets/map/detail.png") as Texture2D).get_image()
-		var tex: ImageTexture = ImageTexture.create_from_image(img)
-		_shader_material.set_shader_parameter("detail_tex", tex)
-		_shader_material.set_shader_parameter("has_detail", true)
-		print("  Detail texture loaded")
+	var _tex_paths: Dictionary = {
+		"terrain_tex": "res://assets/map/terrain.png",
+		"heightmap_tex": "res://assets/map/heightmap.png",
+		"noise_tex": "res://assets/map/noise.png",
+		"detail_tex": "res://assets/map/detail.png",
+		"terrain_type_tex": "res://assets/map/terrain_types.png",
+		"biome_atlas": "res://assets/map/biome_atlas.png",
+	}
+	var _bool_flags: Dictionary = {
+		"terrain_tex": "has_terrain",
+		"heightmap_tex": "has_heightmap",
+		"noise_tex": "has_noise",
+		"detail_tex": "has_detail",
+		"terrain_type_tex": "has_terrain_types",
+	}
+	for param: String in _tex_paths:
+		var path: String = _tex_paths[param]
+		if FileAccess.file_exists(path):
+			var img: Image = (load(path) as Texture2D).get_image()
+			var tex: ImageTexture = ImageTexture.create_from_image(img)
+			_shader_material.set_shader_parameter(param, tex)
+			if _bool_flags.has(param):
+				_shader_material.set_shader_parameter(_bool_flags[param], true)
+			print("  Loaded: %s" % param)
 
 
 # ── LUT helpers ───────────────────────────────────────────────────────────────
