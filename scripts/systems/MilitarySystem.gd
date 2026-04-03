@@ -600,23 +600,22 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 		if has_real_defenders:
 			var def_cas: float = clampf(0.35 * power_ratio, 0.15, 0.80)
 			var dead: Array = []
+			var retreat_to: String = _find_retreat_province(territory_iso, defender_iso)
 			for id: String in defender_ids:
 				if not units.has(id):
 					continue
 				var u: Dictionary = units[id]
 				u.strength = clampi(int(float(u.strength) * (1.0 - def_cas)), 0, 100)
-				u.morale = clampf(float(u.get("morale", 100)) - 20.0, 0.0, 100.0)  # Defeat morale hit
+				u.morale = clampf(float(u.get("morale", 100)) - 20.0, 0.0, 100.0)
 				if u.strength <= 0:
 					dead.append(id)
-				elif u.morale < 20.0:
-					# Rout: retreat to friendly province
-					var retreat_to: String = _find_retreat_province(territory_iso, defender_iso)
-					if retreat_to.is_empty():
-						dead.append(id)  # Encircled — destroyed
-					else:
-						u.location = retreat_to
-						u.path = []
-						u.days_remaining = 0
+				elif retreat_to.is_empty():
+					dead.append(id)  # Encircled — no friendly province to retreat to → destroyed
+				else:
+					# ALL surviving defenders retreat — territory is lost
+					u.location = retreat_to
+					u.path = []
+					u.days_remaining = 0
 			for id: String in dead:
 				units.erase(id)
 	else:
