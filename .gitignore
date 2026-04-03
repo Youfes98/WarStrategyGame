@@ -14,6 +14,9 @@ data/provinces.json
 data/adjacencies.json
 data/province_adjacencies.json
 
+# Cached downloads
+tools/terrain_source.png
+
 # OS
 Thumbs.db
 .DS_Store
