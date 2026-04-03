@@ -102,13 +102,17 @@ func _draw() -> void:
 		cam_pos - vp_size * 0.5 - Vector2(CULL_MARGIN, CULL_MARGIN),
 		vp_size + Vector2(CULL_MARGIN * 2, CULL_MARGIN * 2))
 
+	# Skip all borders at world view
+	if zoom < 0.3:
+		return
+
 	var country_w: float = COUNTRY_WIDTH / maxf(zoom, 0.2)
 	var province_w: float = PROVINCE_WIDTH / maxf(zoom, 0.2)
 	if zoom > 4.0:
 		country_w = maxf(country_w, 0.8)
 		province_w = maxf(province_w, 0.3)
 
-	var draw_province: bool = zoom > 0.4
+	var draw_province: bool = zoom > 1.5
 
 	for x_off: float in [-MAP_WIDTH, 0.0, MAP_WIDTH]:
 		var offset: Vector2 = Vector2(x_off, 0.0)
