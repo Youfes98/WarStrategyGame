@@ -72,29 +72,22 @@ func _ready() -> void:
 	alloc_hdr.add_theme_color_override("font_color", HEADER_COLOR)
 	vbox.add_child(alloc_hdr)
 
-	# 4 budget sliders (greyed out — active when building system is implemented)
+	# 4 budget sliders — controls ministerial auto-build priority
 	var mil_row := _make_slider_row(vbox, "Military")
 	_mil_slider = mil_row[0]; _mil_pct = mil_row[1]
-	_mil_slider.editable = false
+	_mil_slider.value_changed.connect(_on_budget_changed)
 
 	var infra_row := _make_slider_row(vbox, "Infrastructure")
 	_infra_slider = infra_row[0]; _infra_pct = infra_row[1]
-	_infra_slider.editable = false
+	_infra_slider.value_changed.connect(_on_budget_changed)
 
 	var social_row := _make_slider_row(vbox, "Social")
 	_social_slider = social_row[0]; _social_pct = social_row[1]
-	_social_slider.editable = false
+	_social_slider.value_changed.connect(_on_budget_changed)
 
 	var res_row := _make_slider_row(vbox, "Research")
 	_res_slider = res_row[0]; _res_pct = res_row[1]
-	_res_slider.editable = false
-
-	var coming_lbl := Label.new()
-	coming_lbl.text = "Ministerial directives — coming with buildings"
-	coming_lbl.add_theme_font_size_override("font_size", 9)
-	coming_lbl.add_theme_color_override("font_color", Color(0.50, 0.50, 0.50))
-	coming_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(coming_lbl)
+	_res_slider.value_changed.connect(_on_budget_changed)
 
 	vbox.add_child(HSeparator.new())
 

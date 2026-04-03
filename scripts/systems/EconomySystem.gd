@@ -155,8 +155,11 @@ func _tick_country(iso: String) -> void:
 	var balance: float = revenue - debt_service - upkeep
 	treasury += balance
 
-	# Budget allocation effects suspended until building system is implemented.
-	# Discretionary spending will auto-build via ministerial directives.
+	# Apply building effects
+	var bfx: Dictionary = BuildingSystem.get_building_effects(iso)
+	if bfx.get("gdp_bonus", 0.0) > 0.0:
+		gdp_raw = maxf(gdp_raw * (1.0 + float(bfx["gdp_bonus"])), 0.01)
+		data["gdp_raw_billions"] = gdp_raw
 
 	# Deficit handling: if treasury goes negative, increase debt
 	if treasury < 0.0:
@@ -180,10 +183,10 @@ func _tick_country(iso: String) -> void:
 
 	# ── 3. STABILITY DRIFT ────────────────────────────────────────────────────
 	var stab_target: float = 60.0 - maxf(0.0, (debt_ratio - 100.0) * 0.1)
-	# Tax stability: 25% is neutral; higher taxes reduce stability target
 	stab_target -= (tax_rate * 100.0 - 25.0) * 0.1
+	stab_target += float(bfx.get("stability_bonus", 0.0))  # Buildings boost stability
 
-	stab_target = clampf(stab_target, 20.0, 80.0)
+	stab_target = clampf(stab_target, 20.0, 85.0)
 	var new_stab: float = lerpf(stability, stab_target, 0.01)
 
 	if new_stab < 20.0 and randf() < 0.1:

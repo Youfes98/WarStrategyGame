@@ -814,24 +814,33 @@ func get_recruit_location(type: String, preferred: String = "") -> String:
 	var player: String = GameState.player_iso
 	if player.is_empty():
 		return ""
-	var domain: String = UNIT_TYPES.get(type, {}).get("domain", "land")
-	var capital: String = ProvinceDB.get_capital_province(player)
 
-	match domain:
-		"sea":
-			# Naval: must be at a coastal province you own
-			if not preferred.is_empty() and ProvinceDB.is_coastal(preferred):
-				var ter_owner: String = GameState.territory_owner.get(preferred, "")
-				if ter_owner == player:
+	# Find which building types unlock this unit
+	var required_buildings: Array = []
+	for btype: String in BuildingSystem.BUILDING_TYPES:
+		var bdef: Dictionary = BuildingSystem.BUILDING_TYPES[btype]
+		var unlocks: Array = bdef.get("unlocks_recruit", [])
+		if type in unlocks:
+			required_buildings.append(btype)
+
+	if required_buildings.is_empty():
+		return ""  # No building can produce this unit
+
+	# Check preferred location first
+	if not preferred.is_empty():
+		var ter_owner: String = GameState.territory_owner.get(preferred, "")
+		if ter_owner == player:
+			for btype: String in required_buildings:
+				if BuildingSystem.has_building(preferred, btype):
 					return preferred
-			# Fallback: nearest owned coast
-			var coast: String = ProvinceDB.get_nearest_coast(player)
-			return coast if not coast.is_empty() else ""
-		"air", "land":
-			# All units: capital province only (until buildings exist)
-			return capital
 
-	return capital
+	# Fallback: find any province with the required building
+	for btype: String in required_buildings:
+		var provinces: Array = BuildingSystem.get_provinces_with_building(player, btype)
+		if not provinces.is_empty():
+			return provinces[0]
+
+	return ""  # No building available — can't recruit
 
 
 func can_recruit(type: String) -> bool:
@@ -846,19 +855,21 @@ func can_recruit(type: String) -> bool:
 
 ## Check if a specific unit type can be recruited at a specific location.
 func can_recruit_at(type: String, location: String) -> bool:
-	if GameState.player_iso.is_empty():
+	if GameState.player_iso.is_empty() or location.is_empty():
 		return false
 	var cost: float = UNIT_TYPES.get(type, {}).get("cost", 9999.0)
 	if float(GameState.get_country(GameState.player_iso).get("treasury", 0.0)) < cost:
 		return false
 	var player: String = GameState.player_iso
-	var domain: String = UNIT_TYPES.get(type, {}).get("domain", "land")
-	var capital: String = ProvinceDB.get_capital_province(player)
-	match domain:
-		"sea":
-			return ProvinceDB.is_coastal(location) and GameState.territory_owner.get(location, "") == player
-		_:
-			return location == capital
+	if GameState.territory_owner.get(location, "") != player:
+		return false
+	# Check if this location has a building that unlocks this unit type
+	for btype: String in BuildingSystem.BUILDING_TYPES:
+		var bdef: Dictionary = BuildingSystem.BUILDING_TYPES[btype]
+		if type in bdef.get("unlocks_recruit", []):
+			if BuildingSystem.has_building(location, btype):
+				return true
+	return false
 
 
 func recruit_unit(type: String, at_province: String = "") -> bool:

@@ -50,7 +50,7 @@ func quickload() -> void:
 
 func _serialize() -> Dictionary:
 	return {
-		"version": 1,
+		"version": 2,
 		"player_iso": GameState.player_iso,
 		"selected_iso": GameState.selected_iso,
 		"territory_owner": GameState.territory_owner.duplicate(),
@@ -58,6 +58,8 @@ func _serialize() -> Dictionary:
 		"countries": _serialize_countries(),
 		"military": _serialize_military(),
 		"clock": _serialize_clock(),
+		"buildings": GameState.province_buildings.duplicate(true),
+		"construction": GameState.construction_queue.duplicate(true),
 	}
 
 
@@ -148,6 +150,14 @@ func _deserialize(data: Dictionary) -> void:
 		MilitarySystem._next_id = int(mil.next_id)
 	if mil.has("next_army_id"):
 		MilitarySystem._next_army_id = int(mil.next_army_id)
+
+	# Buildings
+	var buildings: Dictionary = data.get("buildings", {})
+	if not buildings.is_empty():
+		GameState.province_buildings = buildings
+	var construction: Dictionary = data.get("construction", {})
+	if not construction.is_empty():
+		GameState.construction_queue = construction
 
 	# Restore pause state
 	GameClock.paused = bool(clk.get("paused", was_paused))

@@ -209,6 +209,51 @@ func _draw() -> void:
 		_draw_unit_at(screen_pos - Vector2(0, SPRITE_SIZE * 0.5), dominant_type,
 			total_n, avg_str, avg_mor, owner_col, is_sel, size_scale)
 
+	# Draw capital stars
+	_draw_capital_stars(cam_pos, vp_size, size_scale)
+
+
+func _draw_capital_stars(cam_pos: Vector2, vp_size: Vector2, ss: float) -> void:
+	var star_size: float = 4.0 * ss
+	var star_col: Color = Color(0.95, 0.85, 0.25, 0.85)
+	var outline_col: Color = Color(0.0, 0.0, 0.0, 0.60)
+
+	for iso: String in GameState.countries:
+		var cap_pid: String = ProvinceDB.get_capital_province(iso)
+		if cap_pid.is_empty():
+			continue
+		var world_pos: Vector2 = ProvinceDB.get_centroid(cap_pid)
+		if world_pos == Vector2.ZERO:
+			continue
+
+		# Pick best wrap
+		var best: Vector2 = world_pos
+		for x_off in [-MAP_WIDTH, MAP_WIDTH]:
+			var alt: Vector2 = world_pos + Vector2(x_off, 0)
+			if absf(alt.x - cam_pos.x) < absf(best.x - cam_pos.x):
+				best = alt
+
+		var sp: Vector2 = _world_to_screen(best)
+		if sp.x < -20 or sp.x > vp_size.x + 20 or sp.y < -20 or sp.y > vp_size.y + 20:
+			continue
+
+		# Draw small 4-pointed star
+		_draw_star(sp, star_size, star_col, outline_col)
+
+
+func _draw_star(pos: Vector2, sz: float, col: Color, outline: Color) -> void:
+	# Simple 4-pointed star
+	var points: PackedVector2Array = PackedVector2Array()
+	for i: int in 8:
+		var angle: float = i * TAU / 8.0 - PI * 0.5
+		var r: float = sz if i % 2 == 0 else sz * 0.4
+		points.append(pos + Vector2(cos(angle), sin(angle)) * r)
+	draw_colored_polygon(points, col)
+	# Outline
+	var outline_pts: PackedVector2Array = points.duplicate()
+	outline_pts.append(points[0])
+	draw_polyline(outline_pts, outline, 1.0, true)
+
 
 func _draw_unit_at(pos: Vector2, unit_type: String, count: int,
 		avg_str: float, avg_mor: float, owner_col: Color, selected: bool,

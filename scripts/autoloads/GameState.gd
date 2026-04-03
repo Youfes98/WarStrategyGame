@@ -15,8 +15,13 @@ var player_iso: String = ""             # which country the player controls
 var selected_iso: String = ""           # currently selected country ISO
 
 # Ownership: territory_id → owner_iso
-# territory_id is a province_id when provinces are loaded, or country_iso otherwise
 var territory_owner: Dictionary = {}
+
+# Province buildings: province_id → [{"type": "barracks", "level": 1}, ...]
+var province_buildings: Dictionary = {}
+
+# Construction queue: country_iso → [{"province": pid, "type": str, "progress": float, "cost": float}, ...]
+var construction_queue: Dictionary = {}
 
 # Relations matrix: "ISO_A:ISO_B" → RelationData dict
 var relations: Dictionary = {}
