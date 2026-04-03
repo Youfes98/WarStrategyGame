@@ -287,6 +287,21 @@ def fetch_cached(url: str, cache_path: Path) -> dict | list:
         raise
 
 
+# Load real literacy rates from CIA World Factbook (cached)
+_LITERACY_CACHE: dict = {}
+_literacy_path = Path(__file__).parent / "cache" / "literacy_rates.json"
+if _literacy_path.exists():
+    with open(_literacy_path, encoding="utf-8") as _f:
+        _LITERACY_CACHE = json.load(_f)
+
+
+def _get_literacy(iso3: str, gdp_norm: float) -> int:
+    """Real literacy rate from CIA Factbook, fallback to GDP-based estimate."""
+    if iso3 in _LITERACY_CACHE:
+        return int(_LITERACY_CACHE[iso3])
+    return max(30, min(99, int(gdp_norm / 12 + 40)))
+
+
 def build_countries() -> tuple[list, dict]:
     print("Fetching REST Countries API (batch A)...")
     raw_a = fetch_cached(REST_COUNTRIES_URL_A, CACHE_A)
@@ -376,7 +391,7 @@ def build_countries() -> tuple[list, dict]:
             "debt_to_gdp":       round(random.uniform(20, 80), 1),
             "credit_rating":     max(10, min(100, int(gdp_norm / 10))),
             "infrastructure":    max(10, min(95, int(gdp_norm / 12 + 20))),
-            "literacy_rate":     max(30, min(99, int(gdp_norm / 12 + 40))),
+            "literacy_rate":     _get_literacy(iso3, gdp_norm),
             # Government
             "government_type":   GOVERNMENT_TYPES.get(iso3, "Republic"),
         }

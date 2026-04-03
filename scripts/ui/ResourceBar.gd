@@ -13,6 +13,8 @@ var _treasury_lbl: Label = null
 var _balance_lbl:  Label = null
 var _pop_lbl:      Label = null
 var _pop_change:   Label = null
+var _treasury_col: VBoxContainer = null
+var _pop_col:      VBoxContainer = null
 
 const BG_COLOR: Color = Color(0.06, 0.06, 0.08, 0.92)
 const TIER_COLORS: Dictionary = {
@@ -77,7 +79,8 @@ func _ready() -> void:
 	hbox.add_child(VSeparator.new())
 
 	# ── Treasury + balance underneath ──
-	var t_col := VBoxContainer.new()
+	_treasury_col = VBoxContainer.new()
+	var t_col: VBoxContainer = _treasury_col
 	t_col.add_theme_constant_override("separation", -2)
 	hbox.add_child(t_col)
 
@@ -99,7 +102,8 @@ func _ready() -> void:
 	hbox.add_child(VSeparator.new())
 
 	# ── Population ──
-	var p_col := VBoxContainer.new()
+	_pop_col = VBoxContainer.new()
+	var p_col: VBoxContainer = _pop_col
 	p_col.add_theme_constant_override("separation", -2)
 	hbox.add_child(p_col)
 
@@ -146,9 +150,9 @@ func _on_data_changed(iso: String) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var click_x: float = event.position.x
-		# Three zones: flag/name | treasury | population
-		var zone_1: float = size.x * 0.33  # flag + name ends
-		var zone_2: float = size.x * 0.66  # treasury ends
+		# Use actual column positions for accurate click zones
+		var zone_1: float = _treasury_col.global_position.x - global_position.x if _treasury_col else size.x * 0.33
+		var zone_2: float = _pop_col.global_position.x - global_position.x if _pop_col else size.x * 0.66
 
 		# Close all panels first
 		var rankings: Control = get_parent().get_node_or_null("RankingsPanel")

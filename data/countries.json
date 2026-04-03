@@ -25,7 +25,7 @@
     "gdp_normalized": 174,
     "population_normalized": 204,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       183,
@@ -34,7 +34,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 42.5,
+    "debt_to_gdp": 39.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -82,10 +82,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 21.55,
-    "debt_to_gdp": 31.9,
+    "debt_to_gdp": 46.4,
     "credit_rating": 45,
     "infrastructure": 58,
-    "literacy_rate": 78,
+    "literacy_rate": 30,
     "government_type": "Transitional Government"
   },
   {
@@ -114,7 +114,7 @@
     "gdp_normalized": 174,
     "population_normalized": 52,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 45,
     "power_tier": "D",
     "map_color": [
       183,
@@ -123,7 +123,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 61.9,
+    "debt_to_gdp": 50.8,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -159,7 +159,7 @@
     "gdp_normalized": 415,
     "population_normalized": 642,
     "military_normalized": 250,
-    "stability": 67,
+    "stability": 62,
     "power_tier": "B",
     "map_color": [
       183,
@@ -168,10 +168,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 12.14,
-    "debt_to_gdp": 33.0,
+    "debt_to_gdp": 24.0,
     "credit_rating": 41,
     "infrastructure": 54,
-    "literacy_rate": 74,
+    "literacy_rate": 64,
     "government_type": "Republic"
   },
   {
@@ -200,7 +200,7 @@
     "gdp_normalized": 495,
     "population_normalized": 715,
     "military_normalized": 250,
-    "stability": 72,
+    "stability": 69,
     "power_tier": "B",
     "map_color": [
       183,
@@ -209,10 +209,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 34.98,
-    "debt_to_gdp": 42.3,
+    "debt_to_gdp": 68.8,
     "credit_rating": 49,
     "infrastructure": 61,
-    "literacy_rate": 81,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -246,7 +246,7 @@
     "gdp_normalized": 407,
     "population_normalized": 634,
     "military_normalized": 250,
-    "stability": 61,
+    "stability": 63,
     "power_tier": "B",
     "map_color": [
       183,
@@ -255,10 +255,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 10.92,
-    "debt_to_gdp": 56.9,
+    "debt_to_gdp": 71.7,
     "credit_rating": 40,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -291,7 +291,7 @@
     "gdp_normalized": 220,
     "population_normalized": 462,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 44,
     "power_tier": "C",
     "map_color": [
       183,
@@ -300,10 +300,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.92,
-    "debt_to_gdp": 29.7,
+    "debt_to_gdp": 32.8,
     "credit_rating": 22,
     "infrastructure": 38,
-    "literacy_rate": 58,
+    "literacy_rate": 95,
     "government_type": "Republic"
   },
   {
@@ -334,7 +334,7 @@
     "gdp_normalized": 437,
     "population_normalized": 661,
     "military_normalized": 250,
-    "stability": 65,
+    "stability": 71,
     "power_tier": "B",
     "map_color": [
       183,
@@ -343,10 +343,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 16.16,
-    "debt_to_gdp": 38.6,
+    "debt_to_gdp": 77.7,
     "credit_rating": 43,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 93,
     "government_type": "Republic"
   },
   {
@@ -389,10 +389,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 27.12,
-    "debt_to_gdp": 55.2,
+    "debt_to_gdp": 69.6,
     "credit_rating": 47,
     "infrastructure": 59,
-    "literacy_rate": 79,
+    "literacy_rate": 81,
     "government_type": "Republic"
   },
   {
@@ -438,10 +438,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 71.1,
-    "debt_to_gdp": 31.7,
+    "debt_to_gdp": 38.0,
     "credit_rating": 54,
     "infrastructure": 65,
-    "literacy_rate": 85,
+    "literacy_rate": 81,
     "government_type": "Presidential Republic"
   },
   {
@@ -487,10 +487,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 160,
-    "debt_to_gdp": 36.5,
+    "debt_to_gdp": 35.8,
     "credit_rating": 61,
     "infrastructure": 70,
-    "literacy_rate": 90,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -519,7 +519,7 @@
     "gdp_normalized": 174,
     "population_normalized": 289,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 46,
     "power_tier": "C",
     "map_color": [
       183,
@@ -528,7 +528,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 51.9,
+    "debt_to_gdp": 69.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -566,7 +566,7 @@
     "gdp_normalized": 359,
     "population_normalized": 590,
     "military_normalized": 250,
-    "stability": 64,
+    "stability": 57,
     "power_tier": "C",
     "map_color": [
       183,
@@ -575,10 +575,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 5.8,
-    "debt_to_gdp": 66.9,
+    "debt_to_gdp": 65.8,
     "credit_rating": 35,
     "infrastructure": 49,
-    "literacy_rate": 69,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -619,10 +619,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.5,
-    "debt_to_gdp": 32.6,
+    "debt_to_gdp": 60.0,
     "credit_rating": 29,
     "infrastructure": 44,
-    "literacy_rate": 64,
+    "literacy_rate": 95,
     "government_type": "Presidential Republic"
   },
   {
@@ -663,10 +663,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 6.1,
-    "debt_to_gdp": 76.2,
+    "debt_to_gdp": 23.4,
     "credit_rating": 36,
     "infrastructure": 50,
-    "literacy_rate": 70,
+    "literacy_rate": 95,
     "government_type": "Republic"
   },
   {
@@ -709,7 +709,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 610,
-    "debt_to_gdp": 25.7,
+    "debt_to_gdp": 33.3,
     "credit_rating": 71,
     "infrastructure": 79,
     "literacy_rate": 99,
@@ -741,7 +741,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1.0,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 47,
     "power_tier": "D",
     "map_color": [
       183,
@@ -750,7 +750,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 46.9,
+    "debt_to_gdp": 46.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -796,10 +796,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 21.16,
-    "debt_to_gdp": 31.8,
+    "debt_to_gdp": 48.0,
     "credit_rating": 45,
     "infrastructure": 58,
-    "literacy_rate": 78,
+    "literacy_rate": 73,
     "government_type": "Presidential Republic"
   },
   {
@@ -828,7 +828,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 49,
     "power_tier": "D",
     "map_color": [
       183,
@@ -837,7 +837,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 43.7,
+    "debt_to_gdp": 27.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -869,7 +869,7 @@
     "gdp_normalized": 203,
     "population_normalized": 447,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       183,
@@ -878,10 +878,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.74,
-    "debt_to_gdp": 21.3,
+    "debt_to_gdp": 74.1,
     "credit_rating": 20,
     "infrastructure": 36,
-    "literacy_rate": 56,
+    "literacy_rate": 87,
     "government_type": "Republic"
   },
   {
@@ -924,7 +924,7 @@
     "debt_to_gdp": 51.6,
     "credit_rating": 79,
     "infrastructure": 86,
-    "literacy_rate": 99,
+    "literacy_rate": 98,
     "government_type": "Presidential Republic"
   },
   {
@@ -953,7 +953,7 @@
     "gdp_normalized": 174,
     "population_normalized": 366,
     "military_normalized": 250,
-    "stability": 44,
+    "stability": 45,
     "power_tier": "C",
     "map_color": [
       183,
@@ -962,7 +962,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 67.5,
+    "debt_to_gdp": 25.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -997,7 +997,7 @@
     "gdp_normalized": 174,
     "population_normalized": 327,
     "military_normalized": 250,
-    "stability": 40,
+    "stability": 42,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1006,7 +1006,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 36.6,
+    "debt_to_gdp": 39.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1053,10 +1053,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 27.89,
-    "debt_to_gdp": 49.6,
+    "debt_to_gdp": 33.4,
     "credit_rating": 47,
     "infrastructure": 59,
-    "literacy_rate": 79,
+    "literacy_rate": 52,
     "government_type": "Republic"
   },
   {
@@ -1097,10 +1097,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 5.25,
-    "debt_to_gdp": 26.3,
+    "debt_to_gdp": 30.6,
     "credit_rating": 35,
     "infrastructure": 49,
-    "literacy_rate": 69,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -1144,10 +1144,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.21,
-    "debt_to_gdp": 44.4,
+    "debt_to_gdp": 32.4,
     "credit_rating": 39,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 80,
     "government_type": "Presidential Republic"
   },
   {
@@ -1181,7 +1181,7 @@
     "gdp_normalized": 341,
     "population_normalized": 573,
     "military_normalized": 250,
-    "stability": 63,
+    "stability": 60,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1190,10 +1190,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.53,
-    "debt_to_gdp": 68.8,
+    "debt_to_gdp": 20.3,
     "credit_rating": 34,
     "infrastructure": 48,
-    "literacy_rate": 68,
+    "literacy_rate": 88,
     "government_type": "Republic"
   },
   {
@@ -1231,10 +1231,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 420,
-    "debt_to_gdp": 22.3,
+    "debt_to_gdp": 54.1,
     "credit_rating": 68,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 97,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -1276,10 +1276,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 310,
-    "debt_to_gdp": 79.6,
+    "debt_to_gdp": 28.5,
     "credit_rating": 66,
     "infrastructure": 75,
-    "literacy_rate": 95,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -1322,10 +1322,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 410,
-    "debt_to_gdp": 49.7,
+    "debt_to_gdp": 67.8,
     "credit_rating": 68,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 71,
     "government_type": "Presidential Republic"
   },
   {
@@ -1354,7 +1354,7 @@
     "gdp_normalized": 174,
     "population_normalized": 212,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 46,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1363,7 +1363,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 49.3,
+    "debt_to_gdp": 58.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1395,7 +1395,7 @@
     "gdp_normalized": 174,
     "population_normalized": 287,
     "military_normalized": 250,
-    "stability": 44,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1404,7 +1404,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 32.1,
+    "debt_to_gdp": 53.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1436,7 +1436,7 @@
     "gdp_normalized": 174,
     "population_normalized": 338,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1445,7 +1445,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 45.3,
+    "debt_to_gdp": 49.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1477,7 +1477,7 @@
     "gdp_normalized": 174,
     "population_normalized": 350,
     "military_normalized": 250,
-    "stability": 39,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1486,7 +1486,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 44.1,
+    "debt_to_gdp": 66.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1530,10 +1530,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 180,
-    "debt_to_gdp": 38.1,
+    "debt_to_gdp": 44.0,
     "credit_rating": 61,
     "infrastructure": 71,
-    "literacy_rate": 91,
+    "literacy_rate": 96,
     "government_type": "Constitutional Monarchy"
   },
   {
@@ -1576,10 +1576,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 15.6,
-    "debt_to_gdp": 66.2,
+    "debt_to_gdp": 51.4,
     "credit_rating": 43,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 98,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -1608,7 +1608,7 @@
     "gdp_normalized": 174,
     "population_normalized": 349,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 45,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1617,7 +1617,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 21.2,
+    "debt_to_gdp": 32.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1649,7 +1649,7 @@
     "gdp_normalized": 285,
     "population_normalized": 522,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 53,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1658,10 +1658,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.16,
-    "debt_to_gdp": 31.3,
+    "debt_to_gdp": 26.4,
     "credit_rating": 28,
     "infrastructure": 43,
-    "literacy_rate": 63,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -1707,10 +1707,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 33.59,
-    "debt_to_gdp": 28.7,
+    "debt_to_gdp": 61.5,
     "credit_rating": 49,
     "infrastructure": 61,
-    "literacy_rate": 81,
+    "literacy_rate": 35,
     "government_type": "Transitional Government"
   },
   {
@@ -1739,7 +1739,7 @@
     "gdp_normalized": 174,
     "population_normalized": 305,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 43,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1748,7 +1748,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 58.1,
+    "debt_to_gdp": 71.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1780,7 +1780,7 @@
     "gdp_normalized": 174,
     "population_normalized": 296,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 46,
     "power_tier": "C",
     "map_color": [
       183,
@@ -1789,7 +1789,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 29.6,
+    "debt_to_gdp": 73.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -1834,10 +1834,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 5.41,
-    "debt_to_gdp": 32.4,
+    "debt_to_gdp": 46.8,
     "credit_rating": 35,
     "infrastructure": 49,
-    "literacy_rate": 69,
+    "literacy_rate": 77,
     "government_type": "Presidential Republic"
   },
   {
@@ -1884,10 +1884,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 90,
-    "debt_to_gdp": 51.8,
+    "debt_to_gdp": 54.4,
     "credit_rating": 56,
     "infrastructure": 67,
-    "literacy_rate": 87,
+    "literacy_rate": 78,
     "government_type": "Republic"
   },
   {
@@ -1929,7 +1929,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 370,
-    "debt_to_gdp": 32.1,
+    "debt_to_gdp": 64.1,
     "credit_rating": 67,
     "infrastructure": 76,
     "literacy_rate": 96,
@@ -1977,10 +1977,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 29.01,
-    "debt_to_gdp": 36.8,
+    "debt_to_gdp": 50.3,
     "credit_rating": 48,
     "infrastructure": 60,
-    "literacy_rate": 80,
+    "literacy_rate": 22,
     "government_type": "Presidential Republic"
   },
   {
@@ -2015,7 +2015,7 @@
     "gdp_normalized": 518,
     "population_normalized": 737,
     "military_normalized": 250,
-    "stability": 75,
+    "stability": 77,
     "power_tier": "B",
     "map_color": [
       176,
@@ -2024,10 +2024,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 47.58,
-    "debt_to_gdp": 26.2,
+    "debt_to_gdp": 32.0,
     "credit_rating": 51,
     "infrastructure": 63,
-    "literacy_rate": 83,
+    "literacy_rate": 47,
     "government_type": "Republic"
   },
   {
@@ -2070,10 +2070,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 6.0,
-    "debt_to_gdp": 51.1,
+    "debt_to_gdp": 66.1,
     "credit_rating": 36,
     "infrastructure": 50,
-    "literacy_rate": 70,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -2102,7 +2102,7 @@
     "gdp_normalized": 174,
     "population_normalized": 324,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 40,
     "power_tier": "C",
     "map_color": [
       173,
@@ -2111,7 +2111,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 60.0,
+    "debt_to_gdp": 20.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2143,7 +2143,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1.0,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 45,
     "power_tier": "D",
     "map_color": [
       171,
@@ -2152,7 +2152,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 60.0,
+    "debt_to_gdp": 79.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2190,7 +2190,7 @@
     "gdp_normalized": 441,
     "population_normalized": 665,
     "military_normalized": 250,
-    "stability": 69,
+    "stability": 67,
     "power_tier": "B",
     "map_color": [
       169,
@@ -2199,10 +2199,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 17.05,
-    "debt_to_gdp": 41.4,
+    "debt_to_gdp": 30.9,
     "credit_rating": 44,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 94,
     "government_type": "Republic"
   },
   {
@@ -2231,7 +2231,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1.0,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 43,
     "power_tier": "D",
     "map_color": [
       167,
@@ -2240,7 +2240,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 59.1,
+    "debt_to_gdp": 49.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2283,10 +2283,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 390,
-    "debt_to_gdp": 43.8,
+    "debt_to_gdp": 73.1,
     "credit_rating": 67,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -2320,7 +2320,7 @@
     "gdp_normalized": 405,
     "population_normalized": 632,
     "military_normalized": 250,
-    "stability": 61,
+    "stability": 64,
     "power_tier": "B",
     "map_color": [
       163,
@@ -2329,10 +2329,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 10.59,
-    "debt_to_gdp": 79.5,
+    "debt_to_gdp": 70.0,
     "credit_rating": 40,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -2378,10 +2378,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 39.47,
-    "debt_to_gdp": 79.1,
+    "debt_to_gdp": 79.4,
     "credit_rating": 50,
     "infrastructure": 62,
-    "literacy_rate": 82,
+    "literacy_rate": 19,
     "government_type": "Transitional Government"
   },
   {
@@ -2410,7 +2410,7 @@
     "gdp_normalized": 174,
     "population_normalized": 340,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       159,
@@ -2419,7 +2419,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 65.7,
+    "debt_to_gdp": 57.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2451,7 +2451,7 @@
     "gdp_normalized": 174,
     "population_normalized": 338,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 39,
     "power_tier": "C",
     "map_color": [
       157,
@@ -2460,7 +2460,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 50.7,
+    "debt_to_gdp": 20.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2492,7 +2492,7 @@
     "gdp_normalized": 174,
     "population_normalized": 324,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 45,
     "power_tier": "C",
     "map_color": [
       155,
@@ -2501,7 +2501,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 44.1,
+    "debt_to_gdp": 38.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2536,7 +2536,7 @@
     "gdp_normalized": 174,
     "population_normalized": 274,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       153,
@@ -2545,7 +2545,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 50.2,
+    "debt_to_gdp": 42.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2581,7 +2581,7 @@
     "gdp_normalized": 350,
     "population_normalized": 582,
     "military_normalized": 250,
-    "stability": 61,
+    "stability": 57,
     "power_tier": "C",
     "map_color": [
       151,
@@ -2590,10 +2590,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 5.13,
-    "debt_to_gdp": 73.2,
+    "debt_to_gdp": 74.6,
     "credit_rating": 35,
     "infrastructure": 49,
-    "literacy_rate": 69,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -2640,7 +2640,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3100,
-    "debt_to_gdp": 42.0,
+    "debt_to_gdp": 47.4,
     "credit_rating": 83,
     "infrastructure": 89,
     "literacy_rate": 99,
@@ -2672,7 +2672,7 @@
     "gdp_normalized": 174,
     "population_normalized": 407,
     "military_normalized": 250,
-    "stability": 44,
+    "stability": 40,
     "power_tier": "C",
     "map_color": [
       147,
@@ -2681,7 +2681,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 42.5,
+    "debt_to_gdp": 40.5,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -2728,10 +2728,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 220,
-    "debt_to_gdp": 70.7,
+    "debt_to_gdp": 64.5,
     "credit_rating": 63,
     "infrastructure": 72,
-    "literacy_rate": 92,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -2765,7 +2765,7 @@
     "gdp_normalized": 570,
     "population_normalized": 746,
     "military_normalized": 320,
-    "stability": 81,
+    "stability": 78,
     "power_tier": "B",
     "map_color": [
       143,
@@ -2774,10 +2774,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 95,
-    "debt_to_gdp": 24.7,
+    "debt_to_gdp": 38.4,
     "credit_rating": 57,
     "infrastructure": 67,
-    "literacy_rate": 87,
+    "literacy_rate": 72,
     "government_type": "Republic"
   },
   {
@@ -2815,10 +2815,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 250,
-    "debt_to_gdp": 44.9,
+    "debt_to_gdp": 38.9,
     "credit_rating": 64,
     "infrastructure": 73,
-    "literacy_rate": 93,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -2847,7 +2847,7 @@
     "gdp_normalized": 345,
     "population_normalized": 577,
     "military_normalized": 250,
-    "stability": 53,
+    "stability": 61,
     "power_tier": "C",
     "map_color": [
       139,
@@ -2856,7 +2856,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.8,
-    "debt_to_gdp": 44.2,
+    "debt_to_gdp": 70.2,
     "credit_rating": 34,
     "infrastructure": 48,
     "literacy_rate": 68,
@@ -2905,10 +2905,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1050,
-    "debt_to_gdp": 53.1,
+    "debt_to_gdp": 33.6,
     "credit_rating": 75,
     "infrastructure": 82,
-    "literacy_rate": 99,
+    "literacy_rate": 97,
     "government_type": "Kingdom"
   },
   {
@@ -2943,7 +2943,7 @@
     "gdp_normalized": 221,
     "population_normalized": 463,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 49,
     "power_tier": "C",
     "map_color": [
       135,
@@ -2952,10 +2952,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.93,
-    "debt_to_gdp": 44.3,
+    "debt_to_gdp": 78.8,
     "credit_rating": 22,
     "infrastructure": 38,
-    "literacy_rate": 58,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -2991,7 +2991,7 @@
     "gdp_normalized": 683,
     "population_normalized": 784,
     "military_normalized": 481,
-    "stability": 86,
+    "stability": 83,
     "power_tier": "B",
     "map_color": [
       130,
@@ -3000,10 +3000,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 420,
-    "debt_to_gdp": 60.2,
+    "debt_to_gdp": 29.4,
     "credit_rating": 68,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 87,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -3046,10 +3046,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 380,
-    "debt_to_gdp": 42.7,
+    "debt_to_gdp": 49.2,
     "credit_rating": 67,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 58,
     "government_type": "Federal Parliamentary Republic"
   },
   {
@@ -3078,7 +3078,7 @@
     "gdp_normalized": 490,
     "population_normalized": 710,
     "military_normalized": 250,
-    "stability": 72,
+    "stability": 73,
     "power_tier": "B",
     "map_color": [
       129,
@@ -3087,10 +3087,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 32.64,
-    "debt_to_gdp": 62.1,
+    "debt_to_gdp": 52.4,
     "credit_rating": 49,
     "infrastructure": 60,
-    "literacy_rate": 80,
+    "literacy_rate": 92,
     "government_type": "Republic"
   },
   {
@@ -3135,10 +3135,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 44.16,
-    "debt_to_gdp": 34.3,
+    "debt_to_gdp": 76.1,
     "credit_rating": 51,
     "infrastructure": 62,
-    "literacy_rate": 82,
+    "literacy_rate": 77,
     "government_type": "Presidential Republic"
   },
   {
@@ -3167,7 +3167,7 @@
     "gdp_normalized": 174,
     "population_normalized": 306,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       125,
@@ -3176,7 +3176,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 37.7,
+    "debt_to_gdp": 77.5,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -3212,7 +3212,7 @@
     "gdp_normalized": 382,
     "population_normalized": 611,
     "military_normalized": 250,
-    "stability": 62,
+    "stability": 65,
     "power_tier": "D",
     "map_color": [
       123,
@@ -3221,10 +3221,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 7.87,
-    "debt_to_gdp": 67.0,
+    "debt_to_gdp": 50.1,
     "credit_rating": 38,
     "infrastructure": 51,
-    "literacy_rate": 71,
+    "literacy_rate": 48,
     "government_type": "Republic"
   },
   {
@@ -3265,7 +3265,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 530,
-    "debt_to_gdp": 33.8,
+    "debt_to_gdp": 79.9,
     "credit_rating": 70,
     "infrastructure": 78,
     "literacy_rate": 98,
@@ -3312,7 +3312,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 900,
-    "debt_to_gdp": 58.6,
+    "debt_to_gdp": 64.6,
     "credit_rating": 74,
     "infrastructure": 81,
     "literacy_rate": 99,
@@ -3361,10 +3361,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 210,
-    "debt_to_gdp": 47.0,
+    "debt_to_gdp": 62.8,
     "credit_rating": 63,
     "infrastructure": 72,
-    "literacy_rate": 92,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -3409,10 +3409,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 11.19,
-    "debt_to_gdp": 48.1,
+    "debt_to_gdp": 36.5,
     "credit_rating": 40,
     "infrastructure": 54,
-    "literacy_rate": 74,
+    "literacy_rate": 91,
     "government_type": "Transitional Government"
   },
   {
@@ -3441,7 +3441,7 @@
     "gdp_normalized": 174,
     "population_normalized": 417,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 39,
     "power_tier": "C",
     "map_color": [
       113,
@@ -3450,10 +3450,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 64.5,
+    "debt_to_gdp": 36.3,
     "credit_rating": 17,
     "infrastructure": 34,
-    "literacy_rate": 54,
+    "literacy_rate": 87,
     "government_type": "Republic"
   },
   {
@@ -3482,7 +3482,7 @@
     "gdp_normalized": 174,
     "population_normalized": 186,
     "military_normalized": 250,
-    "stability": 39,
+    "stability": 45,
     "power_tier": "D",
     "map_color": [
       111,
@@ -3491,7 +3491,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 21.0,
+    "debt_to_gdp": 76.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -3523,7 +3523,7 @@
     "gdp_normalized": 174,
     "population_normalized": 378,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       109,
@@ -3532,7 +3532,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 65.1,
+    "debt_to_gdp": 27.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -3580,10 +3580,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.71,
-    "debt_to_gdp": 26.9,
+    "debt_to_gdp": 61.5,
     "credit_rating": 39,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 37,
     "government_type": "Presidential Republic"
   },
   {
@@ -3617,7 +3617,7 @@
     "gdp_normalized": 435,
     "population_normalized": 660,
     "military_normalized": 250,
-    "stability": 63,
+    "stability": 64,
     "power_tier": "B",
     "map_color": [
       105,
@@ -3626,10 +3626,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 15.75,
-    "debt_to_gdp": 70.9,
+    "debt_to_gdp": 48.8,
     "credit_rating": 43,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -3669,10 +3669,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 8.19,
-    "debt_to_gdp": 21.3,
+    "debt_to_gdp": 29.7,
     "credit_rating": 38,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -3701,7 +3701,7 @@
     "gdp_normalized": 174,
     "population_normalized": 404,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       101,
@@ -3710,7 +3710,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 29.5,
+    "debt_to_gdp": 65.5,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -3754,10 +3754,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 49.03,
-    "debt_to_gdp": 71.1,
+    "debt_to_gdp": 80.0,
     "credit_rating": 52,
     "infrastructure": 63,
-    "literacy_rate": 83,
+    "literacy_rate": 70,
     "government_type": "Presidential Republic"
   },
   {
@@ -3786,7 +3786,7 @@
     "gdp_normalized": 174,
     "population_normalized": 294,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       100,
@@ -3795,7 +3795,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 60.6,
+    "debt_to_gdp": 36.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -3836,10 +3836,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 14.62,
-    "debt_to_gdp": 39.1,
+    "debt_to_gdp": 50.6,
     "credit_rating": 42,
     "infrastructure": 55,
-    "literacy_rate": 75,
+    "literacy_rate": 100,
     "government_type": "Socialist Republic"
   },
   {
@@ -3883,10 +3883,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 15.36,
-    "debt_to_gdp": 59.5,
+    "debt_to_gdp": 22.5,
     "credit_rating": 43,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -3915,7 +3915,7 @@
     "gdp_normalized": 235,
     "population_normalized": 476,
     "military_normalized": 250,
-    "stability": 54,
+    "stability": 51,
     "power_tier": "C",
     "map_color": [
       100,
@@ -3924,10 +3924,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.13,
-    "debt_to_gdp": 32.6,
+    "debt_to_gdp": 57.0,
     "credit_rating": 23,
     "infrastructure": 39,
-    "literacy_rate": 59,
+    "literacy_rate": 84,
     "government_type": "Republic"
   },
   {
@@ -3956,7 +3956,7 @@
     "gdp_normalized": 335,
     "population_normalized": 568,
     "military_normalized": 250,
-    "stability": 60,
+    "stability": 56,
     "power_tier": "C",
     "map_color": [
       100,
@@ -3965,10 +3965,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.24,
-    "debt_to_gdp": 56.2,
+    "debt_to_gdp": 26.3,
     "credit_rating": 33,
     "infrastructure": 47,
-    "literacy_rate": 67,
+    "literacy_rate": 88,
     "government_type": "Republic"
   },
   {
@@ -4010,10 +4010,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 55.24,
-    "debt_to_gdp": 33.1,
+    "debt_to_gdp": 44.8,
     "credit_rating": 52,
     "infrastructure": 64,
-    "literacy_rate": 84,
+    "literacy_rate": 74,
     "government_type": "Constitutional Monarchy"
   },
   {
@@ -4051,10 +4051,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.05,
-    "debt_to_gdp": 66.8,
+    "debt_to_gdp": 78.6,
     "credit_rating": 28,
     "infrastructure": 43,
-    "literacy_rate": 63,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -4083,7 +4083,7 @@
     "gdp_normalized": 174,
     "population_normalized": 417,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4092,7 +4092,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 57.2,
+    "debt_to_gdp": 61.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4124,7 +4124,7 @@
     "gdp_normalized": 174,
     "population_normalized": 52,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 48,
     "power_tier": "D",
     "map_color": [
       100,
@@ -4133,7 +4133,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 25.1,
+    "debt_to_gdp": 70.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4177,7 +4177,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.63,
-    "debt_to_gdp": 66.6,
+    "debt_to_gdp": 45.8,
     "credit_rating": 19,
     "infrastructure": 35,
     "literacy_rate": 55,
@@ -4235,10 +4235,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 18500,
-    "debt_to_gdp": 27.8,
+    "debt_to_gdp": 71.5,
     "credit_rating": 96,
     "infrastructure": 95,
-    "literacy_rate": 99,
+    "literacy_rate": 97,
     "government_type": "People's Republic"
   },
   {
@@ -4267,7 +4267,7 @@
     "gdp_normalized": 174,
     "population_normalized": 386,
     "military_normalized": 250,
-    "stability": 40,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4276,7 +4276,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 22.3,
+    "debt_to_gdp": 21.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4308,7 +4308,7 @@
     "gdp_normalized": 174,
     "population_normalized": 271,
     "military_normalized": 250,
-    "stability": 40,
+    "stability": 45,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4317,7 +4317,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 60.7,
+    "debt_to_gdp": 71.3,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4366,10 +4366,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 77.49,
-    "debt_to_gdp": 72.3,
+    "debt_to_gdp": 55.1,
     "credit_rating": 55,
     "infrastructure": 66,
-    "literacy_rate": 86,
+    "literacy_rate": 61,
     "government_type": "Transitional Government"
   },
   {
@@ -4398,7 +4398,7 @@
     "gdp_normalized": 174,
     "population_normalized": 70,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 42,
     "power_tier": "D",
     "map_color": [
       100,
@@ -4407,7 +4407,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 48.4,
+    "debt_to_gdp": 61.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4445,7 +4445,7 @@
     "gdp_normalized": 385,
     "population_normalized": 614,
     "military_normalized": 250,
-    "stability": 59,
+    "stability": 63,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4454,10 +4454,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 8.12,
-    "debt_to_gdp": 76.4,
+    "debt_to_gdp": 56.5,
     "credit_rating": 38,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -4499,10 +4499,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 18.5,
-    "debt_to_gdp": 70.0,
+    "debt_to_gdp": 56.4,
     "credit_rating": 44,
     "infrastructure": 57,
-    "literacy_rate": 77,
+    "literacy_rate": 68,
     "government_type": "Republic"
   },
   {
@@ -4531,7 +4531,7 @@
     "gdp_normalized": 174,
     "population_normalized": 276,
     "military_normalized": 250,
-    "stability": 40,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4540,7 +4540,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 30.8,
+    "debt_to_gdp": 22.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4590,10 +4590,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 530,
-    "debt_to_gdp": 29.2,
+    "debt_to_gdp": 29.4,
     "credit_rating": 70,
     "infrastructure": 78,
-    "literacy_rate": 98,
+    "literacy_rate": 99,
     "government_type": "Federal Parliamentary Republic"
   },
   {
@@ -4638,10 +4638,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 51.14,
-    "debt_to_gdp": 51.7,
+    "debt_to_gdp": 72.0,
     "credit_rating": 52,
     "infrastructure": 63,
-    "literacy_rate": 83,
+    "literacy_rate": 63,
     "government_type": "Republic"
   },
   {
@@ -4670,7 +4670,7 @@
     "gdp_normalized": 174,
     "population_normalized": 343,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4679,7 +4679,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 57.8,
+    "debt_to_gdp": 22.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4713,7 +4713,7 @@
     "gdp_normalized": 443,
     "population_normalized": 668,
     "military_normalized": 250,
-    "stability": 71,
+    "stability": 64,
     "power_tier": "B",
     "map_color": [
       100,
@@ -4722,10 +4722,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 17.67,
-    "debt_to_gdp": 73.0,
+    "debt_to_gdp": 71.9,
     "credit_rating": 44,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 64,
     "government_type": "Republic"
   },
   {
@@ -4772,10 +4772,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1000,
-    "debt_to_gdp": 41.3,
+    "debt_to_gdp": 72.1,
     "credit_rating": 74,
     "infrastructure": 82,
-    "literacy_rate": 99,
+    "literacy_rate": 96,
     "government_type": "Presidential Republic"
   },
   {
@@ -4809,7 +4809,7 @@
     "gdp_normalized": 292,
     "population_normalized": 528,
     "military_normalized": 250,
-    "stability": 58,
+    "stability": 56,
     "power_tier": "C",
     "map_color": [
       100,
@@ -4818,7 +4818,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.38,
-    "debt_to_gdp": 55.4,
+    "debt_to_gdp": 56.8,
     "credit_rating": 29,
     "infrastructure": 44,
     "literacy_rate": 64,
@@ -4859,7 +4859,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 72.9,
+    "debt_to_gdp": 76.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -4904,10 +4904,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 26.37,
-    "debt_to_gdp": 73.9,
+    "debt_to_gdp": 53.5,
     "credit_rating": 47,
     "infrastructure": 59,
-    "literacy_rate": 79,
+    "literacy_rate": 80,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -4947,10 +4947,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 290,
-    "debt_to_gdp": 61.6,
+    "debt_to_gdp": 32.4,
     "credit_rating": 65,
     "infrastructure": 74,
-    "literacy_rate": 94,
+    "literacy_rate": 96,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -4990,7 +4990,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3200,
-    "debt_to_gdp": 43.1,
+    "debt_to_gdp": 71.9,
     "credit_rating": 83,
     "infrastructure": 89,
     "literacy_rate": 99,
@@ -5036,10 +5036,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 390,
-    "debt_to_gdp": 49.0,
+    "debt_to_gdp": 62.3,
     "credit_rating": 67,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 62,
     "government_type": "Federal Presidential Republic"
   },
   {
@@ -5068,7 +5068,7 @@
     "gdp_normalized": 174,
     "population_normalized": 208,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 46,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5077,7 +5077,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 44.5,
+    "debt_to_gdp": 52.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5109,7 +5109,7 @@
     "gdp_normalized": 174,
     "population_normalized": 284,
     "military_normalized": 250,
-    "stability": 39,
+    "stability": 48,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5118,7 +5118,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 33.2,
+    "debt_to_gdp": 54.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5165,10 +5165,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 360,
-    "debt_to_gdp": 37.2,
+    "debt_to_gdp": 21.7,
     "credit_rating": 67,
     "infrastructure": 75,
-    "literacy_rate": 95,
+    "literacy_rate": 97,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -5200,7 +5200,7 @@
     "gdp_normalized": 174,
     "population_normalized": 411,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 43,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5209,7 +5209,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 47.9,
+    "debt_to_gdp": 58.3,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5253,10 +5253,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 8.23,
-    "debt_to_gdp": 66.5,
+    "debt_to_gdp": 31.4,
     "credit_rating": 38,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 94,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -5294,7 +5294,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4200,
-    "debt_to_gdp": 66.2,
+    "debt_to_gdp": 22.6,
     "credit_rating": 85,
     "infrastructure": 91,
     "literacy_rate": 99,
@@ -5337,10 +5337,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.63,
-    "debt_to_gdp": 69.6,
+    "debt_to_gdp": 30.9,
     "credit_rating": 32,
     "infrastructure": 47,
-    "literacy_rate": 67,
+    "literacy_rate": 50,
     "government_type": "Republic"
   },
   {
@@ -5380,7 +5380,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 65.5,
+    "debt_to_gdp": 34.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5415,7 +5415,7 @@
     "gdp_normalized": 301,
     "population_normalized": 536,
     "military_normalized": 250,
-    "stability": 51,
+    "stability": 59,
     "power_tier": "D",
     "map_color": [
       100,
@@ -5424,10 +5424,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.67,
-    "debt_to_gdp": 60.9,
+    "debt_to_gdp": 51.9,
     "credit_rating": 30,
     "infrastructure": 45,
-    "literacy_rate": 65,
+    "literacy_rate": 46,
     "government_type": "Republic"
   },
   {
@@ -5462,7 +5462,7 @@
     "gdp_normalized": 411,
     "population_normalized": 638,
     "military_normalized": 250,
-    "stability": 64,
+    "stability": 63,
     "power_tier": "B",
     "map_color": [
       100,
@@ -5471,10 +5471,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 11.47,
-    "debt_to_gdp": 45.8,
+    "debt_to_gdp": 67.6,
     "credit_rating": 41,
     "infrastructure": 54,
-    "literacy_rate": 74,
+    "literacy_rate": 84,
     "government_type": "People's Republic"
   },
   {
@@ -5509,7 +5509,7 @@
     "gdp_normalized": 302,
     "population_normalized": 538,
     "military_normalized": 250,
-    "stability": 55,
+    "stability": 56,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5518,10 +5518,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.73,
-    "debt_to_gdp": 60.7,
+    "debt_to_gdp": 32.6,
     "credit_rating": 30,
     "infrastructure": 45,
-    "literacy_rate": 65,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -5561,7 +5561,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 230,
-    "debt_to_gdp": 63.1,
+    "debt_to_gdp": 51.1,
     "credit_rating": 63,
     "infrastructure": 73,
     "literacy_rate": 93,
@@ -5611,10 +5611,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 29.54,
-    "debt_to_gdp": 51.1,
+    "debt_to_gdp": 71.8,
     "credit_rating": 48,
     "infrastructure": 60,
-    "literacy_rate": 80,
+    "literacy_rate": 87,
     "government_type": "Republic"
   },
   {
@@ -5643,7 +5643,7 @@
     "gdp_normalized": 174,
     "population_normalized": 404,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 44,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5652,7 +5652,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 33.0,
+    "debt_to_gdp": 30.8,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5695,7 +5695,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 72.8,
+    "debt_to_gdp": 49.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5743,7 +5743,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2200,
-    "debt_to_gdp": 79.8,
+    "debt_to_gdp": 47.4,
     "credit_rating": 80,
     "infrastructure": 87,
     "literacy_rate": 99,
@@ -5775,7 +5775,7 @@
     "gdp_normalized": 251,
     "population_normalized": 490,
     "military_normalized": 250,
-    "stability": 54,
+    "stability": 51,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5784,10 +5784,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.38,
-    "debt_to_gdp": 38.6,
+    "debt_to_gdp": 41.7,
     "credit_rating": 25,
     "infrastructure": 40,
-    "literacy_rate": 60,
+    "literacy_rate": 58,
     "government_type": "Republic"
   },
   {
@@ -5821,7 +5821,7 @@
     "gdp_normalized": 322,
     "population_normalized": 556,
     "military_normalized": 250,
-    "stability": 54,
+    "stability": 60,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5830,10 +5830,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.54,
-    "debt_to_gdp": 21.2,
+    "debt_to_gdp": 66.0,
     "credit_rating": 32,
     "infrastructure": 46,
-    "literacy_rate": 66,
+    "literacy_rate": 97,
     "government_type": "Republic"
   },
   {
@@ -5864,7 +5864,7 @@
     "gdp_normalized": 174,
     "population_normalized": 269,
     "military_normalized": 250,
-    "stability": 42,
+    "stability": 48,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5873,7 +5873,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 74.0,
+    "debt_to_gdp": 47.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5908,7 +5908,7 @@
     "gdp_normalized": 353,
     "population_normalized": 584,
     "military_normalized": 250,
-    "stability": 55,
+    "stability": 61,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5917,10 +5917,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 5.32,
-    "debt_to_gdp": 69.1,
+    "debt_to_gdp": 75.0,
     "credit_rating": 35,
     "infrastructure": 49,
-    "literacy_rate": 69,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -5949,7 +5949,7 @@
     "gdp_normalized": 174,
     "population_normalized": 336,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 39,
     "power_tier": "C",
     "map_color": [
       100,
@@ -5958,7 +5958,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 37.4,
+    "debt_to_gdp": 41.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -5990,7 +5990,7 @@
     "gdp_normalized": 518,
     "population_normalized": 737,
     "military_normalized": 250,
-    "stability": 68,
+    "stability": 72,
     "power_tier": "B",
     "map_color": [
       100,
@@ -5999,10 +5999,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 47.59,
-    "debt_to_gdp": 60.2,
+    "debt_to_gdp": 56.3,
     "credit_rating": 51,
     "infrastructure": 63,
-    "literacy_rate": 83,
+    "literacy_rate": 77,
     "government_type": "Republic"
   },
   {
@@ -6031,7 +6031,7 @@
     "gdp_normalized": 174,
     "population_normalized": 138,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 46,
     "power_tier": "D",
     "map_color": [
       100,
@@ -6040,7 +6040,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 42.4,
+    "debt_to_gdp": 52.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6072,7 +6072,7 @@
     "gdp_normalized": 174,
     "population_normalized": 136,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 46,
     "power_tier": "D",
     "map_color": [
       100,
@@ -6081,7 +6081,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 31.6,
+    "debt_to_gdp": 35.5,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6115,7 +6115,7 @@
     "gdp_normalized": 174,
     "population_normalized": 269,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6124,7 +6124,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 71.8,
+    "debt_to_gdp": 30.1,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6176,10 +6176,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2100,
-    "debt_to_gdp": 44.8,
+    "debt_to_gdp": 66.9,
     "credit_rating": 80,
     "infrastructure": 87,
-    "literacy_rate": 99,
+    "literacy_rate": 93,
     "government_type": "Federal Presidential Republic"
   },
   {
@@ -6217,7 +6217,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1700,
-    "debt_to_gdp": 55.1,
+    "debt_to_gdp": 33.8,
     "credit_rating": 78,
     "infrastructure": 85,
     "literacy_rate": 99,
@@ -6253,7 +6253,7 @@
     "gdp_normalized": 238,
     "population_normalized": 478,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 51,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6262,10 +6262,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.16,
-    "debt_to_gdp": 76.6,
+    "debt_to_gdp": 70.2,
     "credit_rating": 23,
     "infrastructure": 39,
-    "literacy_rate": 59,
+    "literacy_rate": 88,
     "government_type": "Republic"
   },
   {
@@ -6308,10 +6308,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.2,
-    "debt_to_gdp": 31.8,
+    "debt_to_gdp": 26.2,
     "credit_rating": 31,
     "infrastructure": 46,
-    "literacy_rate": 66,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -6342,7 +6342,7 @@
     "gdp_normalized": 174,
     "population_normalized": 261,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 46,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6351,7 +6351,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 39.3,
+    "debt_to_gdp": 37.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6383,7 +6383,7 @@
     "gdp_normalized": 174,
     "population_normalized": 82,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 40,
     "power_tier": "D",
     "map_color": [
       100,
@@ -6392,7 +6392,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 48.5,
+    "debt_to_gdp": 39.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6437,10 +6437,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 8.23,
-    "debt_to_gdp": 76.4,
+    "debt_to_gdp": 44.8,
     "credit_rating": 38,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 97,
     "government_type": "Presidential Republic"
   },
   {
@@ -6472,7 +6472,7 @@
     "gdp_normalized": 239,
     "population_normalized": 479,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 53,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6481,10 +6481,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.18,
-    "debt_to_gdp": 40.5,
+    "debt_to_gdp": 35.0,
     "credit_rating": 23,
     "infrastructure": 39,
-    "literacy_rate": 59,
+    "literacy_rate": 67,
     "government_type": "Republic"
   },
   {
@@ -6524,10 +6524,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 46.5,
+    "debt_to_gdp": 52.8,
     "credit_rating": 17,
     "infrastructure": 34,
-    "literacy_rate": 54,
+    "literacy_rate": 96,
     "government_type": "Republic"
   },
   {
@@ -6565,10 +6565,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 450,
-    "debt_to_gdp": 42.5,
+    "debt_to_gdp": 51.1,
     "credit_rating": 68,
     "infrastructure": 77,
-    "literacy_rate": 97,
+    "literacy_rate": 96,
     "government_type": "Presidential Republic"
   },
   {
@@ -6610,10 +6610,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 330,
-    "debt_to_gdp": 29.8,
+    "debt_to_gdp": 27.6,
     "credit_rating": 66,
     "infrastructure": 75,
-    "literacy_rate": 95,
+    "literacy_rate": 97,
     "government_type": "Presidential Republic"
   },
   {
@@ -6642,7 +6642,7 @@
     "gdp_normalized": 178,
     "population_normalized": 423,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 43,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6651,7 +6651,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.52,
-    "debt_to_gdp": 28.2,
+    "debt_to_gdp": 68.3,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6694,10 +6694,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 17.8,
-    "debt_to_gdp": 65.5,
+    "debt_to_gdp": 35.9,
     "credit_rating": 44,
     "infrastructure": 57,
-    "literacy_rate": 77,
+    "literacy_rate": 61,
     "government_type": "Presidential Republic"
   },
   {
@@ -6726,7 +6726,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1.0,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 41,
     "power_tier": "D",
     "map_color": [
       100,
@@ -6735,7 +6735,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 24.9,
+    "debt_to_gdp": 22.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6776,7 +6776,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 48.7,
+    "debt_to_gdp": 72.5,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6808,7 +6808,7 @@
     "gdp_normalized": 174,
     "population_normalized": 387,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 42,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6817,7 +6817,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 63.3,
+    "debt_to_gdp": 41.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -6851,7 +6851,7 @@
     "gdp_normalized": 228,
     "population_normalized": 470,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 44,
     "power_tier": "C",
     "map_color": [
       100,
@@ -6860,7 +6860,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.03,
-    "debt_to_gdp": 28.7,
+    "debt_to_gdp": 55.9,
     "credit_rating": 22,
     "infrastructure": 39,
     "literacy_rate": 59,
@@ -6901,10 +6901,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.87,
-    "debt_to_gdp": 27.5,
+    "debt_to_gdp": 35.2,
     "credit_rating": 27,
     "infrastructure": 42,
-    "literacy_rate": 62,
+    "literacy_rate": 91,
     "government_type": "Republic"
   },
   {
@@ -6942,10 +6942,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.39,
-    "debt_to_gdp": 74.8,
+    "debt_to_gdp": 44.3,
     "credit_rating": 29,
     "infrastructure": 44,
-    "literacy_rate": 64,
+    "literacy_rate": 97,
     "government_type": "Constitutional Monarchy"
   },
   {
@@ -6987,10 +6987,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1500,
-    "debt_to_gdp": 45.4,
+    "debt_to_gdp": 29.9,
     "credit_rating": 77,
     "infrastructure": 84,
-    "literacy_rate": 99,
+    "literacy_rate": 95,
     "government_type": "Federal Presidential Republic"
   },
   {
@@ -7019,7 +7019,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1,
     "military_normalized": 250,
-    "stability": 45,
+    "stability": 47,
     "power_tier": "D",
     "map_color": [
       100,
@@ -7028,7 +7028,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 77.2,
+    "debt_to_gdp": 36.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7075,7 +7075,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 590,
-    "debt_to_gdp": 38.3,
+    "debt_to_gdp": 76.7,
     "credit_rating": 70,
     "infrastructure": 79,
     "literacy_rate": 99,
@@ -7110,7 +7110,7 @@
     "gdp_normalized": 514,
     "population_normalized": 732,
     "military_normalized": 250,
-    "stability": 77,
+    "stability": 76,
     "power_tier": "B",
     "map_color": [
       100,
@@ -7119,10 +7119,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 44.87,
-    "debt_to_gdp": 31.8,
+    "debt_to_gdp": 29.0,
     "credit_rating": 51,
     "infrastructure": 62,
-    "literacy_rate": 82,
+    "literacy_rate": 68,
     "government_type": "Republic"
   },
   {
@@ -7163,7 +7163,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 620,
-    "debt_to_gdp": 32.3,
+    "debt_to_gdp": 58.3,
     "credit_rating": 71,
     "infrastructure": 79,
     "literacy_rate": 99,
@@ -7198,7 +7198,7 @@
     "gdp_normalized": 424,
     "population_normalized": 650,
     "military_normalized": 250,
-    "stability": 64,
+    "stability": 67,
     "power_tier": "D",
     "map_color": [
       100,
@@ -7207,10 +7207,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 13.62,
-    "debt_to_gdp": 43.4,
+    "debt_to_gdp": 33.2,
     "credit_rating": 42,
     "infrastructure": 55,
-    "literacy_rate": 75,
+    "literacy_rate": 43,
     "government_type": "Republic"
   },
   {
@@ -7242,7 +7242,7 @@
     "gdp_normalized": 273,
     "population_normalized": 511,
     "military_normalized": 250,
-    "stability": 53,
+    "stability": 50,
     "power_tier": "C",
     "map_color": [
       100,
@@ -7251,10 +7251,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.85,
-    "debt_to_gdp": 55.0,
+    "debt_to_gdp": 55.8,
     "credit_rating": 27,
     "infrastructure": 42,
-    "literacy_rate": 62,
+    "literacy_rate": 88,
     "government_type": "Kingdom"
   },
   {
@@ -7298,10 +7298,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1600,
-    "debt_to_gdp": 31.9,
+    "debt_to_gdp": 32.4,
     "credit_rating": 78,
     "infrastructure": 85,
-    "literacy_rate": 99,
+    "literacy_rate": 98,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -7345,7 +7345,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 340,
-    "debt_to_gdp": 46.5,
+    "debt_to_gdp": 23.3,
     "credit_rating": 66,
     "infrastructure": 75,
     "literacy_rate": 95,
@@ -7377,7 +7377,7 @@
     "gdp_normalized": 174,
     "population_normalized": 289,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       101,
@@ -7386,7 +7386,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 52.0,
+    "debt_to_gdp": 27.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7422,7 +7422,7 @@
     "gdp_normalized": 262,
     "population_normalized": 501,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 51,
     "power_tier": "C",
     "map_color": [
       103,
@@ -7431,10 +7431,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.6,
-    "debt_to_gdp": 45.2,
+    "debt_to_gdp": 37.7,
     "credit_rating": 26,
     "infrastructure": 41,
-    "literacy_rate": 61,
+    "literacy_rate": 50,
     "government_type": "Republic"
   },
   {
@@ -7463,7 +7463,7 @@
     "gdp_normalized": 174,
     "population_normalized": 187,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 47,
     "power_tier": "D",
     "map_color": [
       105,
@@ -7472,7 +7472,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 26.5,
+    "debt_to_gdp": 20.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7507,7 +7507,7 @@
     "gdp_normalized": 393,
     "population_normalized": 621,
     "military_normalized": 250,
-    "stability": 63,
+    "stability": 59,
     "power_tier": "C",
     "map_color": [
       107,
@@ -7516,10 +7516,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.04,
-    "debt_to_gdp": 51.7,
+    "debt_to_gdp": 75.8,
     "credit_rating": 39,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 89,
     "government_type": "Republic"
   },
   {
@@ -7548,7 +7548,7 @@
     "gdp_normalized": 174,
     "population_normalized": 254,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 40,
     "power_tier": "C",
     "map_color": [
       109,
@@ -7557,7 +7557,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 47.6,
+    "debt_to_gdp": 63.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7589,7 +7589,7 @@
     "gdp_normalized": 184,
     "population_normalized": 428,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 45,
     "power_tier": "C",
     "map_color": [
       111,
@@ -7598,7 +7598,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.57,
-    "debt_to_gdp": 71.6,
+    "debt_to_gdp": 56.6,
     "credit_rating": 18,
     "infrastructure": 35,
     "literacy_rate": 55,
@@ -7643,10 +7643,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 14.84,
-    "debt_to_gdp": 60.8,
+    "debt_to_gdp": 48.6,
     "credit_rating": 43,
     "infrastructure": 55,
-    "literacy_rate": 75,
+    "literacy_rate": 87,
     "government_type": "Republic"
   },
   {
@@ -7690,10 +7690,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 120,
-    "debt_to_gdp": 60.5,
+    "debt_to_gdp": 21.8,
     "credit_rating": 58,
     "infrastructure": 69,
-    "literacy_rate": 89,
+    "literacy_rate": 81,
     "government_type": "Presidential Republic"
   },
   {
@@ -7722,7 +7722,7 @@
     "gdp_normalized": 215,
     "population_normalized": 457,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 52,
     "power_tier": "C",
     "map_color": [
       117,
@@ -7731,10 +7731,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.86,
-    "debt_to_gdp": 64.8,
+    "debt_to_gdp": 68.8,
     "credit_rating": 21,
     "infrastructure": 37,
-    "literacy_rate": 57,
+    "literacy_rate": 94,
     "government_type": "Republic"
   },
   {
@@ -7777,10 +7777,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.74,
-    "debt_to_gdp": 31.7,
+    "debt_to_gdp": 39.2,
     "credit_rating": 30,
     "infrastructure": 45,
-    "literacy_rate": 65,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -7813,7 +7813,7 @@
     "gdp_normalized": 325,
     "population_normalized": 559,
     "military_normalized": 250,
-    "stability": 53,
+    "stability": 57,
     "power_tier": "C",
     "map_color": [
       121,
@@ -7822,10 +7822,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.7,
-    "debt_to_gdp": 44.0,
+    "debt_to_gdp": 79.4,
     "credit_rating": 32,
     "infrastructure": 47,
-    "literacy_rate": 67,
+    "literacy_rate": 84,
     "government_type": "Republic"
   },
   {
@@ -7856,7 +7856,7 @@
     "gdp_normalized": 671,
     "population_normalized": 636,
     "military_normalized": 464,
-    "stability": 90,
+    "stability": 84,
     "power_tier": "B",
     "map_color": [
       123,
@@ -7865,7 +7865,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 360,
-    "debt_to_gdp": 59.2,
+    "debt_to_gdp": 56.6,
     "credit_rating": 67,
     "infrastructure": 75,
     "literacy_rate": 95,
@@ -7906,7 +7906,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 54.0,
+    "debt_to_gdp": 27.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7938,7 +7938,7 @@
     "gdp_normalized": 174,
     "population_normalized": 180,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 42,
     "power_tier": "D",
     "map_color": [
       127,
@@ -7947,7 +7947,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 40.7,
+    "debt_to_gdp": 50.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -7981,7 +7981,7 @@
     "gdp_normalized": 282,
     "population_normalized": 519,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 58,
     "power_tier": "C",
     "map_color": [
       129,
@@ -7990,10 +7990,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.09,
-    "debt_to_gdp": 62.7,
+    "debt_to_gdp": 65.6,
     "credit_rating": 28,
     "infrastructure": 43,
-    "literacy_rate": 63,
+    "literacy_rate": 68,
     "government_type": "Republic"
   },
   {
@@ -8026,7 +8026,7 @@
     "gdp_normalized": 218,
     "population_normalized": 461,
     "military_normalized": 250,
-    "stability": 51,
+    "stability": 52,
     "power_tier": "C",
     "map_color": [
       131,
@@ -8035,7 +8035,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.9,
-    "debt_to_gdp": 71.1,
+    "debt_to_gdp": 67.1,
     "credit_rating": 21,
     "infrastructure": 38,
     "literacy_rate": 58,
@@ -8069,7 +8069,7 @@
     "gdp_normalized": 314,
     "population_normalized": 548,
     "military_normalized": 250,
-    "stability": 55,
+    "stability": 60,
     "power_tier": "C",
     "map_color": [
       133,
@@ -8078,10 +8078,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.17,
-    "debt_to_gdp": 43.4,
+    "debt_to_gdp": 57.4,
     "credit_rating": 31,
     "infrastructure": 46,
-    "literacy_rate": 66,
+    "literacy_rate": 79,
     "government_type": "Republic"
   },
   {
@@ -8122,7 +8122,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 28000,
-    "debt_to_gdp": 49.6,
+    "debt_to_gdp": 59.7,
     "credit_rating": 100,
     "infrastructure": 95,
     "literacy_rate": 99,
@@ -8168,10 +8168,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 550,
-    "debt_to_gdp": 60.3,
+    "debt_to_gdp": 72.8,
     "credit_rating": 70,
     "infrastructure": 78,
-    "literacy_rate": 98,
+    "literacy_rate": 94,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -8200,7 +8200,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1.0,
     "military_normalized": 250,
-    "stability": 48,
+    "stability": 41,
     "power_tier": "D",
     "map_color": [
       139,
@@ -8209,7 +8209,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 43.1,
+    "debt_to_gdp": 27.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -8257,10 +8257,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3900,
-    "debt_to_gdp": 56.8,
+    "debt_to_gdp": 41.3,
     "credit_rating": 85,
     "infrastructure": 90,
-    "literacy_rate": 99,
+    "literacy_rate": 74,
     "government_type": "Federal Parliamentary Republic"
   },
   {
@@ -8294,7 +8294,7 @@
     "gdp_normalized": 337,
     "population_normalized": 570,
     "military_normalized": 250,
-    "stability": 53,
+    "stability": 54,
     "power_tier": "C",
     "map_color": [
       143,
@@ -8303,10 +8303,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.34,
-    "debt_to_gdp": 35.4,
+    "debt_to_gdp": 32.0,
     "credit_rating": 33,
     "infrastructure": 48,
-    "literacy_rate": 68,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -8335,7 +8335,7 @@
     "gdp_normalized": 174,
     "population_normalized": 118,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 46,
     "power_tier": "D",
     "map_color": [
       145,
@@ -8344,7 +8344,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 65.6,
+    "debt_to_gdp": 79.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -8390,10 +8390,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 25.61,
-    "debt_to_gdp": 53.3,
+    "debt_to_gdp": 50.2,
     "credit_rating": 47,
     "infrastructure": 59,
-    "literacy_rate": 79,
+    "literacy_rate": 89,
     "government_type": "Republic"
   },
   {
@@ -8422,7 +8422,7 @@
     "gdp_normalized": 174,
     "population_normalized": 106,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 49,
     "power_tier": "D",
     "map_color": [
       149,
@@ -8431,7 +8431,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 69.3,
+    "debt_to_gdp": 29.2,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -8463,7 +8463,7 @@
     "gdp_normalized": 207,
     "population_normalized": 450,
     "military_normalized": 250,
-    "stability": 52,
+    "stability": 47,
     "power_tier": "C",
     "map_color": [
       151,
@@ -8472,7 +8472,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.77,
-    "debt_to_gdp": 49.0,
+    "debt_to_gdp": 33.8,
     "credit_rating": 20,
     "infrastructure": 37,
     "literacy_rate": 57,
@@ -8516,10 +8516,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 17.96,
-    "debt_to_gdp": 52.6,
+    "debt_to_gdp": 32.1,
     "credit_rating": 44,
     "infrastructure": 57,
-    "literacy_rate": 77,
+    "literacy_rate": 81,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -8560,10 +8560,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2.05,
-    "debt_to_gdp": 77.3,
+    "debt_to_gdp": 35.5,
     "credit_rating": 28,
     "infrastructure": 43,
-    "literacy_rate": 63,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -8604,10 +8604,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 430,
-    "debt_to_gdp": 69.3,
+    "debt_to_gdp": 53.5,
     "credit_rating": 68,
     "infrastructure": 77,
-    "literacy_rate": 97,
+    "literacy_rate": 74,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -8651,10 +8651,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 56.79,
-    "debt_to_gdp": 24.8,
+    "debt_to_gdp": 24.1,
     "credit_rating": 53,
     "infrastructure": 64,
-    "literacy_rate": 84,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -8696,10 +8696,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 80,
-    "debt_to_gdp": 29.8,
+    "debt_to_gdp": 28.5,
     "credit_rating": 55,
     "infrastructure": 66,
-    "literacy_rate": 86,
+    "literacy_rate": 79,
     "government_type": "Presidential Republic"
   },
   {
@@ -8741,10 +8741,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 540,
-    "debt_to_gdp": 56.5,
+    "debt_to_gdp": 76.4,
     "credit_rating": 70,
     "infrastructure": 78,
-    "literacy_rate": 98,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Monarchy"
   },
   {
@@ -8786,10 +8786,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 29.48,
-    "debt_to_gdp": 21.5,
+    "debt_to_gdp": 53.0,
     "credit_rating": 48,
     "infrastructure": 60,
-    "literacy_rate": 80,
+    "literacy_rate": 38,
     "government_type": "Federal Republic"
   },
   {
@@ -8818,7 +8818,7 @@
     "gdp_normalized": 187,
     "population_normalized": 432,
     "military_normalized": 250,
-    "stability": 44,
+    "stability": 50,
     "power_tier": "C",
     "map_color": [
       167,
@@ -8827,7 +8827,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.6,
-    "debt_to_gdp": 34.3,
+    "debt_to_gdp": 36.8,
     "credit_rating": 18,
     "infrastructure": 35,
     "literacy_rate": 55,
@@ -8872,10 +8872,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 8.02,
-    "debt_to_gdp": 36.0,
+    "debt_to_gdp": 51.8,
     "credit_rating": 38,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 96,
     "government_type": "Sultanate"
   },
   {
@@ -8917,10 +8917,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.02,
-    "debt_to_gdp": 59.7,
+    "debt_to_gdp": 47.8,
     "credit_rating": 22,
     "infrastructure": 39,
-    "literacy_rate": 59,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -8965,10 +8965,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 260,
-    "debt_to_gdp": 49.4,
+    "debt_to_gdp": 75.8,
     "credit_rating": 64,
     "infrastructure": 73,
-    "literacy_rate": 93,
+    "literacy_rate": 86,
     "government_type": "Federal Parliamentary Republic"
   },
   {
@@ -8997,7 +8997,7 @@
     "gdp_normalized": 174,
     "population_normalized": 326,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 41,
     "power_tier": "C",
     "map_color": [
       175,
@@ -9006,7 +9006,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 38.0,
+    "debt_to_gdp": 40.0,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -9043,7 +9043,7 @@
     "gdp_normalized": 377,
     "population_normalized": 607,
     "military_normalized": 250,
-    "stability": 63,
+    "stability": 64,
     "power_tier": "C",
     "map_color": [
       176,
@@ -9052,10 +9052,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 7.39,
-    "debt_to_gdp": 49.3,
+    "debt_to_gdp": 41.4,
     "credit_rating": 37,
     "infrastructure": 51,
-    "literacy_rate": 71,
+    "literacy_rate": 53,
     "government_type": "Republic"
   },
   {
@@ -9095,7 +9095,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 2100,
-    "debt_to_gdp": 59.3,
+    "debt_to_gdp": 57.3,
     "credit_rating": 80,
     "infrastructure": 87,
     "literacy_rate": 99,
@@ -9142,10 +9142,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 76.98,
-    "debt_to_gdp": 61.5,
+    "debt_to_gdp": 26.0,
     "credit_rating": 55,
     "infrastructure": 66,
-    "literacy_rate": 86,
+    "literacy_rate": 76,
     "government_type": "Provisional Government"
   },
   {
@@ -9187,10 +9187,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 430,
-    "debt_to_gdp": 55.2,
+    "debt_to_gdp": 30.0,
     "credit_rating": 68,
     "infrastructure": 77,
-    "literacy_rate": 97,
+    "literacy_rate": 95,
     "government_type": "Federal Parliamentary Monarchy"
   },
   {
@@ -9219,7 +9219,7 @@
     "gdp_normalized": 174,
     "population_normalized": 1,
     "military_normalized": 250,
-    "stability": 41,
+    "stability": 44,
     "power_tier": "D",
     "map_color": [
       183,
@@ -9228,7 +9228,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 55.8,
+    "debt_to_gdp": 74.8,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -9260,7 +9260,7 @@
     "gdp_normalized": 174,
     "population_normalized": 257,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 39,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9269,7 +9269,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 79.8,
+    "debt_to_gdp": 68.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -9316,10 +9316,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 68.86,
-    "debt_to_gdp": 30.9,
+    "debt_to_gdp": 24.7,
     "credit_rating": 54,
     "infrastructure": 65,
-    "literacy_rate": 85,
+    "literacy_rate": 77,
     "government_type": "Presidential Republic"
   },
   {
@@ -9365,10 +9365,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 380,
-    "debt_to_gdp": 62.9,
+    "debt_to_gdp": 50.9,
     "credit_rating": 67,
     "infrastructure": 76,
-    "literacy_rate": 96,
+    "literacy_rate": 86,
     "government_type": "Islamic Republic"
   },
   {
@@ -9397,7 +9397,7 @@
     "gdp_normalized": 174,
     "population_normalized": 367,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 42,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9406,10 +9406,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 20.0,
+    "debt_to_gdp": 55.0,
     "credit_rating": 17,
     "infrastructure": 34,
-    "literacy_rate": 54,
+    "literacy_rate": 97,
     "government_type": "Republic"
   },
   {
@@ -9453,10 +9453,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 320,
-    "debt_to_gdp": 30.8,
+    "debt_to_gdp": 31.2,
     "credit_rating": 66,
     "infrastructure": 75,
-    "literacy_rate": 95,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -9500,10 +9500,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 38.43,
-    "debt_to_gdp": 62.5,
+    "debt_to_gdp": 63.7,
     "credit_rating": 50,
     "infrastructure": 61,
-    "literacy_rate": 81,
+    "literacy_rate": 86,
     "government_type": "Presidential Republic"
   },
   {
@@ -9532,7 +9532,7 @@
     "gdp_normalized": 249,
     "population_normalized": 489,
     "military_normalized": 250,
-    "stability": 52,
+    "stability": 51,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9541,10 +9541,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.35,
-    "debt_to_gdp": 70.9,
+    "debt_to_gdp": 22.8,
     "credit_rating": 24,
     "infrastructure": 40,
-    "literacy_rate": 60,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -9573,7 +9573,7 @@
     "gdp_normalized": 174,
     "population_normalized": 341,
     "military_normalized": 250,
-    "stability": 47,
+    "stability": 44,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9582,7 +9582,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 49.4,
+    "debt_to_gdp": 55.4,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -9626,7 +9626,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1100,
-    "debt_to_gdp": 59.0,
+    "debt_to_gdp": 26.2,
     "credit_rating": 75,
     "infrastructure": 82,
     "literacy_rate": 99,
@@ -9673,10 +9673,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 260,
-    "debt_to_gdp": 66.2,
+    "debt_to_gdp": 40.7,
     "credit_rating": 64,
     "infrastructure": 73,
-    "literacy_rate": 93,
+    "literacy_rate": 94,
     "government_type": "Presidential Republic"
   },
   {
@@ -9705,7 +9705,7 @@
     "gdp_normalized": 249,
     "population_normalized": 488,
     "military_normalized": 250,
-    "stability": 54,
+    "stability": 50,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9714,7 +9714,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1.34,
-    "debt_to_gdp": 25.3,
+    "debt_to_gdp": 64.9,
     "credit_rating": 24,
     "infrastructure": 40,
     "literacy_rate": 60,
@@ -9760,10 +9760,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 3.54,
-    "debt_to_gdp": 77.0,
+    "debt_to_gdp": 41.1,
     "credit_rating": 32,
     "infrastructure": 46,
-    "literacy_rate": 66,
+    "literacy_rate": 88,
     "government_type": "Republic"
   },
   {
@@ -9808,10 +9808,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 65.77,
-    "debt_to_gdp": 42.7,
+    "debt_to_gdp": 45.9,
     "credit_rating": 54,
     "infrastructure": 65,
-    "literacy_rate": 85,
+    "literacy_rate": 37,
     "government_type": "Islamic Emirate"
   },
   {
@@ -9849,7 +9849,7 @@
     "gdp_normalized": 399,
     "population_normalized": 627,
     "military_normalized": 250,
-    "stability": 59,
+    "stability": 61,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9858,10 +9858,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.85,
-    "debt_to_gdp": 48.1,
+    "debt_to_gdp": 75.0,
     "credit_rating": 39,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -9904,10 +9904,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 310,
-    "debt_to_gdp": 75.1,
+    "debt_to_gdp": 75.6,
     "credit_rating": 66,
     "infrastructure": 75,
-    "literacy_rate": 95,
+    "literacy_rate": 99,
     "government_type": "Parliamentary Republic"
   },
   {
@@ -9936,7 +9936,7 @@
     "gdp_normalized": 174,
     "population_normalized": 308,
     "military_normalized": 250,
-    "stability": 46,
+    "stability": 43,
     "power_tier": "C",
     "map_color": [
       183,
@@ -9945,7 +9945,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 37.6,
+    "debt_to_gdp": 52.9,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -9994,7 +9994,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 780,
-    "debt_to_gdp": 75.3,
+    "debt_to_gdp": 39.8,
     "credit_rating": 72,
     "infrastructure": 80,
     "literacy_rate": 99,
@@ -10031,7 +10031,7 @@
     "gdp_normalized": 452,
     "population_normalized": 676,
     "military_normalized": 250,
-    "stability": 70,
+    "stability": 66,
     "power_tier": "B",
     "map_color": [
       183,
@@ -10040,10 +10040,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 19.84,
-    "debt_to_gdp": 45.9,
+    "debt_to_gdp": 44.9,
     "credit_rating": 45,
     "infrastructure": 57,
-    "literacy_rate": 77,
+    "literacy_rate": 42,
     "government_type": "Republic"
   },
   {
@@ -10075,7 +10075,7 @@
     "gdp_normalized": 333,
     "population_normalized": 566,
     "military_normalized": 250,
-    "stability": 59,
+    "stability": 60,
     "power_tier": "C",
     "map_color": [
       183,
@@ -10084,10 +10084,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.12,
-    "debt_to_gdp": 23.7,
+    "debt_to_gdp": 41.5,
     "credit_rating": 33,
     "infrastructure": 47,
-    "literacy_rate": 67,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -10140,10 +10140,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1850,
-    "debt_to_gdp": 62.6,
+    "debt_to_gdp": 57.1,
     "credit_rating": 79,
     "infrastructure": 86,
-    "literacy_rate": 99,
+    "literacy_rate": 100,
     "government_type": "Federal Republic"
   },
   {
@@ -10172,7 +10172,7 @@
     "gdp_normalized": 174,
     "population_normalized": 180,
     "military_normalized": 250,
-    "stability": 43,
+    "stability": 39,
     "power_tier": "D",
     "map_color": [
       183,
@@ -10181,7 +10181,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.5,
-    "debt_to_gdp": 48.3,
+    "debt_to_gdp": 72.7,
     "credit_rating": 17,
     "infrastructure": 34,
     "literacy_rate": 54,
@@ -10226,10 +10226,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 1400,
-    "debt_to_gdp": 57.8,
+    "debt_to_gdp": 62.3,
     "credit_rating": 77,
     "infrastructure": 84,
-    "literacy_rate": 99,
+    "literacy_rate": 96,
     "government_type": "Presidential Republic"
   },
   {
@@ -10270,10 +10270,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 10.21,
-    "debt_to_gdp": 48.0,
+    "debt_to_gdp": 75.6,
     "credit_rating": 40,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 83,
     "government_type": "Presidential Republic"
   },
   {
@@ -10316,10 +10316,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4.61,
-    "debt_to_gdp": 43.4,
+    "debt_to_gdp": 26.9,
     "credit_rating": 34,
     "infrastructure": 48,
-    "literacy_rate": 68,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -10363,10 +10363,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 13.66,
-    "debt_to_gdp": 79.1,
+    "debt_to_gdp": 60.6,
     "credit_rating": 42,
     "infrastructure": 55,
-    "literacy_rate": 75,
+    "literacy_rate": 100,
     "government_type": "Presidential Republic"
   },
   {
@@ -10411,10 +10411,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 160,
-    "debt_to_gdp": 63.1,
+    "debt_to_gdp": 51.3,
     "credit_rating": 61,
     "infrastructure": 70,
-    "literacy_rate": 90,
+    "literacy_rate": 52,
     "government_type": "Federal Parliamentary Republic"
   },
   {
@@ -10455,10 +10455,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 7.96,
-    "debt_to_gdp": 23.6,
+    "debt_to_gdp": 41.2,
     "credit_rating": 38,
     "infrastructure": 51,
-    "literacy_rate": 71,
+    "literacy_rate": 98,
     "government_type": "Republic"
   },
   {
@@ -10502,10 +10502,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 17.6,
-    "debt_to_gdp": 52.0,
+    "debt_to_gdp": 59.4,
     "credit_rating": 44,
     "infrastructure": 56,
-    "literacy_rate": 76,
+    "literacy_rate": 98,
     "government_type": "Constitutional Monarchy"
   },
   {
@@ -10553,7 +10553,7 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 4500,
-    "debt_to_gdp": 27.5,
+    "debt_to_gdp": 77.5,
     "credit_rating": 86,
     "infrastructure": 91,
     "literacy_rate": 99,
@@ -10588,7 +10588,7 @@
     "gdp_normalized": 476,
     "population_normalized": 698,
     "military_normalized": 250,
-    "stability": 68,
+    "stability": 72,
     "power_tier": "B",
     "map_color": [
       183,
@@ -10597,10 +10597,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 27.16,
-    "debt_to_gdp": 48.9,
+    "debt_to_gdp": 79.7,
     "credit_rating": 47,
     "infrastructure": 59,
-    "literacy_rate": 79,
+    "literacy_rate": 94,
     "government_type": "Republic"
   },
   {
@@ -10642,10 +10642,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 38.92,
-    "debt_to_gdp": 20.6,
+    "debt_to_gdp": 79.2,
     "credit_rating": 50,
     "infrastructure": 61,
-    "literacy_rate": 81,
+    "literacy_rate": 100,
     "government_type": "Republic"
   },
   {
@@ -10683,10 +10683,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.59,
-    "debt_to_gdp": 60.5,
+    "debt_to_gdp": 55.0,
     "credit_rating": 18,
     "infrastructure": 35,
-    "literacy_rate": 55,
+    "literacy_rate": 99,
     "government_type": "Republic"
   },
   {
@@ -10731,10 +10731,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 23.68,
-    "debt_to_gdp": 55.5,
+    "debt_to_gdp": 55.4,
     "credit_rating": 46,
     "infrastructure": 58,
-    "literacy_rate": 78,
+    "literacy_rate": 35,
     "government_type": "Presidential Republic"
   },
   {
@@ -10767,7 +10767,7 @@
     "gdp_normalized": 486,
     "population_normalized": 707,
     "military_normalized": 250,
-    "stability": 69,
+    "stability": 70,
     "power_tier": "B",
     "map_color": [
       183,
@@ -10776,10 +10776,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 31.1,
-    "debt_to_gdp": 36.5,
+    "debt_to_gdp": 56.2,
     "credit_rating": 48,
     "infrastructure": 60,
-    "literacy_rate": 80,
+    "literacy_rate": 62,
     "government_type": "Republic"
   },
   {
@@ -10824,10 +10824,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 36.11,
-    "debt_to_gdp": 70.4,
+    "debt_to_gdp": 37.1,
     "credit_rating": 49,
     "infrastructure": 61,
-    "literacy_rate": 81,
+    "literacy_rate": 41,
     "government_type": "Transitional Government"
   },
   {
@@ -10875,10 +10875,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 169.25,
-    "debt_to_gdp": 69.8,
+    "debt_to_gdp": 37.7,
     "credit_rating": 61,
     "infrastructure": 71,
-    "literacy_rate": 91,
+    "literacy_rate": 77,
     "government_type": "Republic"
   },
   {
@@ -10920,10 +10920,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 42.78,
-    "debt_to_gdp": 70.7,
+    "debt_to_gdp": 33.8,
     "credit_rating": 51,
     "infrastructure": 62,
-    "literacy_rate": 82,
+    "literacy_rate": 97,
     "government_type": "Federal Presidential Republic"
   },
   {
@@ -10954,7 +10954,7 @@
     "gdp_normalized": 198,
     "population_normalized": 441,
     "military_normalized": 250,
-    "stability": 49,
+    "stability": 44,
     "power_tier": "C",
     "map_color": [
       183,
@@ -10963,10 +10963,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 0.68,
-    "debt_to_gdp": 50.8,
+    "debt_to_gdp": 49.0,
     "credit_rating": 19,
     "infrastructure": 36,
-    "literacy_rate": 56,
+    "literacy_rate": 97,
     "government_type": "Sultanate"
   },
   {
@@ -11008,10 +11008,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.16,
-    "debt_to_gdp": 47.5,
+    "debt_to_gdp": 37.9,
     "credit_rating": 39,
     "infrastructure": 52,
-    "literacy_rate": 72,
+    "literacy_rate": 94,
     "government_type": "Republic"
   },
   {
@@ -11046,7 +11046,7 @@
     "gdp_normalized": 398,
     "population_normalized": 626,
     "military_normalized": 250,
-    "stability": 62,
+    "stability": 67,
     "power_tier": "C",
     "map_color": [
       183,
@@ -11055,10 +11055,10 @@
     ],
     "flag_emoji": "",
     "gdp_raw_billions": 9.66,
-    "debt_to_gdp": 77.2,
+    "debt_to_gdp": 72.4,
     "credit_rating": 39,
     "infrastructure": 53,
-    "literacy_rate": 73,
+    "literacy_rate": 98,
     "government_type": "Republic"
   }
 ]
