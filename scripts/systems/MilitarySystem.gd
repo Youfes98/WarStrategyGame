@@ -25,6 +25,7 @@ const STARTING_UNITS: Dictionary = {
 var units:            Dictionary = {}
 var selected_iso:     String     = ""
 var selected_army_id: String     = ""
+var recruit_iso:      String     = ""   # last clicked owned province (for recruitment)
 var _next_id:         int        = 1
 var _next_army_id:    int        = 1
 

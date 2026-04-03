@@ -297,7 +297,12 @@ func _handle_click(vp: Vector2) -> void:
 	if not GameState.player_iso.is_empty():
 		if MilitarySystem.handle_territory_click(rid):
 			return
-	var ciso: String = ProvinceDB.get_parent_iso(rid)
+	# Track clicked province for recruitment (even if no army there)
+	var parent: String = ProvinceDB.get_parent_iso(rid)
+	var ter_owner: String = GameState.territory_owner.get(rid, parent)
+	if ter_owner == GameState.player_iso:
+		MilitarySystem.recruit_iso = rid
+	var ciso: String = parent
 	emit_signal("country_clicked", ciso)
 	GameState.select_country(ciso)
 
@@ -439,13 +444,14 @@ func _update_base(ciso: String) -> void:
 
 func _compute_color(id: String) -> Color:
 	var parent: String = ProvinceDB.get_parent_iso(id)
-	var ter_owner: String  = GameState.territory_owner.get(id, parent)
-	if parent == _selected_country:
-		return COLOR_SELECTED
+	var ter_owner: String = GameState.territory_owner.get(id, parent)
 	if id == _mil_sel_iso:
 		return COLOR_MIL_SEL
+	# Ownership takes priority over selection
 	if ter_owner == GameState.player_iso:
 		return COLOR_PLAYER
 	if not GameState.player_iso.is_empty() and GameState.is_at_war(GameState.player_iso, ter_owner):
 		return COLOR_ENEMY
+	if parent == _selected_country:
+		return COLOR_SELECTED
 	return ProvinceDB.get_display_color(id)

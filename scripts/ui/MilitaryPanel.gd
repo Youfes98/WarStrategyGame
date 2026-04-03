@@ -89,14 +89,7 @@ func _ready() -> void:
 
 
 func _recruit(type_key: String) -> void:
-	var recruit_loc: String = ""
-	var sel: String = MilitarySystem.selected_iso
-	if not sel.is_empty():
-		var parent: String = ProvinceDB.get_parent_iso(sel)
-		var ter_owner: String = GameState.territory_owner.get(sel, parent)
-		if ter_owner == GameState.player_iso:
-			recruit_loc = sel
-	MilitarySystem.recruit_unit(type_key, recruit_loc)
+	MilitarySystem.recruit_unit(type_key, MilitarySystem.recruit_iso)
 
 
 func _on_split() -> void:
