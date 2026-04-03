@@ -51,6 +51,7 @@ var _confirm_btn: Button = null
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(260, 0)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = false
 
 	# Remove any scene-defined children (allows clean .tscn)

@@ -6,10 +6,10 @@ extends Control
 
 const MAP_WIDTH: float = 16384.0
 
-const SPRITE_SIZE: float = 32.0
-const RING_RADIUS: float = 14.0
-const RING_WIDTH:  float = 2.0
-const UNIT_SPACING: float = 38.0
+const BASE_SPRITE_SIZE: float = 32.0
+const BASE_RING_RADIUS: float = 14.0
+const BASE_RING_WIDTH:  float = 2.0
+const BASE_SPACING:     float = 38.0
 const FOG_RANGE:    int = 3
 
 const COL_SEL_RING:  Color = Color(1.0, 1.0, 1.0, 0.90)
@@ -102,6 +102,15 @@ func _draw() -> void:
 
 	var vp_size: Vector2 = get_viewport_rect().size
 	var cam_pos: Vector2 = _cam.global_position
+
+	# Subtle zoom scaling: sprites grow a bit when zoomed in, shrink when zoomed out
+	# At zoom 1.0 = base size, zoom 4.0 = ~1.5x, zoom 0.3 = ~0.7x
+	var zoom: float = _cam.zoom.x
+	var size_scale: float = clampf(0.6 + zoom * 0.25, 0.5, 1.8)
+	var SPRITE_SIZE: float = BASE_SPRITE_SIZE * size_scale
+	var RING_RADIUS: float = BASE_RING_RADIUS * size_scale
+	var RING_WIDTH:  float = BASE_RING_WIDTH * size_scale
+	var UNIT_SPACING: float = BASE_SPACING * size_scale
 
 	# Gather units by army, track interpolated world positions
 	var army_data: Dictionary = {}   # army_id → {units, owner, world_pos}
@@ -198,19 +207,23 @@ func _draw() -> void:
 		var is_sel: bool = MilitarySystem.is_army_selected(aid)
 
 		_draw_unit_at(screen_pos - Vector2(0, SPRITE_SIZE * 0.5), dominant_type,
-			total_n, avg_str, avg_mor, owner_col, is_sel)
+			total_n, avg_str, avg_mor, owner_col, is_sel, size_scale)
 
 
 func _draw_unit_at(pos: Vector2, unit_type: String, count: int,
-		avg_str: float, avg_mor: float, owner_col: Color, selected: bool) -> void:
+		avg_str: float, avg_mor: float, owner_col: Color, selected: bool,
+		ss: float = 1.0) -> void:
 	var cx: float = pos.x
 	var cy: float = pos.y
+	var ring_r: float = BASE_RING_RADIUS * ss
+	var ring_w: float = BASE_RING_WIDTH * ss
+	var spr_size: float = BASE_SPRITE_SIZE * ss
 
 	# Health ring background
-	draw_arc(pos, RING_RADIUS, 0.0, TAU, 24, COL_HEALTH_BG, RING_WIDTH + 1.0)
+	draw_arc(pos, ring_r, 0.0, TAU, 24, COL_HEALTH_BG, ring_w + 1.0)
 
 	# Owner color ring
-	draw_arc(pos, RING_RADIUS + 2.0, 0.0, TAU, 24, owner_col.lightened(0.3), 1.5)
+	draw_arc(pos, ring_r + 2.0 * ss, 0.0, TAU, 24, owner_col.lightened(0.3), 1.5 * ss)
 
 	# Health arc
 	var health_pct: float = avg_str / 100.0
@@ -219,34 +232,35 @@ func _draw_unit_at(pos: Vector2, unit_type: String, count: int,
 	elif avg_str > 35.0: health_col = COL_HEALTH_MID
 	else:                health_col = COL_HEALTH_LOW
 	if health_pct > 0.01:
-		draw_arc(pos, RING_RADIUS, -PI * 0.5,
-			-PI * 0.5 + TAU * health_pct, 24, health_col, RING_WIDTH)
+		draw_arc(pos, ring_r, -PI * 0.5,
+			-PI * 0.5 + TAU * health_pct, 24, health_col, ring_w)
 
 	# Selection ring
 	if selected:
-		draw_arc(pos, RING_RADIUS + 4.0, 0.0, TAU, 24, COL_SEL_RING, 2.0)
+		draw_arc(pos, ring_r + 4.0 * ss, 0.0, TAU, 24, COL_SEL_RING, 2.0 * ss)
 
 	# Unit sprite
 	var sprite_name: String = MilitarySystem.UNIT_TYPES.get(unit_type, {}).get("sprite", "infantry")
 	var tex: Texture2D = _sprites.get(sprite_name)
 	if tex != null:
 		var tex_size: Vector2 = tex.get_size()
-		var draw_size: float = SPRITE_SIZE * 0.7
+		var draw_size: float = spr_size * 0.7
 		var scale_f: float = draw_size / maxf(tex_size.x, tex_size.y)
 		var offset: Vector2 = pos - tex_size * scale_f * 0.5
 		draw_texture_rect(tex, Rect2(offset, tex_size * scale_f), false)
 
 	# Unit count badge
 	if count > 1 and _font != null:
-		draw_string(_font, Vector2(cx + 10.0, cy + RING_RADIUS + 2.0),
-			str(count), HORIZONTAL_ALIGNMENT_CENTER, 20, 9, Color.WHITE)
+		var fs: int = maxi(7, int(9.0 * ss))
+		draw_string(_font, Vector2(cx + 10.0 * ss, cy + ring_r + 2.0),
+			str(count), HORIZONTAL_ALIGNMENT_CENTER, 20, fs, Color.WHITE)
 
 	# Morale indicator (small bar below health ring)
 	if avg_mor < 70.0:
-		var mor_w: float = 16.0
-		var mor_h: float = 2.0
+		var mor_w: float = 16.0 * ss
+		var mor_h: float = 2.0 * ss
 		var mor_x: float = cx - mor_w * 0.5
-		var mor_y: float = cy + RING_RADIUS + 6.0
+		var mor_y: float = cy + ring_r + 6.0 * ss
 		draw_rect(Rect2(mor_x, mor_y, mor_w, mor_h), COL_HEALTH_BG)
 		var mor_fill: float = mor_w * (avg_mor / 100.0)
 		var mor_col: Color = Color(0.6, 0.6, 0.2) if avg_mor > 40 else Color(0.8, 0.2, 0.1)

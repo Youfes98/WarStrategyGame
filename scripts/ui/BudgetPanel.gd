@@ -24,6 +24,7 @@ const VALUE_COLOR:  Color = Color(0.9, 0.9, 0.9)
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(280, 0)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = false
 
 	var style := StyleBoxFlat.new()

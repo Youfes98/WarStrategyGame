@@ -22,6 +22,7 @@ const DOMAIN_COLORS: Dictionary = {
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(290, 0)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
 	add_child(vbox)
