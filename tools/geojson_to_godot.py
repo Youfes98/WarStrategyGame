@@ -447,29 +447,36 @@ def main():
             prov["terrain"] = "plains"
             prov["coastal"] = False
 
-    # ── Province GDP from real subnational data + estimation ────────────────────
-    print("  Assigning province GDP...")
+    # ── Province GDP + Population from real subnational data ─────────────────────
+    print("  Assigning province GDP + population...")
 
-    # Load real subnational GDP per capita data (Kummu et al. 2025)
     import csv
-    adm1_gdp_path = Path(__file__).parent / "cache" / "adm1_gdp_percapita.csv"
-    subnat_gdp: dict = {}  # iso3 → {region_name_lower: gdp_per_capita}
-    if adm1_gdp_path.exists():
-        with open(adm1_gdp_path, "r", encoding="utf-8") as f:
+    # Load DOSE dataset: real total GDP and population per subnational region
+    dose_path = Path(__file__).parent / "cache" / "dose_v2.csv"
+    # iso3 → {region_name_lower: {"pop": int, "gdp_total_b": float}}
+    subnat_data: dict = {}
+    if dose_path.exists():
+        with open(dose_path, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                iso = row.get("iso3", "")
-                name = row.get("Subnat", "NA")
-                if name == "NA" or not iso:
+                iso = row.get("GID_0", "")
+                region = row.get("region", "")
+                year = row.get("year", "")
+                if not iso or not region or year != "2019":  # Latest complete year
                     continue
-                gdppc = float(row.get("2022", "0") or "0")
-                if gdppc > 0:
-                    if iso not in subnat_gdp:
-                        subnat_gdp[iso] = {}
-                    subnat_gdp[iso][name.lower().strip()] = gdppc
-        print(f"    Loaded subnational GDP data for {len(subnat_gdp)} countries")
+                pop = int(float(row.get("pop", "0") or "0"))
+                gdppc = float(row.get("grp_pc_usd", "0") or "0")
+                if pop > 0 and gdppc > 0:
+                    total_gdp_b = pop * gdppc / 1e9
+                    if iso not in subnat_data:
+                        subnat_data[iso] = {}
+                    subnat_data[iso][region.lower().strip()] = {
+                        "pop": pop, "gdp_total_b": total_gdp_b
+                    }
+        print(f"    Loaded DOSE data for {len(subnat_data)} countries")
+    else:
+        print("    WARNING: dose_v2.csv not found in cache/")
 
-    # Terrain productivity multipliers
     TERRAIN_GDP_MULT = {
         "plains": 1.2, "forest": 1.0, "desert": 0.5,
         "mountain": 0.6, "jungle": 0.7, "tundra": 0.4,
@@ -493,64 +500,64 @@ def main():
         if n == 0:
             continue
 
-        # Try to match provinces with real subnational GDP data
-        real_data = subnat_gdp.get(iso, {})
+        real_data = subnat_data.get(iso, {})
         matched = 0
 
-        weights = []
+        # First pass: try exact name matching for GDP + population
+        gdp_weights = []
+        pop_weights = []
         for prov in provs:
-            w = 1.0
             prov_name = prov.get("name", "").lower().strip()
+            best_match = None
 
-            # Try fuzzy matching against real subnational data
-            best_match_gdppc = 0.0
             if real_data:
-                for region_name, gdppc in real_data.items():
-                    # Exact or substring match
-                    if prov_name in region_name or region_name in prov_name:
-                        if gdppc > best_match_gdppc:
-                            best_match_gdppc = gdppc
-                    # First word match (e.g., "Texas" in "Austin-Round Rock, TX")
-                    elif prov_name.split(",")[0].split("-")[0].strip() in region_name:
-                        if gdppc > best_match_gdppc:
-                            best_match_gdppc = gdppc * 0.8  # partial match penalty
+                # Exact match
+                if prov_name in real_data:
+                    best_match = real_data[prov_name]
+                else:
+                    # Fuzzy: check if province name is substring of region or vice versa
+                    for region_name, rdata in real_data.items():
+                        if prov_name in region_name or region_name in prov_name:
+                            if best_match is None or rdata["gdp_total_b"] > best_match["gdp_total_b"]:
+                                best_match = rdata
 
-            if best_match_gdppc > 0:
-                # Use real GDP per capita as weight (higher = richer province)
-                w = best_match_gdppc / 10000.0  # normalize to ~1-10 range
+            if best_match is not None:
+                gdp_weights.append(best_match["gdp_total_b"])
+                pop_weights.append(best_match["pop"])
                 matched += 1
             else:
-                # Fallback: estimate from terrain, coastal, capital proximity
+                # Fallback: terrain + coastal + capital estimate
+                w = 1.0
                 terrain = prov.get("terrain", "plains")
                 w *= TERRAIN_GDP_MULT.get(terrain, 1.0)
                 if prov.get("coastal", False):
-                    w *= 1.4
+                    w *= 1.5
                 cx, cy = prov["centroid"]
                 cap_x, cap_y = capital_centroid[0], capital_centroid[1]
                 dist = ((cx - cap_x)**2 + (cy - cap_y)**2)**0.5
-                if dist < 100: w *= 3.0
+                if dist < 100: w *= 3.5
                 elif dist < 300: w *= 1.8
                 elif dist < 600: w *= 1.3
+                gdp_weights.append(w)
+                pop_weights.append(w)
 
-            weights.append(max(w, 0.1))
-
-        # Normalize weights to sum to total_gdp
-        total_weight = sum(weights)
+        # Normalize to sum to national totals
+        gdp_sum = sum(gdp_weights)
+        pop_sum = sum(pop_weights)
         for i, prov in enumerate(provs):
-            share = weights[i] / total_weight
-            prov["gdp_billions"] = round(total_gdp * share, 3)
-            prov["est_population"] = int(country_pop * share)
+            prov["gdp_billions"] = round(total_gdp * (gdp_weights[i] / gdp_sum), 3)
+            prov["est_population"] = int(country_pop * (pop_weights[i] / pop_sum))
 
-        if matched > 0 and iso in ("USA", "CHN", "GBR", "DEU", "JPN"):
-            print(f"    {iso}: matched {matched}/{n} provinces with real GDP data")
+        if matched > 0 and iso in ("USA", "CHN", "GBR", "DEU", "JPN", "IND", "BRA", "RUS"):
+            print(f"    {iso}: matched {matched}/{n} provinces with real GDP+pop data")
 
     # Verify
-    for iso in ["USA", "CHN", "GBR", "BRA", "NGA"]:
+    for iso in ["USA", "CHN", "GBR", "IND", "DEU", "JPN", "BRA", "NGA"]:
         provs = country_provs.get(iso, [])
         if provs:
             total = sum(p.get("gdp_billions", 0) for p in provs)
             cap_prov = max(provs, key=lambda p: p.get("gdp_billions", 0))
-            print(f"    {iso}: total=${total:.1f}B, richest={cap_prov['name']} (${cap_prov['gdp_billions']:.1f}B)")
+            print(f"    {iso}: total=${total:.1f}B, richest={cap_prov['name']} (${cap_prov['gdp_billions']:.1f}B, pop={cap_prov.get('est_population',0):,})")
 
     # ── Write output files ─────────────────────────────────────────────────────
     with open(PROVINCES_JSON, "w", encoding="utf-8") as f:
