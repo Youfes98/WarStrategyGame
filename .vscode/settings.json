@@ -1,0 +1,17 @@
+{
+  "godotTools.editorPath.godot4": "C:\\Godot\\Godot_v4.6.2.exe",
+  "godotTools.lsp.serverPort": 6005,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "files.associations": {
+    "*.gd": "gdscript",
+    "*.tscn": "gdresource",
+    "*.tres": "gdresource",
+    "*.godot": "gdresource"
+  },
+  "[gdscript]": {
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  }
+}

@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://notif_item"]
+
+[ext_resource type="Script" path="res://scripts/ui/NotificationItem.gd" id="1"]
+
+[node name="NotificationItem" type="PanelContainer"]
+script = ExtResource("1")
+custom_minimum_size = Vector2(300, 0)
+
+[node name="HBox" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Label" type="Label" parent="HBox"]
+layout_mode = 3
+size_flags_horizontal = 3
+text = ""
+autowrap_mode = 2
+
+[node name="ActionButton" type="Button" parent="HBox"]
+text = "View"
+visible = false
+
+[node name="CloseButton" type="Button" parent="HBox"]
+text = "✕"
+custom_minimum_size = Vector2(28, 0)

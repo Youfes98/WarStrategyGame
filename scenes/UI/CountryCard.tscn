@@ -1,0 +1,152 @@
+[gd_scene load_steps=2 format=3 uid="uid://country_card"]
+
+[ext_resource type="Script" path="res://scripts/ui/CountryCard.gd" id="1"]
+
+[node name="CountryCard" type="PanelContainer"]
+script = ExtResource("1")
+custom_minimum_size = Vector2(270, 0)
+visible = false
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="VBox"]
+
+[node name="Flag" type="Label" parent="VBox/Header"]
+text = ""
+custom_minimum_size = Vector2(32, 0)
+theme_override_font_sizes/font_size = 22
+
+[node name="Name" type="Label" parent="VBox/Header"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+
+[node name="Tier" type="Label" parent="VBox/Header"]
+text = ""
+theme_override_font_sizes/font_size = 11
+
+[node name="Sep1" type="HSeparator" parent="VBox"]
+
+[node name="Stats" type="VBoxContainer" parent="VBox"]
+visible = false
+theme_override_constants/separation = 3
+
+[node name="GDPRow" type="HBoxContainer" parent="VBox/Stats"]
+
+[node name="GDPLabel" type="Label" parent="VBox/Stats/GDPRow"]
+text = "GDP"
+custom_minimum_size = Vector2(90, 0)
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+
+[node name="GDPValue" type="Label" parent="VBox/Stats/GDPRow"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+
+[node name="PopRow" type="HBoxContainer" parent="VBox/Stats"]
+
+[node name="PopLabel" type="Label" parent="VBox/Stats/PopRow"]
+text = "Population"
+custom_minimum_size = Vector2(90, 0)
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+
+[node name="PopValue" type="Label" parent="VBox/Stats/PopRow"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+
+[node name="TroopsRow" type="HBoxContainer" parent="VBox/Stats"]
+
+[node name="TroopsLabel" type="Label" parent="VBox/Stats/TroopsRow"]
+text = "Military"
+custom_minimum_size = Vector2(90, 0)
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+
+[node name="TroopsValue" type="Label" parent="VBox/Stats/TroopsRow"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+
+[node name="StabRow" type="HBoxContainer" parent="VBox/Stats"]
+
+[node name="StabLabel" type="Label" parent="VBox/Stats/StabRow"]
+text = "Stability"
+custom_minimum_size = Vector2(90, 0)
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+
+[node name="StabValue" type="Label" parent="VBox/Stats/StabRow"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+
+[node name="GovRow" type="HBoxContainer" parent="VBox/Stats"]
+
+[node name="GovLabel" type="Label" parent="VBox/Stats/GovRow"]
+text = "Government"
+custom_minimum_size = Vector2(90, 0)
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+
+[node name="GovValue" type="Label" parent="VBox/Stats/GovRow"]
+text = "—"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 2
+
+[node name="Sep2" type="HSeparator" parent="VBox"]
+visible = false
+
+[node name="Bars" type="VBoxContainer" parent="VBox"]
+visible = false
+
+[node name="EconLabel" type="Label" parent="VBox/Bars"]
+text = "Economy"
+theme_override_font_sizes/font_size = 10
+
+[node name="EconBar" type="ProgressBar" parent="VBox/Bars"]
+max_value = 1000
+custom_minimum_size = Vector2(0, 10)
+
+[node name="StabilityLabel" type="Label" parent="VBox/Bars"]
+text = "Stability"
+theme_override_font_sizes/font_size = 10
+
+[node name="StabilityBar" type="ProgressBar" parent="VBox/Bars"]
+max_value = 100
+custom_minimum_size = Vector2(0, 10)
+
+[node name="MilitaryLabel" type="Label" parent="VBox/Bars"]
+text = "Military"
+theme_override_font_sizes/font_size = 10
+
+[node name="MilitaryBar" type="ProgressBar" parent="VBox/Bars"]
+max_value = 1000
+custom_minimum_size = Vector2(0, 10)
+
+[node name="WarButton" type="Button" parent="VBox"]
+text = "⚔ Declare War"
+visible = false
+custom_minimum_size = Vector2(0, 34)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+
+[node name="PeaceButton" type="Button" parent="VBox"]
+text = "✦ At War — Sue for Peace"
+visible = false
+custom_minimum_size = Vector2(0, 34)
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+
+[node name="ConfirmButton" type="Button" parent="VBox"]
+text = "Play as ..."
+visible = false
+custom_minimum_size = Vector2(0, 40)
+theme_override_font_sizes/font_size = 15

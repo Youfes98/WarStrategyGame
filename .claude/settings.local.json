@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netstat -ano)",
+      "Bash(findstr :6005)",
+      "Bash(python3 -c \"import json; data=json.load\\(open\\('c:/Claude/WarStrategyGame/data/countries.json'\\)\\); print\\(list\\(data[0].keys\\(\\)\\)\\); print\\(json.dumps\\(data[0], indent=2\\)\\)\")",
+      "Bash(tasklist)",
+      "Bash(powershell -Command \"Get-Process -Name 'Godot*' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty MainModule | Select-Object FileName\")",
+      "Bash(python3:*)"
+    ]
+  }
+}
