@@ -128,43 +128,15 @@ void fragment() {
         float col_gray = dot(col, vec3(0.3, 0.5, 0.2));
         col = mix(col, mix(vec3(col_gray), col, 0.85) * paper_tint, paper_strength);
 
-        // ── BORDERS ──────────────────────────────────────────────────────
-        float prov_diff = 0.0;
-        float ctry_diff = 0.0;
+        // Coast darkening (keep in shader — vector borders don't handle coastlines)
         float coast = 0.0;
-        float my_c = texture(country_lut, vec2(u_idx, 0.5)).r;
         for (int i = 0; i < 8; i++) {
-            vec3 nb = texture(province_tex, UV + offsets[i] * px).rgb;
-            float is_diff = step(0.004, distance(det, nb));
-            prov_diff += is_diff;
-            int nb_idx = rgb_to_index(nb);
-            if (nb_idx == 0) coast += 1.0;
-            if (is_diff > 0.5 && nb_idx > 0) {
-                float nb_c = texture(country_lut, vec2((float(nb_idx) + 0.5) / lut_size, 0.5)).r;
-                ctry_diff += step(0.002, abs(nb_c - my_c));
-            }
+            if (rgb_to_index(texture(province_tex, UV + offsets[i] * px).rgb) == 0) coast += 1.0;
         }
-
         if (coast > 0.5) {
             col = mix(col, col * 0.7, smoothstep(0.5, 4.0, coast) * coast_glow_str);
         }
-        if (prov_diff > 0.5 && ctry_diff < 0.5) {
-            float ea = smoothstep(0.5, 3.0, prov_diff);
-            col = mix(col, col * (1.0 - inner_darken), ea);
-            col = mix(col, vec3(0.0), province_border_str * ea * 0.5);
-        }
-        if (prov_diff > 0.5 && ctry_diff > 0.5) {
-            float ea = smoothstep(0.5, 2.5, prov_diff);
-            float outer = 0.0;
-            for (int i = 0; i < 8; i++) {
-                int nb2 = rgb_to_index(texture(province_tex, UV + offsets[i] * px * 2.0).rgb);
-                if (nb2 > 0) {
-                    float nb2_c = texture(country_lut, vec2((float(nb2) + 0.5) / lut_size, 0.5)).r;
-                    outer += step(0.002, abs(nb2_c - my_c));
-                }
-            }
-            col = mix(col, vec3(0.02, 0.02, 0.04), country_border_str * max(ea, smoothstep(0.5, 3.0, outer) * 0.6));
-        }
+        // Province/country borders rendered by vector BorderLayer (not shader)
     }
 
     COLOR = vec4(clamp(col, vec3(0.0), vec3(1.0)), 1.0);
