@@ -31,8 +31,8 @@ ADJACENCIES_OUT  = OUT_DIR / "adjacencies.json"
 REST_COUNTRIES_URL_A = "https://restcountries.com/v3.1/all?fields=name,cca3,cca2,capital,region,subregion"
 REST_COUNTRIES_URL_B = "https://restcountries.com/v3.1/all?fields=cca3,population,area,latlng,landlocked,borders"
 
-MAP_WIDTH  = 8192
-MAP_HEIGHT = 4096
+MAP_WIDTH  = 16384
+MAP_HEIGHT = 8192
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

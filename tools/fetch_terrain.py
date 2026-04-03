@@ -36,8 +36,8 @@ except ImportError:
 ASSETS_DIR = Path(__file__).parent.parent / "assets" / "map"
 ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
-TARGET_W = 8192
-TARGET_H = 4096
+TARGET_W = 16384
+TARGET_H = 8192
 
 # Natural Earth 1 with Shaded Relief, Water, and Drainages
 # Beautiful stylized terrain — perfect for strategy games
@@ -63,6 +63,20 @@ def download_raster(url: str, label: str) -> Image.Image:
                 img_data = zf.read(name)
                 return Image.open(io.BytesIO(img_data)).convert("RGB")
     raise RuntimeError("No image found in ZIP")
+
+
+def generate_detail_texture(size: int = 512) -> Image.Image:
+    """Tileable micro-detail — adds paper/terrain grain at high zoom."""
+    arr = np.zeros((size, size), dtype=np.float64)
+    for octave in range(5):
+        freq = max(2, size // (2 ** (octave + 1)))
+        noise = np.random.rand(freq, freq)
+        small = Image.fromarray((noise * 255).astype(np.uint8), mode="L")
+        big = small.resize((size, size), Image.Resampling.BICUBIC)
+        weight = 1.0 / (1.5 ** octave)
+        arr += np.array(big, dtype=np.float64) * weight
+    arr = (arr / arr.max() * 255.0)
+    return Image.fromarray(arr.astype(np.uint8), mode="L")
 
 
 def generate_noise(size: int = 256) -> Image.Image:
@@ -126,6 +140,13 @@ def main():
     noise = generate_noise(256)
     noise.save(noise_path, "PNG")
     print(f"  OK: Saved noise.png")
+
+    # ── Generate detail texture ─────────────────────────────────────────────
+    detail_path = ASSETS_DIR / "detail.png"
+    print(f"  Generating detail texture (512x512)...")
+    detail = generate_detail_texture(512)
+    detail.save(detail_path, "PNG")
+    print(f"  OK: Saved detail.png")
 
     print(f"\nTerrain pipeline complete!")
     print(f"Files saved to: {ASSETS_DIR}")

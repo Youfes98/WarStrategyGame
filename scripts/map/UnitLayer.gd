@@ -2,7 +2,7 @@
 ## Draws HoI4-style rectangular military counters and movement path lines.
 extends Node2D
 
-const MAP_WIDTH: float = 8192.0
+const MAP_WIDTH: float = 16384.0
 
 const CHIP_W:       float = 80.0
 const CHIP_H:       float = 38.0

@@ -39,8 +39,8 @@ PROVINCES_JSON    = DATA_DIR / "provinces.json"
 PROVINCE_ADJ_JSON = DATA_DIR / "province_adjacencies.json"
 PROVINCES_PNG     = ASSETS_DIR / "provinces.png"
 
-MAP_WIDTH  = 8192
-MAP_HEIGHT = 4096
+MAP_WIDTH  = 16384
+MAP_HEIGHT = 8192
 
 ADMIN0_URL = (
     "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/"

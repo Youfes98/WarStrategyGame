@@ -3,8 +3,8 @@
 ## No horizontal limits — world wraps seamlessly. Vertical locked to map height.
 extends Camera2D
 
-const MAP_WIDTH:  float = 8192.0
-const MAP_HEIGHT: float = 4096.0
+const MAP_WIDTH:  float = 16384.0
+const MAP_HEIGHT: float = 8192.0
 const PAN_SPEED:  float = 900.0
 
 

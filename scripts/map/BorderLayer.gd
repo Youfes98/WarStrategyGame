@@ -3,7 +3,7 @@
 ## When provinces are loaded, borders are rendered by the map shader instead.
 extends Node2D
 
-const MAP_WIDTH: float = 8192.0
+const MAP_WIDTH: float = 16384.0
 const BORDER_COLOR: Color = Color(0.0, 0.0, 0.0, 0.55)
 const BORDER_WIDTH: float = 1.2
 

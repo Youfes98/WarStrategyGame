@@ -7,8 +7,8 @@ extends Node2D
 
 signal country_clicked(iso: String)
 
-const MAP_WIDTH:  float = 8192.0
-const MAP_HEIGHT: float = 4096.0
+const MAP_WIDTH:  float = 16384.0
+const MAP_HEIGHT: float = 8192.0
 const ZOOM_MIN:   float = 0.15
 const ZOOM_MAX:   float = 8.0
 const ZOOM_STEP:  float = 0.15
@@ -183,6 +183,14 @@ func _load_terrain_layers() -> void:
 		_shader_material.set_shader_parameter("noise_tex", tex)
 		_shader_material.set_shader_parameter("has_noise", true)
 		print("  Noise layer loaded")
+
+	# Detail micro-texture
+	if FileAccess.file_exists("res://assets/map/detail.png"):
+		var img: Image = (load("res://assets/map/detail.png") as Texture2D).get_image()
+		var tex: ImageTexture = ImageTexture.create_from_image(img)
+		_shader_material.set_shader_parameter("detail_tex", tex)
+		_shader_material.set_shader_parameter("has_detail", true)
+		print("  Detail texture loaded")
 
 
 # ── LUT helpers ───────────────────────────────────────────────────────────────

@@ -12,11 +12,14 @@ uniform sampler2D noise_tex : filter_linear;
 uniform bool has_terrain = false;
 uniform bool has_heightmap = false;
 uniform bool has_noise = false;
+uniform sampler2D detail_tex : filter_linear, repeat_enable;
+uniform bool has_detail = false;
 
 uniform float terrain_blend = 0.42;
 uniform float elevation_strength = 8.0;
 uniform float coast_glow_str = 0.18;
 uniform float noise_str = 0.025;
+uniform float detail_strength = 0.08;
 uniform float province_border_str = 0.20;
 uniform float country_border_str = 0.55;
 
@@ -56,9 +59,15 @@ void fragment() {
         }
 
         if (has_noise) {
-            float noise_scale = mix(30.0, 80.0, clamp(px.x * 8192.0 * 2.0, 0.0, 1.0));
-            vec3 n = texture(noise_tex, UV * noise_scale).rgb - vec3(0.5);
-            col += n * noise_str * 1.5;
+            col += (texture(noise_tex, UV * 50.0).rgb - vec3(0.5)) * noise_str;
+        }
+
+        if (has_detail) {
+            float d1 = texture(detail_tex, UV * 200.0).r - 0.5;
+            float d2 = texture(detail_tex, UV * 80.0).r - 0.5;
+            float d3 = texture(detail_tex, UV * 30.0).r - 0.5;
+            float detail = d1 * 0.5 + d2 * 0.3 + d3 * 0.2;
+            col += vec3(detail) * detail_strength;
         }
 
         // ── Anti-aliased border detection ────────────────────────────────

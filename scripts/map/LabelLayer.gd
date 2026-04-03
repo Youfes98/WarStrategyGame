@@ -3,7 +3,7 @@
 ## Labels scale with zoom, hide when too small, prioritize large countries.
 extends Node2D
 
-const MAP_WIDTH:     float = 8192.0
+const MAP_WIDTH:     float = 16384.0
 const TEXT_COLOR:    Color = Color(1.0, 1.0, 1.0, 0.88)
 const SHADOW_COLOR:  Color = Color(0.0, 0.0, 0.0, 0.60)
 const PLAYER_COLOR:  Color = Color(0.55, 1.0, 0.65, 1.0)
