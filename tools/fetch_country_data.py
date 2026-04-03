@@ -104,6 +104,28 @@ MILITARY_ESTIMATES: dict[str, float] = {
     "ITA": 340,  "EGY": 380,  "AUS": 360,  "CAN": 320,  "ESP": 300,
 }
 
+# Manual tier overrides — real geopolitical weight, not just GDP math
+TIER_OVERRIDES: dict[str, str] = {
+    "USA": "S", "CHN": "S",
+    "RUS": "A", "GBR": "A", "FRA": "A", "DEU": "A", "JPN": "A", "IND": "A",
+    "BRA": "B", "TUR": "B", "SAU": "B", "IRN": "B", "ISR": "B",
+    "KOR": "B", "AUS": "B", "ITA": "B", "CAN": "B", "PAK": "B",
+    "EGY": "B", "IDN": "B", "POL": "B", "ESP": "B", "NGA": "B",
+    "MEX": "B", "ARE": "B", "ZAF": "B", "UKR": "B", "THA": "B",
+    "ARG": "B", "NLD": "B", "CHE": "B", "NOR": "B",
+    "JOR": "C", "QAT": "C", "KWT": "C", "BHR": "C", "OMN": "C",
+    "LBN": "C", "TUN": "C", "HUN": "C", "CZE": "C", "ROU": "C",
+    "PRT": "C", "GRC": "C", "NZL": "C", "IRL": "C", "SGP": "C",
+    "MYS": "C", "PHL": "C", "VNM": "C", "CHL": "C", "COL": "C",
+    "PER": "C", "CUB": "C", "SWE": "C", "FIN": "C",
+    "DNK": "C", "BEL": "C", "AUT": "C",
+    "BGD": "C", "MMR": "C", "ETH": "C", "KEN": "C",
+    "MAR": "C", "DZA": "C", "IRQ": "C", "SYR": "C", "LBY": "C",
+    "SOM": "D", "HTI": "D", "YEM": "D", "SSD": "D", "AFG": "D",
+    "CAF": "D", "TCD": "D", "MLI": "D", "BFA": "D", "NER": "D",
+    "ERI": "D", "SLE": "D", "LBR": "D", "GNB": "D", "COD": "D",
+}
+
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
@@ -185,7 +207,7 @@ def build_countries() -> tuple[list, dict]:
             "population_normalized": pop_norm,
             "military_normalized":   mil_norm,
             "stability":         max(20, min(90, int(gdp_norm / 12 + 30 + random.uniform(-5, 5)))),
-            "power_tier":        assign_power_tier(gdp_norm, mil_norm, pop_norm),
+            "power_tier":        TIER_OVERRIDES.get(iso3, assign_power_tier(gdp_norm, mil_norm, pop_norm)),
             # Map rendering
             "map_color":         unique_color(idx, total),
             "flag_emoji":        "",   # filled by geojson_to_godot.py from flag SVG name

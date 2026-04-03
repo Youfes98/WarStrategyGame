@@ -325,9 +325,13 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	if not GameState.player_iso.is_empty():
 		if MilitarySystem.handle_territory_click(rid, shift):
 			return
-	# Show country card for the OWNER, not the original parent
+	# Track owned province for recruitment panel
 	var parent: String = ProvinceDB.get_parent_iso(rid)
 	var ter_owner: String = GameState.territory_owner.get(rid, parent)
+	if ter_owner == GameState.player_iso:
+		MilitarySystem.recruit_iso = rid
+		MilitarySystem.selection_changed.emit()
+	# Show country card for the OWNER, not the original parent
 	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
 	emit_signal("country_clicked", card_iso)
 	GameState.select_country(card_iso)

@@ -171,12 +171,12 @@ func _refresh() -> void:
 
 
 func _on_selection_changed() -> void:
-	visible = not MilitarySystem.selected_army_ids.is_empty()
+	visible = not MilitarySystem.selected_army_ids.is_empty() or not MilitarySystem.recruit_iso.is_empty()
 	_refresh()
 
 
 func _on_territory_selected(iso: String) -> void:
-	if iso.is_empty():
+	if iso.is_empty() and MilitarySystem.recruit_iso.is_empty():
 		_sel_label.visible = false
 		_hint.text = "Left-click your territory to select army\nRight-click any territory to move"
 		return
