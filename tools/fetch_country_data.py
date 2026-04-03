@@ -63,18 +63,50 @@ def assign_power_tier(gdp_norm: float, mil_norm: float, pop_norm: float) -> str:
     return "D"
 
 
-def unique_color(index: int, total: int) -> list[int]:
+COUNTRY_COLORS: dict[str, list[int]] = {
+    "USA": [80, 120, 180],    "CHN": [190, 160, 70],
+    "RUS": [140, 100, 80],    "GBR": [180, 60, 70],
+    "FRA": [80, 100, 170],    "DEU": [120, 120, 130],
+    "JPN": [200, 180, 180],   "IND": [60, 140, 80],
+    "BRA": [80, 160, 60],     "CAN": [180, 80, 80],
+    "AUS": [180, 160, 80],    "ITA": [100, 170, 100],
+    "ESP": [200, 180, 60],    "MEX": [160, 160, 50],
+    "TUR": [170, 130, 100],   "SAU": [160, 170, 80],
+    "IRN": [150, 100, 120],   "ISR": [120, 180, 190],
+    "EGY": [190, 170, 100],   "NGA": [80, 130, 60],
+    "ZAF": [130, 110, 80],    "ARG": [130, 170, 200],
+    "KOR": [160, 130, 170],   "IDN": [140, 110, 70],
+    "PAK": [80, 120, 70],     "POL": [200, 140, 140],
+    "UKR": [180, 180, 80],    "NOR": [140, 60, 70],
+    "SWE": [80, 120, 150],    "JOR": [180, 130, 140],
+    "IRQ": [150, 120, 90],    "ARE": [130, 150, 120],
+    "COL": [170, 150, 60],    "PER": [160, 100, 80],
+    "CHL": [120, 70, 70],     "VEN": [170, 140, 50],
+    "CUB": [140, 80, 80],     "ETH": [90, 140, 90],
+    "KEN": [120, 90, 60],     "THA": [160, 120, 160],
+    "VNM": [170, 100, 70],    "MYS": [100, 130, 100],
+    "PHL": [130, 130, 170],   "AFG": [130, 120, 100],
+    "SYR": [160, 140, 120],   "LBN": [160, 100, 110],
+    "PSE": [120, 150, 120],   "LBY": [150, 150, 100],
+    "SDN": [140, 120, 80],    "MAR": [150, 90, 80],
+    "DZA": [120, 140, 100],   "TUN": [130, 120, 150],
+}
+
+
+def unique_color(index: int, total: int, iso: str = "") -> list[int]:
     """Generate a visually distinct color for each country."""
+    if iso in COUNTRY_COLORS:
+        return COUNTRY_COLORS[iso]
     hue = (index / total) * 360.0
-    # HSV → RGB (S=0.6, V=0.8 for muted map colors)
     h = hue / 60.0
     i = int(h)
     f = h - i
-    p = int(0.8 * (1 - 0.6) * 255)
-    q = int(0.8 * (1 - 0.6 * f) * 255)
-    t = int(0.8 * (1 - 0.6 * (1 - f)) * 255)
-    v = int(0.8 * 255)
-    combos = [(v,t,p),(q,v,p),(p,v,t),(p,q,v),(t,p,v),(v,p,q)]
+    s, v = 0.45, 0.72
+    p = int(v * (1 - s) * 255)
+    q = int(v * (1 - s * f) * 255)
+    t = int(v * (1 - s * (1 - f)) * 255)
+    vi = int(v * 255)
+    combos = [(vi,t,p),(q,vi,p),(p,vi,t),(p,q,vi),(t,p,vi),(vi,p,q)]
     r, g, b = combos[i % 6]
     return [r, g, b]
 
@@ -306,7 +338,7 @@ def build_countries() -> tuple[list, dict]:
             "stability":         STABILITY_OVERRIDES.get(iso3, max(20, min(90, int(gdp_norm / 12 + 30 + random.uniform(-5, 5))))),
             "power_tier":        TIER_OVERRIDES.get(iso3, assign_power_tier(gdp_norm, mil_norm, pop_norm)),
             # Map rendering
-            "map_color":         unique_color(idx, total),
+            "map_color":         unique_color(idx, total, iso3),
             "flag_emoji":        "",   # filled by geojson_to_godot.py from flag SVG name
             # Economy starting values
             "gdp_raw_billions":  round(gdp, 2),
