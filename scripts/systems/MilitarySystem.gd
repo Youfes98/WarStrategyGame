@@ -36,12 +36,33 @@ func _ready() -> void:
 
 func _on_player_set(iso: String) -> void:
 	var tier: String = GameState.get_country(iso).get("power_tier", "C")
-	var spawn_loc: String = ProvinceDB.get_main_province(iso)
+	var spawn_loc: String = _find_home_province(iso)
 	var army_id: String = _new_army_id()
 	for entry: Array in STARTING_UNITS.get(tier, [["infantry", 1]]):
 		for _i: int in entry[1]:
 			spawn_unit(entry[0], iso, spawn_loc, army_id)
 	units_changed.emit()
+
+
+## Find the province closest to the country centroid (capital region).
+func _find_home_province(country_iso: String) -> String:
+	var provinces: Array = ProvinceDB.get_country_province_ids(country_iso)
+	if provinces.is_empty():
+		return country_iso
+	var country_centroid: Vector2 = ProvinceDB.get_centroid(country_iso)
+	if country_centroid == Vector2.ZERO:
+		return provinces[0]
+	var best_pid: String = provinces[0]
+	var best_dist: float = INF
+	for pid: String in provinces:
+		var pc: Vector2 = ProvinceDB.get_centroid(pid)
+		if pc == Vector2.ZERO:
+			continue
+		var d: float = pc.distance_squared_to(country_centroid)
+		if d < best_dist:
+			best_dist = d
+			best_pid = pid
+	return best_pid
 
 
 func spawn_unit(type: String, unit_owner: String, location: String, army_id: String = "") -> String:
@@ -76,9 +97,13 @@ func _get_army_location(army_id: String) -> String:
 func _get_army_ids_at(iso: String, unit_owner: String) -> Array:
 	var seen: Dictionary = {}
 	var result: Array = []
+	var parent: String = ProvinceDB.get_parent_iso(iso)
 	for id: String in units:
 		var u: Dictionary = units[id]
-		if u.location == iso and u.owner == unit_owner:
+		if u.owner != unit_owner:
+			continue
+		# Match exact location OR parent country fallback
+		if u.location == iso or u.location == parent:
 			var aid: String = u.get("army_id", "")
 			if not aid.is_empty() and not seen.has(aid):
 				seen[aid] = true
@@ -319,7 +344,7 @@ func recruit_unit(type: String) -> bool:
 	data["gdp_raw_billions"] = float(data.get("gdp_raw_billions", 0.0)) \
 							   - float(UNIT_TYPES[type].get("cost", 0.0))
 	# Join existing stationary army at home province, or create a new one
-	var home: String = ProvinceDB.get_main_province(player)
+	var home: String = _find_home_province(player)
 	var army_id: String = _find_stationary_army(player, home)
 	if army_id.is_empty():
 		army_id = _new_army_id()
@@ -338,8 +363,11 @@ func get_player_units_at(iso: String) -> Array:
 
 func _get_units_at(iso: String, owner_filter: String) -> Array:
 	var result: Array = []
+	var parent: String = ProvinceDB.get_parent_iso(iso)
 	for id: String in units:
 		var u: Dictionary = units[id]
-		if u.location == iso and (owner_filter.is_empty() or u.owner == owner_filter):
+		if u.location != iso and u.location != parent:
+			continue
+		if owner_filter.is_empty() or u.owner == owner_filter:
 			result.append(u)
 	return result
