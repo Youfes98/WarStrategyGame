@@ -145,32 +145,59 @@ func _on_data_changed(iso: String) -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		# Left half (flag + name) → Rankings panel
-		# Right half (treasury) → Budget panel
 		var click_x: float = event.position.x
-		var mid: float = size.x * 0.4  # roughly where treasury section starts
+		# Three zones: flag/name | treasury | population
+		var zone_1: float = size.x * 0.33  # flag + name ends
+		var zone_2: float = size.x * 0.66  # treasury ends
 
-		if click_x < mid:
-			# Open rankings
-			var rankings: Control = get_parent().get_node_or_null("RankingsPanel")
+		# Close all panels first
+		var rankings: Control = get_parent().get_node_or_null("RankingsPanel")
+		var budget: Control = get_parent().get_node_or_null("BudgetPanel")
+
+		if click_x < zone_1:
+			# Flag/Name → Rankings
+			if budget != null: budget.visible = false
 			if rankings != null and rankings.has_method("show_rankings"):
-				# Close budget if open
-				var budget: Control = get_parent().get_node_or_null("BudgetPanel")
-				if budget != null:
-					budget.visible = false
 				rankings.show_rankings()
-		else:
-			# Open budget
-			var budget: Control = get_parent().get_node_or_null("BudgetPanel")
+		elif click_x < zone_2:
+			# Treasury → Budget
+			if rankings != null: rankings.visible = false
 			if budget != null:
-				# Close rankings if open
-				var rankings: Control = get_parent().get_node_or_null("RankingsPanel")
-				if rankings != null:
-					rankings.visible = false
 				budget.visible = not budget.visible
 				if budget.visible and budget.has_method("_load_from_data"):
 					budget._load_from_data()
+		else:
+			# Population → show population tooltip/info
+			if rankings != null: rankings.visible = false
+			if budget != null: budget.visible = false
+			_show_pop_info()
 		accept_event()
+
+
+func _show_pop_info() -> void:
+	var data: Dictionary = GameState.get_country(GameState.player_iso)
+	var pop: int = int(data.get("population", 0))
+	var gdp: float = float(data.get("gdp_raw_billions", 1.0))
+	var gdp_pc: float = gdp * 1_000_000_000.0 / maxf(pop, 1.0)
+	var stab: float = float(data.get("stability", 50))
+	var growth_rate: float
+	if gdp_pc > 30000: growth_rate = 0.3
+	elif gdp_pc > 10000: growth_rate = 0.7
+	else: growth_rate = 1.0
+	# Stability effect
+	var stab_effect: String = "positive" if stab > 40 else "negative (emigration)"
+	var at_war: bool = false
+	for other: String in GameState.countries:
+		if GameState.is_at_war(GameState.player_iso, other):
+			at_war = true
+			break
+	var war_text: String = "War penalty: -0.5%/yr" if at_war else "No war penalty"
+
+	UIManager.push_notification(
+		"Population: %s | GDP/capita: $%sK | Growth: %.1f%%/yr | Stability: %s | %s" % [
+			_fmt_pop(pop), str(int(gdp_pc / 1000)), growth_rate,
+			stab_effect, war_text
+		], "info")
 
 
 func _refresh(iso: String) -> void:
