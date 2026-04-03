@@ -204,7 +204,11 @@ func _set_country_lut(ciso: String, col: Color) -> void:
 
 func _restore_province_lut(pid: String) -> void:
 	var idx: int = ProvinceDB.get_province_index(pid)
-	_set_lut(idx, _base_colors.get(idx, COLOR_OCEAN))
+	if idx <= 0:
+		return
+	var col: Color = _compute_color(pid)
+	_base_colors[idx] = col
+	_set_lut(idx, col)
 
 func _restore_country_lut(ciso: String) -> void:
 	for pid: String in ProvinceDB.get_country_province_ids(ciso):
@@ -437,27 +441,24 @@ func _clear_selected() -> void:
 func _set_hover(id: String) -> void:
 	if _shader_mode:
 		if not _hover_id.is_empty() and _hover_id != _mil_sel_iso:
-			if ProvinceDB.get_parent_iso(_hover_id) == _selected_country:
-				_set_province_lut(_hover_id, COLOR_SELECTED)
-			else:
-				_restore_province_lut(_hover_id)
+			_restore_province_lut(_hover_id)
 		_hover_id = id
 		if not id.is_empty() and id != _mil_sel_iso:
-			if ProvinceDB.get_parent_iso(id) != _selected_country:
-				var idx: int = ProvinceDB.get_province_index(id)
-				var base: Color = _base_colors.get(idx, COLOR_OCEAN)
-				var parent: String = ProvinceDB.get_parent_iso(id)
+			var parent: String = ProvinceDB.get_parent_iso(id)
+			if parent != _selected_country:
 				var ter_owner: String = GameState.territory_owner.get(id, parent)
-				var at_war: bool = not GameState.player_iso.is_empty() and not ter_owner.is_empty() and ter_owner != GameState.player_iso and GameState.is_at_war(GameState.player_iso, ter_owner)
-				if not at_war:
-					_set_lut(idx, base.lightened(0.18))
+				var is_own: bool = not GameState.player_iso.is_empty() and ter_owner == GameState.player_iso
+				var at_war: bool = not GameState.player_iso.is_empty() and not ter_owner.is_empty() and GameState.is_at_war(GameState.player_iso, ter_owner)
+				if not is_own and not at_war:
+					var idx: int = ProvinceDB.get_province_index(id)
+					_set_lut(idx, _base_colors.get(idx, COLOR_OCEAN).lightened(0.12))
 		_flush_lut()
 	else:
 		if not _hover_id.is_empty() and _polygons.has(_hover_id):
 			(_polygons[_hover_id] as Polygon2D).color = ProvinceDB.get_map_color(_hover_id)
 		_hover_id = id
 		if not id.is_empty() and _polygons.has(id):
-			(_polygons[id] as Polygon2D).color = ProvinceDB.get_map_color(id).lightened(0.18)
+			(_polygons[id] as Polygon2D).color = ProvinceDB.get_map_color(id).lightened(0.12)
 
 func _on_battle_resolved(tid: String, _a: String, _d: String, _w: bool) -> void:
 	refresh_country_color(tid)
