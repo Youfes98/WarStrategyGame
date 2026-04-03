@@ -141,6 +141,11 @@ func _build_shader_map(prov_img: Image) -> void:
 	var test_px: Color = prov_img.get_pixel(int(prov_img.get_width() / 2.0), int(prov_img.get_height() / 2.0))
 	print("  Centre pixel detect = R:", roundi(test_px.r * 255), " G:", roundi(test_px.g * 255), " B:", roundi(test_px.b * 255))
 
+	# Disable shader borders — BorderLayer handles them as vectors now
+	_shader_material.set_shader_parameter("province_border_str", 0.0)
+	_shader_material.set_shader_parameter("country_border_str", 0.0)
+	_shader_material.set_shader_parameter("inner_darken", 0.0)
+
 	# Load optional terrain layers
 	_load_terrain_layers()
 
