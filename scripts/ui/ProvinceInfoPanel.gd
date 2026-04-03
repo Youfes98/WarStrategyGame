@@ -106,6 +106,9 @@ func _on_country_selected(_iso: String) -> void:
 
 ## Called externally by MapRenderer when a province is clicked.
 func show_province(province_id: String) -> void:
+	# Don't show during country picking (before player has chosen)
+	if GameState.player_iso.is_empty():
+		return
 	_province_id = province_id
 	visible = true
 	_refresh()

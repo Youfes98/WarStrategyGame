@@ -17,6 +17,9 @@ signal country_confirmed(iso: String)
 @onready var _stab_bar:      ProgressBar   = $Panel/VBox/Columns/Preview/Stats/StabBar
 @onready var _confirm_btn:   Button        = $Panel/VBox/Columns/Preview/ConfirmButton
 @onready var _tip_label:     Label         = $Panel/VBox/Columns/Preview/TipLabel
+@onready var _stats_vbox:    VBoxContainer = $Panel/VBox/Columns/Preview/Stats
+
+var _detail_lbl: Label = null  # Added programmatically
 
 const TIER_LABELS: Dictionary = {
 	"S": "Superpower",
@@ -44,6 +47,14 @@ func _ready() -> void:
 	_confirm_btn.pressed.connect(_on_confirm)
 	_search_box.text_changed.connect(_on_search)
 	ProvinceDB.data_loaded.connect(_populate)
+
+	# Add detailed stats label
+	_detail_lbl = Label.new()
+	_detail_lbl.add_theme_font_size_override("font_size", 13)
+	_detail_lbl.add_theme_color_override("font_color", Color(0.80, 0.82, 0.88))
+	_detail_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_stats_vbox.add_child(_detail_lbl)
+
 	if not ProvinceDB.country_map_data.is_empty():
 		_populate()
 
@@ -123,13 +134,53 @@ func _on_row_selected(iso: String) -> void:
 	_confirm_btn.disabled = false
 	_confirm_btn.text = "Play as %s" % data.get("name", iso)
 
-	# Highlight on map
+	# Detailed stats
+	var gdp: float = data.get("gdp_raw_billions", 0.0)
+	var pop: int = data.get("population", 0)
+	var capital: String = data.get("capital", "Unknown")
+	var gov: String = data.get("government_type", "Unknown")
+	var debt: float = data.get("debt_to_gdp", 0.0)
+	var infra: int = int(data.get("infrastructure", 0))
+	var literacy: int = int(data.get("literacy_rate", 0))
+	var area: float = data.get("area_km2", 0.0)
+	var landlocked: bool = data.get("landlocked", false)
+	var n_provinces: int = ProvinceDB.get_country_province_ids(iso).size()
+	var neighbors: Array = data.get("borders", [])
+
+	var gdp_str: String = "$%.2fT" % (gdp / 1000.0) if gdp >= 1000 else "$%.1fB" % gdp
+	var pop_str: String = "%.1fB" % (float(pop) / 1e9) if pop >= 1e9 else "%.1fM" % (float(pop) / 1e6)
+	var area_str: String = "%sK km²" % str(int(area / 1000)) if area >= 1000 else "%d km²" % int(area)
+
+	if _detail_lbl:
+		_detail_lbl.text = (
+			"Capital: %s\n" % capital +
+			"Government: %s\n" % gov +
+			"GDP: %s  |  Population: %s\n" % [gdp_str, pop_str] +
+			"Area: %s  |  Provinces: %d\n" % [area_str, n_provinces] +
+			"Debt/GDP: %.0f%%  |  Infrastructure: %d%%\n" % [debt, infra] +
+			"Literacy: %d%%  |  %s\n" % [literacy, "Landlocked" if landlocked else "Sea access"] +
+			"Neighbors: %d countries" % neighbors.size()
+		)
+
+	# Highlight on map and center camera
 	GameState.select_country(iso)
+	var centroid: Vector2 = ProvinceDB.get_centroid(iso)
+	if centroid != Vector2.ZERO:
+		var cam := get_viewport().get_camera_2d()
+		if cam:
+			cam.position = centroid
 
 
 func _on_confirm() -> void:
 	if _selected_iso.is_empty():
 		return
+	# Center camera on chosen country and zoom in
+	var centroid: Vector2 = ProvinceDB.get_centroid(_selected_iso)
+	if centroid != Vector2.ZERO:
+		var cam := get_viewport().get_camera_2d()
+		if cam:
+			cam.position = centroid
+			cam.zoom = Vector2(1.0, 1.0)  # Comfortable zoom to see your country
 	GameState.set_player_country(_selected_iso)
 	GameState.deselect()
 	emit_signal("country_confirmed", _selected_iso)
