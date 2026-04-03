@@ -96,20 +96,23 @@ const TERRAIN_BUILD_SPEED: Dictionary = {
 	"mountain": 0.6, "jungle": 0.7, "tundra": 0.75,
 }
 
-# Starting buildings by power tier
-const STARTING_BUILDINGS: Dictionary = {
-	"S": [
-		["barracks", 3], ["factory", 2], ["naval_yard", 2],
-		["airfield", 2], ["university", 1], ["hospital", 2],
-		["civilian_factory", 2], ["port", 1],
-	],
-	"A": [
-		["barracks", 2], ["factory", 1], ["naval_yard", 1],
-		["airfield", 1], ["university", 1], ["hospital", 1],
-	],
-	"B": [["barracks", 1], ["factory", 1]],
-	"C": [["barracks", 1]],
-	"D": [],
+# Starting buildings scaled by infrastructure stat (0-100).
+# Formula: building_count = base * (infrastructure / 50)
+# S-tier USA (infra=95) gets ~30+ barracks, 15+ factories, etc.
+# D-tier Somalia (infra=10) gets 1 barracks maybe.
+const BUILDING_SEEDS: Dictionary = {
+	# type → base count at infrastructure=50
+	"barracks":         15,
+	"factory":          8,
+	"naval_yard":       4,
+	"airfield":         5,
+	"bunker":           3,
+	"port":             4,
+	"civilian_factory": 10,
+	"power_plant":      4,
+	"university":       3,
+	"hospital":         8,
+	"school":           12,
 }
 
 
@@ -386,53 +389,67 @@ func _complete_building(province_id: String, building_type: String, country_iso:
 
 
 func _seed_starting_buildings() -> void:
+	var total_buildings: int = 0
 	for iso: String in GameState.countries:
-		var tier: String = GameState.get_country(iso).get("power_tier", "D")
-		var specs: Array = STARTING_BUILDINGS.get(tier, [])
-		if specs.is_empty():
-			continue
+		var cdata: Dictionary = GameState.get_country(iso)
+		var infra: float = float(cdata.get("infrastructure", 30))
+		var infra_scale: float = infra / 50.0  # 1.0 at infra=50, 1.9 at infra=95, 0.2 at infra=10
 
 		var provinces: Array = ProvinceDB.get_country_province_ids(iso)
 		if provinces.is_empty():
 			continue
 		var capital: String = ProvinceDB.get_capital_province(iso)
 
-		# Find coastal provinces for naval buildings
+		# Sort provinces by GDP (richest first — get buildings first)
+		var sorted_provs: Array = provinces.duplicate()
+		sorted_provs.sort_custom(func(a: String, b: String) -> bool:
+			var ga: float = float(ProvinceDB.province_data.get(a, {}).get("gdp_billions", 0))
+			var gb: float = float(ProvinceDB.province_data.get(b, {}).get("gdp_billions", 0))
+			return ga > gb)
+
 		var coastal: Array = []
-		for pid: String in provinces:
+		for pid: String in sorted_provs:
 			if ProvinceDB.is_coastal(pid):
 				coastal.append(pid)
 
 		var prov_idx: int = 0
-		for spec: Array in specs:
-			var btype: String = spec[0]
-			var count: int = spec[1]
+		var coast_idx: int = 0
+
+		for btype: String in BUILDING_SEEDS:
+			var base_count: int = BUILDING_SEEDS[btype]
+			var count: int = maxi(0, int(float(base_count) * infra_scale))
+			if count == 0:
+				continue
+
 			var bdef: Dictionary = BUILDING_TYPES.get(btype, {})
 			var needs_coast: bool = bdef.get("requires_coastal", false)
 			var needs_capital: bool = bdef.get("requires_capital", false)
+
+			# Cap to available provinces
+			if needs_coast:
+				count = mini(count, coastal.size())
+			else:
+				count = mini(count, sorted_provs.size())
 
 			for _i: int in count:
 				var target: String = ""
 				if needs_capital:
 					target = capital
 				elif needs_coast and not coastal.is_empty():
-					target = coastal[prov_idx % coastal.size()]
+					target = coastal[coast_idx % coastal.size()]
+					coast_idx += 1
 				else:
-					# Spread across provinces starting from capital
-					if prov_idx == 0:
-						target = capital
-					else:
-						target = provinces[prov_idx % provinces.size()]
-				prov_idx += 1
+					target = sorted_provs[prov_idx % sorted_provs.size()]
+					prov_idx += 1
 
 				if target.is_empty():
 					continue
-				# Place building directly (no construction time for starting buildings)
 				if not GameState.province_buildings.has(target):
 					GameState.province_buildings[target] = []
 				if not has_building(target, btype):
 					(GameState.province_buildings[target] as Array).append({
 						"type": btype, "level": 1,
 					})
+					total_buildings += 1
 
-	print("BuildingSystem: Seeded starting buildings for %d countries" % GameState.countries.size())
+	print("BuildingSystem: Seeded %d buildings across %d countries" % [total_buildings, GameState.countries.size()])

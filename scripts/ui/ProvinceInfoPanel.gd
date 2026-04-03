@@ -143,15 +143,20 @@ func _refresh() -> void:
 	_terrain_lbl.add_theme_color_override("font_color",
 		TERRAIN_COLORS.get(terrain, TEXT_COLOR))
 
-	# Population estimate (distribute country pop across provinces)
-	var country_pop: int = int(owner_data.get("population", 100000))
-	var prov_count: int = maxi(ProvinceDB.get_country_province_ids(ter_owner).size(), 1)
-	var est_pop: int = country_pop / prov_count
+	# Population (baked from pipeline, or fallback to even split)
+	var est_pop: int = int(pdata.get("est_population", 0))
+	if est_pop == 0:
+		var country_pop: int = int(owner_data.get("population", 100000))
+		var prov_count: int = maxi(ProvinceDB.get_country_province_ids(ter_owner).size(), 1)
+		est_pop = country_pop / prov_count
 	_pop_lbl.text = "Population: ~%s" % _fmt_pop(est_pop)
 
-	# GDP contribution
+	# GDP (baked from pipeline with terrain/coastal/capital modifiers)
+	var prov_gdp: float = float(pdata.get("gdp_billions", 0.0))
 	var country_gdp: float = float(owner_data.get("gdp_raw_billions", 1.0))
-	var base_gdp: float = country_gdp / float(prov_count)
+	if prov_gdp < 0.001:
+		var prov_count: int = maxi(ProvinceDB.get_country_province_ids(ter_owner).size(), 1)
+		prov_gdp = country_gdp / float(prov_count)
 	# Buildings boost province GDP
 	var bs: Node = get_node_or_null("/root/BuildingSystem")
 	var prov_buildings: Array = bs.get_buildings_at(_province_id) if bs != null else []
@@ -161,7 +166,7 @@ func _refresh() -> void:
 		if btype == "civilian_factory": gdp_mult += 0.3
 		elif btype == "port": gdp_mult += 0.15
 		elif btype == "power_plant": gdp_mult += 0.2
-	var prov_gdp: float = base_gdp * gdp_mult
+	prov_gdp *= gdp_mult
 	var contribution_pct: float = prov_gdp / maxf(country_gdp, 0.01) * 100.0
 
 	_gdp_lbl.text = "GDP: ~%s (%.1f%% of national)" % [_fmt_money(prov_gdp), contribution_pct]
