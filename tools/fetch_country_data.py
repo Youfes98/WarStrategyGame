@@ -126,6 +126,30 @@ TIER_OVERRIDES: dict[str, str] = {
     "ERI": "D", "SLE": "D", "LBR": "D", "GNB": "D", "COD": "D",
 }
 
+# Manual stability overrides — real-world 2026 baseline (0-100 scale)
+STABILITY_OVERRIDES: dict[str, int] = {
+    # Very stable (75-95)
+    "CHE": 92, "NOR": 90, "DNK": 90, "FIN": 89, "NZL": 88, "SWE": 87,
+    "CAN": 86, "AUS": 85, "NLD": 85, "IRL": 85, "AUT": 84, "DEU": 83,
+    "JPN": 82, "SGP": 82, "GBR": 80, "USA": 78, "FRA": 77, "KOR": 76,
+    "BEL": 78, "PRT": 78, "ESP": 76, "CZE": 75, "ITA": 73,
+    # Stable (55-74)
+    "JOR": 68, "ARE": 72, "QAT": 75, "KWT": 70, "OMN": 72, "BHR": 65,
+    "SAU": 67, "CHN": 70, "IND": 58, "BRA": 55, "MEX": 52, "IDN": 60,
+    "MYS": 65, "THA": 55, "VNM": 63, "MAR": 60, "TUN": 52, "GHA": 55,
+    "RWA": 60, "TUR": 55, "ISR": 56, "POL": 68, "HUN": 62, "ROU": 60,
+    "ARG": 48, "CHL": 65, "PER": 50, "COL": 52, "CUB": 55,
+    "RUS": 52, "KAZ": 58, "AZE": 55, "BLR": 50, "EGY": 50,
+    # Unstable (30-54)
+    "PAK": 38, "BGD": 42, "IRQ": 35, "LBN": 30, "NGA": 40,
+    "KEN": 45, "ETH": 32, "UKR": 35, "IRN": 45, "VEN": 30,
+    "NIC": 38, "DZA": 45, "MMR": 25, "PSE": 32,
+    # Very unstable / conflict (5-29)
+    "SYR": 15, "YEM": 10, "SOM": 8, "SSD": 10, "AFG": 18,
+    "LBY": 20, "CAF": 15, "COD": 22, "HTI": 12, "SDN": 15,
+    "MLI": 20, "BFA": 18, "NER": 22, "TCD": 25, "ERI": 28,
+}
+
 GOVERNMENT_TYPES: dict[str, str] = {
     # Official self-designations — what each country calls itself
     # Presidential Republic
@@ -270,7 +294,7 @@ def build_countries() -> tuple[list, dict]:
             "gdp_normalized":    gdp_norm,
             "population_normalized": pop_norm,
             "military_normalized":   mil_norm,
-            "stability":         max(20, min(90, int(gdp_norm / 12 + 30 + random.uniform(-5, 5)))),
+            "stability":         STABILITY_OVERRIDES.get(iso3, max(20, min(90, int(gdp_norm / 12 + 30 + random.uniform(-5, 5))))),
             "power_tier":        TIER_OVERRIDES.get(iso3, assign_power_tier(gdp_norm, mil_norm, pop_norm)),
             # Map rendering
             "map_color":         unique_color(idx, total),
