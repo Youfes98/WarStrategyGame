@@ -338,12 +338,16 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	if not GameState.player_iso.is_empty():
 		if MilitarySystem.handle_territory_click(rid, shift):
 			return
-	# Track owned province for recruitment panel
+	# Only set recruit_iso if no army was selected at this province
 	var parent: String = ProvinceDB.get_parent_iso(rid)
 	var ter_owner: String = GameState.territory_owner.get(rid, parent)
-	if ter_owner == GameState.player_iso:
+	if ter_owner == GameState.player_iso and MilitarySystem.selected_army_ids.is_empty():
+		# Don't auto-show military panel — only set recruit location
+		# Player must explicitly click an army or use the panel
 		MilitarySystem.recruit_iso = rid
-		MilitarySystem.selection_changed.emit()
+	elif ter_owner != GameState.player_iso:
+		# Clicked foreign territory — clear recruit
+		MilitarySystem.recruit_iso = ""
 	# Show country card for the OWNER, not the original parent
 	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
 	emit_signal("country_clicked", card_iso)

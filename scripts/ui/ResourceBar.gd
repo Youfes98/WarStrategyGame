@@ -121,11 +121,31 @@ func _on_data_changed(iso: String) -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var budget: Control = get_parent().get_node_or_null("BudgetPanel")
-		if budget != null:
-			budget.visible = not budget.visible
-			if budget.visible and budget.has_method("_load_from_data"):
-				budget._load_from_data()
+		# Left half (flag + name) → Rankings panel
+		# Right half (treasury) → Budget panel
+		var click_x: float = event.position.x
+		var mid: float = size.x * 0.4  # roughly where treasury section starts
+
+		if click_x < mid:
+			# Open rankings
+			var rankings: Control = get_parent().get_node_or_null("RankingsPanel")
+			if rankings != null and rankings.has_method("show_rankings"):
+				# Close budget if open
+				var budget: Control = get_parent().get_node_or_null("BudgetPanel")
+				if budget != null:
+					budget.visible = false
+				rankings.show_rankings()
+		else:
+			# Open budget
+			var budget: Control = get_parent().get_node_or_null("BudgetPanel")
+			if budget != null:
+				# Close rankings if open
+				var rankings: Control = get_parent().get_node_or_null("RankingsPanel")
+				if rankings != null:
+					rankings.visible = false
+				budget.visible = not budget.visible
+				if budget.visible and budget.has_method("_load_from_data"):
+					budget._load_from_data()
 		accept_event()
 
 

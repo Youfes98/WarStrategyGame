@@ -24,6 +24,12 @@ func setup(notif: Dictionary) -> void:
 	_action_btn.pressed.connect(_on_action)
 	_close_btn.pressed.connect(queue_free)
 
+	# Auto-dismiss after 6 seconds with fade
+	var tween: Tween = create_tween()
+	tween.tween_interval(5.0)
+	tween.tween_property(self, "modulate:a", 0.0, 1.0)
+	tween.tween_callback(queue_free)
+
 
 func _on_action() -> void:
 	UIManager.unlock_panel(_action_panel, UIManager.PanelState.FULL)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=11 format=3 uid="uid://main_scene"]
 
 [ext_resource type="PackedScene" path="res://scenes/Map/Map.tscn"            id="1"]
 [ext_resource type="PackedScene" path="res://scenes/UI/CountryCard.tscn"     id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script"      path="res://scripts/ui/BudgetPanel.gd"      id="8"]
 [ext_resource type="Script"      path="res://scripts/ui/ResourceBar.gd"      id="9"]
 [ext_resource type="Script"      path="res://scripts/map/UnitOverlay.gd"     id="10"]
+[ext_resource type="Script"      path="res://scripts/ui/RankingsPanel.gd"    id="11"]
 
 [node name="Main" type="Node"]
 script = ExtResource("5")
@@ -60,6 +61,14 @@ offset_left   = 8.0
 offset_top    = -212.0
 offset_right  = 292.0
 offset_bottom = -52.0
+visible       = false
+
+[node name="RankingsPanel" type="PanelContainer" parent="HUD"]
+script        = ExtResource("11")
+offset_left   = 0.0
+offset_top    = 54.0
+offset_right  = 340.0
+offset_bottom = 530.0
 visible       = false
 
 [node name="BudgetPanel" type="PanelContainer" parent="HUD"]

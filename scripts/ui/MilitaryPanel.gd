@@ -33,23 +33,27 @@ func _ready() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 
-	# Build sections by domain
+	# Build sections by domain — each section has a container we can hide/show
 	for domain: String in ["land", "sea", "air"]:
-		vbox.add_child(HSeparator.new())
+		var sec_container := VBoxContainer.new()
+		sec_container.add_theme_constant_override("separation", 2)
+		vbox.add_child(sec_container)
+
+		sec_container.add_child(HSeparator.new())
 		var hdr := Label.new()
 		hdr.text = DOMAIN_HEADERS[domain]
 		hdr.add_theme_font_size_override("font_size", 9)
 		hdr.add_theme_color_override("font_color", DOMAIN_COLORS[domain])
-		vbox.add_child(hdr)
+		sec_container.add_child(hdr)
 
-		var sec: Dictionary = {"labels": {}, "btns": {}}
+		var sec: Dictionary = {"labels": {}, "btns": {}, "container": sec_container}
 		for type_key: String in MilitarySystem.UNIT_TYPES:
 			var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
 			if tdata.get("domain", "land") != domain:
 				continue
 
 			var row := HBoxContainer.new()
-			vbox.add_child(row)
+			sec_container.add_child(row)
 
 			var lbl := Label.new()
 			lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -175,9 +179,24 @@ func _refresh() -> void:
 	if recruit_loc.is_empty() and not MilitarySystem.selected_army_ids.is_empty():
 		recruit_loc = MilitarySystem._get_army_location(MilitarySystem.selected_army_ids[0])
 
-	# Update all sections
+	# Determine which domains are available at this location
+	var capital: String = ProvinceDB.get_capital_province(player)
+	var at_capital: bool = recruit_loc == capital
+	var at_coast: bool = not recruit_loc.is_empty() and ProvinceDB.is_coastal(recruit_loc)
+
+	# Hide/show domain sections based on what can be built here
+	# Land: always show (infantry recruitable at capital)
+	(_sections["land"]["container"] as Control).visible = true
+	# Sea: only show if at a coastal province
+	(_sections["sea"]["container"] as Control).visible = at_coast
+	# Air: only show at capital (until airfields exist)
+	(_sections["air"]["container"] as Control).visible = at_capital
+
+	# Update all visible sections
 	for domain: String in _sections:
 		var sec: Dictionary = _sections[domain]
+		if not (sec["container"] as Control).visible:
+			continue
 		for type_key: String in sec["labels"]:
 			var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
 			var tname: String = tdata["label"]
@@ -192,7 +211,6 @@ func _refresh() -> void:
 			var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000.0)
 			var btn: Button = sec["btns"][type_key]
 			btn.text = "+ %s" % cost_str
-			# Disable if can't afford OR wrong location
 			if not recruit_loc.is_empty():
 				btn.disabled = not MilitarySystem.can_recruit_at(type_key, recruit_loc)
 			else:
@@ -216,7 +234,8 @@ func _refresh() -> void:
 
 
 func _on_selection_changed() -> void:
-	visible = not MilitarySystem.selected_army_ids.is_empty() or not MilitarySystem.recruit_iso.is_empty()
+	# Only show panel when an army is actively selected
+	visible = not MilitarySystem.selected_army_ids.is_empty()
 	_refresh()
 
 
