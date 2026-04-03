@@ -1,32 +1,46 @@
 ## UnitLayer.gd
-## Draws unit badges (one per army), garrison indicators, selection rings, and movement arrows.
+## Draws HoI4-style rectangular unit counters with NATO icons, composition,
+## strength bars, and movement arrows. Multiple armies fan out as stacked chips.
 extends Node2D
 
-const BADGE_R:      float = 11.0
-const BADGE_SPACING: float = 26.0   # center-to-center when multiple armies at same location
-const COL_PLAYER:   Color = Color(0.25, 0.65, 1.0)
-const COL_ENEMY:    Color = Color(0.90, 0.28, 0.28)
-const COL_SEL:      Color = Color(1.0,  0.88, 0.22, 0.9)
-const COL_ADJ:      Color = Color(0.35, 0.75, 1.0,  0.22)
-const COL_ADJ_RIM:  Color = Color(0.40, 0.80, 1.0,  0.55)
-const COL_ARROW:    Color = Color(1.0,  0.92, 0.30, 0.75)
+const MAP_WIDTH: float = 8192.0
+
+# Counter dimensions
+const CHIP_W:     float = 72.0
+const CHIP_H:     float = 36.0
+const CHIP_GAP:   float = 6.0    # vertical gap when stacking
+const STRIPE_H:   float = 4.0    # coloured owner stripe at top
+const BAR_H:      float = 3.0    # strength bar height
+const BAR_GAP:    float = 2.0    # gap between chip and bar
+
+const COL_BG:      Color = Color(0.12, 0.12, 0.16, 0.92)
+const COL_PLAYER:  Color = Color(0.25, 0.65, 1.0)
+const COL_SEL:     Color = Color(1.0,  0.88, 0.22, 0.9)
+const COL_ADJ:     Color = Color(0.35, 0.75, 1.0,  0.22)
+const COL_ADJ_RIM: Color = Color(0.40, 0.80, 1.0,  0.55)
+const COL_ARROW:   Color = Color(1.0,  0.92, 0.30, 0.75)
 const COL_GARRISON: Color = Color(0.85, 0.25, 0.25, 0.75)
 
+# NATO-style unit type symbols
+const TYPE_ICONS: Dictionary = {
+	"infantry":  "X",
+	"armor":     ">>",
+	"artillery": "*",
+}
+
 var _font:      Font = null
-var _font_size: int  = 11
+var _font_size: int  = 10
+var _font_sm:   int  = 8
 
 
 func _ready() -> void:
 	_font = ThemeDB.fallback_font
-	_font_size = ThemeDB.fallback_font_size
-	if _font_size > 14:
-		_font_size = 11
+	_font_size = 10
+	_font_sm   = 8
 	MilitarySystem.units_changed.connect(queue_redraw)
 	MilitarySystem.territory_selected.connect(func(_iso: String) -> void: queue_redraw())
 	MilitarySystem.battle_resolved.connect(func(_t: String, _a: String, _d: String, _w: bool) -> void: queue_redraw())
 
-
-const MAP_WIDTH: float = 8192.0
 
 func _draw() -> void:
 	var player: String = GameState.player_iso
@@ -43,82 +57,72 @@ func _draw_units() -> void:
 	var sel_army: String = MilitarySystem.selected_army_id
 	var sel_iso:  String = MilitarySystem.selected_iso
 
-	# --- Adjacent highlights + enemy garrison indicators ---
+	# --- Adjacent highlights when army selected ---
 	if sel_iso != "":
 		for nb: String in ProvinceDB.get_neighbors(sel_iso):
 			var c: Vector2 = ProvinceDB.get_centroid(nb)
 			if c == Vector2.ZERO:
 				continue
-			draw_circle(c, 26.0, COL_ADJ)
-			draw_arc(c, 26.0, 0.0, TAU, 32, COL_ADJ_RIM, 2.0)
+			draw_circle(c, 30.0, COL_ADJ)
+			draw_arc(c, 30.0, 0.0, TAU, 32, COL_ADJ_RIM, 2.0)
 
-			# Garrison power on enemy adjacent territories
+			# Garrison indicator on enemy territories
 			var ter_owner: String = GameState.territory_owner.get(nb, nb)
 			if ter_owner != player and _font:
 				var power: float = MilitarySystem.get_garrison_power(nb)
 				var label: String = _garrison_label(power)
-				draw_circle(c, BADGE_R, COL_GARRISON.darkened(0.3))
-				draw_arc(c, BADGE_R, 0.0, TAU, 32, COL_GARRISON, 2.0)
-				draw_string(_font,
-					c + Vector2(-BADGE_R, _font_size * 0.38),
-					label,
-					HORIZONTAL_ALIGNMENT_CENTER,
-					int(BADGE_R * 2), _font_size, Color.WHITE)
+				var gpos: Vector2 = c + Vector2(-12.0, -4.0)
+				draw_rect(Rect2(gpos, Vector2(24.0, 14.0)), COL_GARRISON.darkened(0.4))
+				draw_string(_font, gpos + Vector2(2.0, 11.0), label,
+					HORIZONTAL_ALIGNMENT_CENTER, 20, _font_sm, Color.WHITE)
 
-	# --- Group player units by location → army_id → count ---
-	# loc_armies[iso] = { army_id: count }
-	var loc_armies: Dictionary = {}
-	for id: String in MilitarySystem.units:
-		var u: Dictionary = MilitarySystem.units[id]
+	# --- Group player units by (location, army_id) → {type → count, total_str} ---
+	# armies_at[iso] = [{army_id, types: {type→count}, total, avg_str}]
+	var armies_at: Dictionary = {}
+	for uid: String in MilitarySystem.units:
+		var u: Dictionary = MilitarySystem.units[uid]
 		if u.owner != player:
 			continue
 		var loc: String = u.location
 		var aid: String = u.get("army_id", "")
-		if not loc_armies.has(loc):
-			loc_armies[loc] = {}
-		loc_armies[loc][aid] = loc_armies[loc].get(aid, 0) + 1
+		if not armies_at.has(loc):
+			armies_at[loc] = {}
+		if not armies_at[loc].has(aid):
+			armies_at[loc][aid] = {"types": {}, "total": 0, "str_sum": 0.0}
+		var entry: Dictionary = armies_at[loc][aid]
+		var utype: String = u.type
+		entry["types"][utype] = entry["types"].get(utype, 0) + 1
+		entry["total"] += 1
+		entry["str_sum"] += float(u.strength)
 
-	# --- Draw army badges ---
-	for iso: String in loc_armies:
+	# --- Draw army chips ---
+	for iso: String in armies_at:
 		var centroid: Vector2 = ProvinceDB.get_centroid(iso)
 		if centroid == Vector2.ZERO:
 			continue
 
-		var army_ids: Array = loc_armies[iso].keys()
+		var army_ids: Array = armies_at[iso].keys()
 		var n: int = army_ids.size()
-		# Offset badges so they're centered on the centroid
-		var total_w: float = (n - 1) * BADGE_SPACING
-		var start_x: float = centroid.x - total_w * 0.5
 
 		for i: int in n:
-			var army_id: String = army_ids[i]
-			var count: int      = loc_armies[iso][army_id]
-			var pos: Vector2    = Vector2(start_x + i * BADGE_SPACING, centroid.y)
+			var aid: String = army_ids[i]
+			var info: Dictionary = armies_at[iso][aid]
+			var is_selected: bool = (aid == sel_army)
 
-			var is_selected: bool = (army_id == sel_army)
-			if is_selected:
-				draw_arc(pos, BADGE_R + 4.0, 0.0, TAU, 36, COL_SEL, 2.5)
+			# Stack chips vertically, centered on centroid
+			var chip_y: float = centroid.y - (float(n) * (CHIP_H + CHIP_GAP)) * 0.5 + float(i) * (CHIP_H + CHIP_GAP)
+			var chip_x: float = centroid.x - CHIP_W * 0.5
+			var chip_pos: Vector2 = Vector2(chip_x, chip_y)
 
-			draw_circle(pos, BADGE_R, COL_PLAYER.darkened(0.45))
-			draw_arc(pos, BADGE_R, 0.0, TAU, 32, COL_PLAYER.lightened(0.15), 2.0)
+			_draw_chip(chip_pos, info, is_selected)
 
-			if _font:
-				draw_string(_font,
-					pos + Vector2(-BADGE_R, _font_size * 0.38),
-					str(count),
-					HORIZONTAL_ALIGNMENT_CENTER,
-					int(BADGE_R * 2), _font_size, Color.WHITE)
-
-		# Strength bar below the badge group (avg strength of all units at location)
-		_draw_strength_bar(centroid, iso)
-
-	# --- Movement arrows (one per army per destination) ---
+	# --- Movement arrows ---
 	var drawn: Dictionary = {}
-	for id: String in MilitarySystem.units:
-		var u: Dictionary = MilitarySystem.units[id]
+	for uid: String in MilitarySystem.units:
+		var u: Dictionary = MilitarySystem.units[uid]
 		if u.destination.is_empty() or u.owner != player:
 			continue
-		var key: String = "%s:%s" % [u.get("army_id", u.id), u.destination]
+		var key: String = "%s:%s" % [u.get("army_id", uid), u.destination]
 		if drawn.has(key):
 			continue
 		drawn[key] = true
@@ -128,38 +132,65 @@ func _draw_units() -> void:
 			_draw_arrow(from, to, COL_ARROW)
 
 
-func _draw_strength_bar(centroid: Vector2, iso: String) -> void:
-	var all_units: Array = MilitarySystem.get_player_units_at(iso)
-	if all_units.is_empty():
-		return
-	var avg_str: float = 0.0
-	for u: Dictionary in all_units:
-		avg_str += float(u.strength)
-	avg_str /= all_units.size()
+func _draw_chip(pos: Vector2, info: Dictionary, selected: bool) -> void:
+	var types: Dictionary = info["types"]
+	var total: int        = info["total"]
+	var avg_str: float    = info["str_sum"] / maxf(float(total), 1.0)
 
-	var bar_w: float = BADGE_R * 2.0
-	var bar_h: float = 3.0
-	var bar_x: float = centroid.x - bar_w * 0.5
-	var bar_y: float = centroid.y + BADGE_R + 3.0
-	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), Color(0.2, 0.2, 0.2, 0.8))
+	# Selection glow
+	if selected:
+		draw_rect(Rect2(pos - Vector2(3, 3), Vector2(CHIP_W + 6, CHIP_H + 6)), COL_SEL, false, 2.0)
+
+	# Background
+	draw_rect(Rect2(pos, Vector2(CHIP_W, CHIP_H)), COL_BG)
+
+	# Owner stripe at top
+	draw_rect(Rect2(pos, Vector2(CHIP_W, STRIPE_H)), COL_PLAYER)
+
+	# Border
+	draw_rect(Rect2(pos, Vector2(CHIP_W, CHIP_H)), Color(0.4, 0.5, 0.6, 0.6), false, 1.0)
+
+	if _font == null:
+		return
+
+	# Unit composition lines
+	var line_y: float = pos.y + STRIPE_H + 2.0
+	for utype: String in types:
+		var count: int = types[utype]
+		var icon: String = TYPE_ICONS.get(utype, "?")
+		var label: String = "%s %d" % [icon, count]
+		draw_string(_font, Vector2(pos.x + 4.0, line_y + _font_sm),
+			label, HORIZONTAL_ALIGNMENT_LEFT, int(CHIP_W - 8.0), _font_sm, Color(0.85, 0.9, 0.95))
+		line_y += float(_font_sm) + 2.0
+
+	# Total count on the right side
+	var total_str: String = str(total)
+	draw_string(_font, Vector2(pos.x + CHIP_W - 20.0, pos.y + CHIP_H - 4.0),
+		total_str, HORIZONTAL_ALIGNMENT_RIGHT, 18, _font_size,
+		Color(0.9, 0.95, 1.0, 0.8))
+
+	# Strength bar below chip
+	var bar_y: float = pos.y + CHIP_H + BAR_GAP
+	var bar_w: float = CHIP_W
+	draw_rect(Rect2(pos.x, bar_y, bar_w, BAR_H), Color(0.15, 0.15, 0.15, 0.8))
 	var fill: float = bar_w * (avg_str / 100.0)
-	var col: Color  = Color(0.2, 0.85, 0.2) if avg_str > 60.0 \
-					else Color(0.9, 0.75, 0.1) if avg_str > 30.0 \
-					else Color(0.9, 0.2, 0.2)
-	draw_rect(Rect2(bar_x, bar_y, fill, bar_h), col)
+	var bar_col: Color = Color(0.2, 0.85, 0.2) if avg_str > 60.0 \
+		else Color(0.9, 0.75, 0.1) if avg_str > 30.0 \
+		else Color(0.9, 0.2, 0.2)
+	draw_rect(Rect2(pos.x, bar_y, fill, BAR_H), bar_col)
 
 
 func _garrison_label(power: float) -> String:
-	if power >= 250: return "★★★"
-	if power >= 150: return "★★"
-	if power >= 70:  return "★"
-	return "◆"
+	if power >= 250.0: return "III"
+	if power >= 150.0: return "II"
+	if power >= 70.0:  return "I"
+	return "0"
 
 
 func _draw_arrow(from: Vector2, to: Vector2, col: Color) -> void:
 	draw_line(from, to, col, 2.0)
 	var dir:  Vector2 = (to - from).normalized()
 	var perp: Vector2 = Vector2(-dir.y, dir.x)
-	var tip:  Vector2 = to - dir * BADGE_R
+	var tip:  Vector2 = to - dir * 14.0
 	draw_line(tip, tip - dir * 10.0 + perp * 5.0, col, 2.0)
 	draw_line(tip, tip - dir * 10.0 - perp * 5.0, col, 2.0)
