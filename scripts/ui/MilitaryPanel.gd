@@ -3,10 +3,11 @@
 extends PanelContainer
 
 var _sections:  Dictionary = {}  # domain → {labels: {type→Label}, btns: {type→Button}}
-var _sel_label: Label      = null
-var _hint:      Label      = null
-var _split_btn: Button     = null
-var _merge_btn: Button     = null
+var _sel_label:  Label      = null
+var _army_info:  Label      = null
+var _hint:       Label      = null
+var _split_btn:  Button     = null
+var _merge_btn:  Button     = null
 
 const DOMAIN_HEADERS: Dictionary = {
 	"land": "LAND FORCES",
@@ -105,6 +106,13 @@ func _ready() -> void:
 	_sel_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sel_label.visible = false
 	vbox.add_child(_sel_label)
+
+	_army_info = Label.new()
+	_army_info.add_theme_font_size_override("font_size", 9)
+	_army_info.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
+	_army_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_army_info.visible = false
+	vbox.add_child(_army_info)
 
 	_hint = Label.new()
 	_hint.text = "Left-click your territory to select\nRight-click to move"
@@ -219,6 +227,65 @@ func _refresh() -> void:
 
 	var sel_aid: String = MilitarySystem.selected_army_id
 	_split_btn.disabled = sel_aid.is_empty() or MilitarySystem.is_army_moving(sel_aid)
+
+	# Army info card
+	if not sel_aid.is_empty():
+		_army_info.visible = true
+		var total_str: float = 0.0
+		var total_mor: float = 0.0
+		var unit_count: int = 0
+		var dest_prov: String = ""
+		var days_left: int = 0
+		var composition: Dictionary = {}
+
+		for uid: String in MilitarySystem.units:
+			var u: Dictionary = MilitarySystem.units[uid]
+			if u.get("army_id", "") == sel_aid and u.owner == player:
+				total_str += float(u.get("strength", 100))
+				total_mor += float(u.get("morale", 80))
+				unit_count += 1
+				var utype: String = u.get("type", "infantry")
+				composition[utype] = int(composition.get(utype, 0)) + 1
+				var path: Array = u.get("path", [])
+				if not path.is_empty() and dest_prov.is_empty():
+					dest_prov = path[path.size() - 1]
+					days_left = int(u.get("days_remaining", 0))
+
+		if unit_count > 0:
+			var avg_str: float = total_str / unit_count
+			var avg_mor: float = total_mor / unit_count
+			var supply: int = int(MilitarySystem.units.values()[0].get("supply_distance", 0)) if not MilitarySystem.units.is_empty() else 0
+			# Get supply for first unit of this army
+			for uid: String in MilitarySystem.units:
+				var u: Dictionary = MilitarySystem.units[uid]
+				if u.get("army_id", "") == sel_aid:
+					supply = int(u.get("supply_distance", 0))
+					break
+
+			var comp_parts: PackedStringArray = PackedStringArray()
+			for t: String in composition:
+				comp_parts.append("%d %s" % [composition[t], MilitarySystem.UNIT_TYPES.get(t, {}).get("label", t)])
+
+			var info_text: String = "Units: %s\nStrength: %.0f%%  |  Morale: %.0f%%\nSupply: %d provinces" % [
+				", ".join(comp_parts), avg_str, avg_mor, supply]
+
+			if not dest_prov.is_empty():
+				var dest_name: String = ProvinceDB.province_data.get(dest_prov, {}).get("name", dest_prov)
+				info_text += "\nDestination: %s (~%d days)" % [dest_name, days_left]
+
+			_army_info.text = info_text
+
+			# Color morale
+			if avg_mor < 30:
+				_army_info.add_theme_color_override("font_color", Color(0.90, 0.40, 0.35))
+			elif avg_mor < 60:
+				_army_info.add_theme_color_override("font_color", Color(0.85, 0.75, 0.35))
+			else:
+				_army_info.add_theme_color_override("font_color", Color(0.75, 0.78, 0.82))
+		else:
+			_army_info.visible = false
+	else:
+		_army_info.visible = false
 
 	var sel_iso: String = MilitarySystem.selected_iso
 	var armies_here: int = 0

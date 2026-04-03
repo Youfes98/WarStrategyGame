@@ -40,6 +40,7 @@ var _country_idx_map:   Dictionary = {}
 var _polygons: Dictionary = {}
 
 var _selected_country: String = ""
+var _selected_province: String = ""
 var _hover_id:         String = ""
 var _mil_sel_iso:      String = ""
 
@@ -225,6 +226,19 @@ func _restore_country_lut(ciso: String) -> void:
 
 
 ## Refresh all province colors (called after save/load to reflect ownership changes).
+func _highlight_province(pid: String) -> void:
+	# Unhighlight previous
+	if not _selected_province.is_empty():
+		_restore_province_lut(_selected_province)
+	_selected_province = pid
+	# Highlight new
+	if not pid.is_empty():
+		var idx: int = ProvinceDB.get_province_index(pid)
+		if idx > 0:
+			var base: Color = _base_colors.get(idx, COLOR_OCEAN)
+			_set_lut(idx, base.lightened(0.25))
+
+
 func _refresh_all_colors() -> void:
 	for pid: String in ProvinceDB.province_data:
 		_restore_province_lut(pid)
@@ -328,6 +342,7 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	if rid.is_empty() and not _shader_mode:
 		rid = _hit_test(mp)
 	if rid.is_empty():
+		_highlight_province("")  # Clear highlight
 		if not MilitarySystem.selected_army_ids.is_empty():
 			MilitarySystem.deselect()
 		else:
@@ -335,6 +350,7 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 		return
 	if not GameState.player_iso.is_empty():
 		if MilitarySystem.handle_territory_click(rid, shift):
+			_highlight_province("")  # Clear highlight when selecting army
 			return
 	# Only set recruit_iso if no army was selected at this province
 	var parent: String = ProvinceDB.get_parent_iso(rid)
@@ -350,6 +366,9 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
 	emit_signal("country_clicked", card_iso)
 	GameState.select_country(card_iso)
+
+	# Highlight clicked province
+	_highlight_province(rid)
 
 	# Show province info panel if this is a province (not country-level)
 	if ProvinceDB.province_data.has(rid):
