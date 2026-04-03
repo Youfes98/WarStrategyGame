@@ -325,6 +325,42 @@ def main():
         color = tuple(p["detect_color"])
         if len(ring) >= 3:
             draw.polygon(ring, fill=color, outline=color)
+            # 1px outline expansion to close micro-gaps between adjacent provinces
+            draw.line(ring + [ring[0]], fill=color, width=2)
+
+    # ─�� Fill single-pixel gaps between provinces (vectorized) ────────────────
+    try:
+        import numpy as np
+        from scipy.ndimage import maximum_filter
+        print("  Filling border gaps...")
+        arr = np.array(img)
+        black = np.all(arr == 0, axis=2)
+        # Dilate non-black by 1px — any black pixel that gets covered was a gap
+        non_black = ~black
+        dilated = maximum_filter(non_black, size=3)
+        gaps = black & dilated
+        gap_ys, gap_xs = np.where(gaps)
+        filled = 0
+        for y, x in zip(gap_ys.tolist(), gap_xs.tolist()):
+            # Count non-black neighbors
+            neighbors = []
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if dy == 0 and dx == 0:
+                        continue
+                    ny, nx = y + dy, x + dx
+                    if 0 <= ny < arr.shape[0] and 0 <= nx < arr.shape[1]:
+                        nc = tuple(arr[ny, nx].tolist())
+                        if nc != (0, 0, 0):
+                            neighbors.append(nc)
+            if len(neighbors) >= 3:
+                from collections import Counter
+                arr[y, x] = Counter(neighbors).most_common(1)[0][0]
+                filled += 1
+        img = Image.fromarray(arr)
+        print(f"  Filled {filled} gap pixels")
+    except ImportError:
+        print("  scipy not available — skipping gap fill (pip install scipy)")
 
     img.save(PROVINCES_PNG)
     print(f"  OK: Saved provinces.png")
