@@ -1,46 +1,71 @@
 ## MilitaryPanel.gd
-## Bottom-left HUD: unit counts, recruit buttons, split/merge army controls.
+## Bottom-left HUD: unit counts by domain, recruit buttons, split/merge army controls.
 extends PanelContainer
 
-var _labels:    Dictionary = {}
-var _btns:      Dictionary = {}
+var _sections:  Dictionary = {}  # domain → {labels: {type→Label}, btns: {type→Button}}
 var _sel_label: Label      = null
 var _hint:      Label      = null
 var _split_btn: Button     = null
 var _merge_btn: Button     = null
 
+const DOMAIN_HEADERS: Dictionary = {
+	"land": "LAND FORCES",
+	"sea":  "NAVAL FORCES",
+	"air":  "AIR FORCES",
+}
+const DOMAIN_COLORS: Dictionary = {
+	"land": Color(0.7, 0.85, 1.0),
+	"sea":  Color(0.4, 0.75, 1.0),
+	"air":  Color(0.85, 0.85, 0.5),
+}
+
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(290, 0)
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 5)
+	vbox.add_theme_constant_override("separation", 4)
 	add_child(vbox)
 
-	var header := Label.new()
-	header.text = "MILITARY FORCES"
-	header.add_theme_font_size_override("font_size", 11)
-	header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	vbox.add_child(header)
+	var title := Label.new()
+	title.text = "MILITARY FORCES"
+	title.add_theme_font_size_override("font_size", 12)
+	title.add_theme_color_override("font_color", Color(0.85, 0.75, 0.45))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
 
-	vbox.add_child(HSeparator.new())
+	# Build sections by domain
+	for domain: String in ["land", "sea", "air"]:
+		vbox.add_child(HSeparator.new())
+		var hdr := Label.new()
+		hdr.text = DOMAIN_HEADERS[domain]
+		hdr.add_theme_font_size_override("font_size", 9)
+		hdr.add_theme_color_override("font_color", DOMAIN_COLORS[domain])
+		vbox.add_child(hdr)
 
-	for type_key: String in ["infantry", "armor", "artillery"]:
-		var row := HBoxContainer.new()
-		vbox.add_child(row)
+		var sec: Dictionary = {"labels": {}, "btns": {}}
+		for type_key: String in MilitarySystem.UNIT_TYPES:
+			var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
+			if tdata.get("domain", "land") != domain:
+				continue
 
-		var lbl := Label.new()
-		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		lbl.add_theme_font_size_override("font_size", 11)
-		row.add_child(lbl)
-		_labels[type_key] = lbl
+			var row := HBoxContainer.new()
+			vbox.add_child(row)
 
-		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(90, 22)
-		btn.add_theme_font_size_override("font_size", 10)
-		var t: String = type_key
-		btn.pressed.connect(func() -> void: _recruit(t))
-		row.add_child(btn)
-		_btns[type_key] = btn
+			var lbl := Label.new()
+			lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			lbl.add_theme_font_size_override("font_size", 11)
+			row.add_child(lbl)
+			sec["labels"][type_key] = lbl
+
+			var btn := Button.new()
+			btn.custom_minimum_size = Vector2(80, 20)
+			btn.add_theme_font_size_override("font_size", 9)
+			var t: String = type_key
+			btn.pressed.connect(func() -> void: _recruit(t))
+			row.add_child(btn)
+			sec["btns"][type_key] = btn
+
+		_sections[domain] = sec
 
 	vbox.add_child(HSeparator.new())
 
@@ -77,7 +102,7 @@ func _ready() -> void:
 	vbox.add_child(_sel_label)
 
 	_hint = Label.new()
-	_hint.text = "Left-click your territory to select army\nRight-click any territory to move"
+	_hint.text = "Left-click your territory to select\nRight-click to move"
 	_hint.add_theme_font_size_override("font_size", 9)
 	_hint.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -132,8 +157,12 @@ func _refresh() -> void:
 	if player.is_empty():
 		return
 
-	var counts: Dictionary = {"infantry": 0, "armor": 0, "artillery": 0}
-	var in_transit: Dictionary = {"infantry": 0, "armor": 0, "artillery": 0}
+	# Count all player units by type
+	var counts: Dictionary = {}
+	var in_transit: Dictionary = {}
+	for type_key: String in MilitarySystem.UNIT_TYPES:
+		counts[type_key] = 0
+		in_transit[type_key] = 0
 	for id: String in MilitarySystem.units:
 		var u: Dictionary = MilitarySystem.units[id]
 		if u.owner == player and counts.has(u.type):
@@ -141,19 +170,24 @@ func _refresh() -> void:
 			if not (u.get("path", []) as Array).is_empty():
 				in_transit[u.type] += 1
 
-	for type_key: String in _labels:
-		var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
-		var tname: String = tdata["label"]
-		var total: int    = counts[type_key]
-		var moving: int   = in_transit[type_key]
-		var txt: String   = "%s  x%d" % [tname, total]
-		if moving > 0:
-			txt += "  (%d moving)" % moving
-		_labels[type_key].text = txt
-		var cost: float = float(tdata.get("cost", 0))
-		var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000.0)
-		_btns[type_key].text   = "+ %s" % cost_str
-		_btns[type_key].disabled = not MilitarySystem.can_recruit(type_key)
+	# Update all sections
+	for domain: String in _sections:
+		var sec: Dictionary = _sections[domain]
+		for type_key: String in sec["labels"]:
+			var tdata: Dictionary = MilitarySystem.UNIT_TYPES[type_key]
+			var tname: String = tdata["label"]
+			var total: int = counts.get(type_key, 0)
+			var moving: int = in_transit.get(type_key, 0)
+			var txt: String = "%s  x%d" % [tname, total]
+			if moving > 0:
+				txt += "  (%d moving)" % moving
+			(sec["labels"][type_key] as Label).text = txt
+
+			var cost: float = float(tdata.get("cost", 0))
+			var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000.0)
+			var btn: Button = sec["btns"][type_key]
+			btn.text = "+ %s" % cost_str
+			btn.disabled = not MilitarySystem.can_recruit(type_key)
 
 	var sel_aid: String = MilitarySystem.selected_army_id
 	_split_btn.disabled = sel_aid.is_empty() or MilitarySystem.is_army_moving(sel_aid)
@@ -180,7 +214,7 @@ func _on_selection_changed() -> void:
 func _on_territory_selected(iso: String) -> void:
 	if iso.is_empty() and MilitarySystem.recruit_iso.is_empty():
 		_sel_label.visible = false
-		_hint.text = "Left-click your territory to select army\nRight-click any territory to move"
+		_hint.text = "Left-click your territory to select\nRight-click to move"
 		return
 
 	var sel_name: String
@@ -195,4 +229,4 @@ func _on_territory_selected(iso: String) -> void:
 
 	_sel_label.visible = true
 	_sel_label.text = "Selected: %s" % sel_name
-	_hint.text = "Right-click any territory to move\nClick same territory to cycle/deselect"
+	_hint.text = "Right-click to move | Click same to cycle/deselect"

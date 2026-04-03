@@ -258,6 +258,11 @@ GOVERNMENT_TYPES: dict[str, str] = {
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
+CACHE_DIR = Path(__file__).parent / "cache"
+CACHE_A   = CACHE_DIR / "rest_countries_a.json"
+CACHE_B   = CACHE_DIR / "rest_countries_b.json"
+
+
 def fetch(url: str) -> dict | list:
     print(f"  Fetching {url[:80]}...")
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -265,11 +270,28 @@ def fetch(url: str) -> dict | list:
         return json.loads(resp.read().decode())
 
 
+def fetch_cached(url: str, cache_path: Path) -> dict | list:
+    """Fetch from API and cache, or use cache if API fails."""
+    CACHE_DIR.mkdir(exist_ok=True)
+    try:
+        data = fetch(url)
+        # Save successful response to cache
+        with open(cache_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+        return data
+    except Exception as e:
+        if cache_path.exists():
+            print(f"  API failed ({e}), using cached response")
+            with open(cache_path, encoding="utf-8") as f:
+                return json.load(f)
+        raise
+
+
 def build_countries() -> tuple[list, dict]:
     print("Fetching REST Countries API (batch A)...")
-    raw_a = fetch(REST_COUNTRIES_URL_A)
+    raw_a = fetch_cached(REST_COUNTRIES_URL_A, CACHE_A)
     print("Fetching REST Countries API (batch B)...")
-    raw_b = fetch(REST_COUNTRIES_URL_B)
+    raw_b = fetch_cached(REST_COUNTRIES_URL_B, CACHE_B)
 
     # Merge by cca3
     b_by_iso = {e["cca3"]: e for e in raw_b if "cca3" in e}

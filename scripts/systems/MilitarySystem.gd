@@ -9,19 +9,26 @@ signal territory_selected(iso: String)
 signal selection_changed()
 signal battle_resolved(territory_iso: String, attacker_iso: String, defender_iso: String, attacker_won: bool)
 
+## domain: "land" = moves on land provinces, "sea" = moves on ocean, "air" = range-based
 const UNIT_TYPES: Dictionary = {
-	# Real-world brigade-level costs in $B (2026 estimates)
-	# Infantry brigade (~5K troops): ~$0.5B to stand up, ~$0.24B/yr upkeep
-	# Armored brigade (~4K troops + 200 AFVs): ~$3B to equip, ~$1B/yr upkeep
-	# Artillery brigade (~2K troops + 100 systems): ~$1.2B to equip, ~$0.5B/yr upkeep
-	"infantry":  {"label": "Infantry",  "travel_days": 3, "cost": 0.5,  "upkeep": 0.02, "icon": "INF", "power": 10},
-	"armor":     {"label": "Armor",     "travel_days": 2, "cost": 3.0,  "upkeep": 0.08, "icon": "ARM", "power": 25},
-	"artillery": {"label": "Artillery", "travel_days": 4, "cost": 1.2,  "upkeep": 0.04, "icon": "ART", "power": 18},
+	# ── LAND (brigade-level, 2026 costs in $B) ──
+	"infantry":  {"label": "Infantry",    "domain": "land", "travel_days": 3, "cost": 0.5,  "upkeep": 0.02, "power": 10, "sprite": "infantry"},
+	"armor":     {"label": "Armor",       "domain": "land", "travel_days": 2, "cost": 3.0,  "upkeep": 0.08, "power": 25, "sprite": "armor"},
+	"artillery": {"label": "Artillery",   "domain": "land", "travel_days": 4, "cost": 1.2,  "upkeep": 0.04, "power": 18, "sprite": "artillery"},
+	# ── NAVAL (ship-level) ──
+	"destroyer": {"label": "Destroyer",   "domain": "sea",  "travel_days": 1, "cost": 1.8,  "upkeep": 0.06, "power": 20, "sprite": "destroyer"},
+	"submarine": {"label": "Submarine",   "domain": "sea",  "travel_days": 2, "cost": 3.5,  "upkeep": 0.10, "power": 22, "sprite": "submarine"},
+	"carrier":   {"label": "Carrier",     "domain": "sea",  "travel_days": 1, "cost": 13.0, "upkeep": 0.35, "power": 30, "sprite": "carrier"},
+	"transport": {"label": "Transport",   "domain": "sea",  "travel_days": 2, "cost": 0.8,  "upkeep": 0.03, "power": 2,  "sprite": "transport", "capacity": 5},
+	# ── AIR (squadron-level) ──
+	"fighter":   {"label": "Fighter Jet", "domain": "air",  "travel_days": 0, "cost": 2.5,  "upkeep": 0.08, "power": 15, "sprite": "fighter",  "range": 8},
+	"bomber":    {"label": "Bomber",      "domain": "air",  "travel_days": 0, "cost": 5.0,  "upkeep": 0.15, "power": 30, "sprite": "bomber",   "range": 6},
+	"drone":     {"label": "Drone",       "domain": "air",  "travel_days": 0, "cost": 0.3,  "upkeep": 0.01, "power": 8,  "sprite": "drone",    "range": 10},
 }
 
 const STARTING_UNITS: Dictionary = {
-	"S": [["infantry", 5], ["armor", 3], ["artillery", 2]],
-	"A": [["infantry", 4], ["armor", 2], ["artillery", 1]],
+	"S": [["infantry", 5], ["armor", 3], ["artillery", 2], ["destroyer", 2], ["fighter", 2]],
+	"A": [["infantry", 4], ["armor", 2], ["artillery", 1], ["destroyer", 1], ["fighter", 1]],
 	"B": [["infantry", 3], ["armor", 1]],
 	"C": [["infantry", 2]],
 	"D": [["infantry", 1]],
