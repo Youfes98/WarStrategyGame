@@ -45,6 +45,10 @@ func _ready() -> void:
 	add_child(_main_vbox)
 
 	call_deferred("_connect_signals")
+	# Refresh every month to update progress bars
+	GameClock.tick_month.connect(func(_d: Dictionary) -> void:
+		if visible:
+			_refresh())
 
 
 func _connect_signals() -> void:
@@ -104,10 +108,9 @@ func _show_main() -> void:
 	# ── Construction Queue ──
 	var bs: Node = _bs()
 	var queue: Array = bs.get_queue(GameState.player_iso) if bs != null else []
-	var max_q: int = bs._get_max_queue(GameState.player_iso) if bs != null else 2
 
 	var q_header := Label.new()
-	q_header.text = "QUEUE  %d / %d" % [queue.size(), max_q]
+	q_header.text = "QUEUE  (%d projects)" % queue.size()
 	q_header.add_theme_font_size_override("font_size", 10)
 	q_header.add_theme_color_override("font_color", ACCENT)
 	_main_vbox.add_child(q_header)
@@ -119,8 +122,14 @@ func _show_main() -> void:
 		empty.add_theme_color_override("font_color", DIM)
 		_main_vbox.add_child(empty)
 	else:
+		# Track first-per-province to show "active" vs "queued"
+		var active_provinces: Dictionary = {}
 		for i: int in queue.size():
-			_add_queue_item(queue[i], i)
+			var pid: String = queue[i].get("province", "")
+			var is_active: bool = not active_provinces.has(pid)
+			if is_active:
+				active_provinces[pid] = true
+			_add_queue_item(queue[i], i, is_active)
 
 	_main_vbox.add_child(HSeparator.new())
 
@@ -164,7 +173,7 @@ func _show_main() -> void:
 		list.add_child(row)
 
 
-func _add_queue_item(item: Dictionary, index: int) -> void:
+func _add_queue_item(item: Dictionary, index: int, is_active: bool = true) -> void:
 	var bs: Node = _bs()
 	var bdef: Dictionary = bs.BUILDING_TYPES.get(item.get("type", ""), {}) if bs != null else {}
 	var pname: String = ProvinceDB.province_data.get(item.get("province", ""), {}).get("name", "?")
@@ -182,15 +191,19 @@ func _add_queue_item(item: Dictionary, index: int) -> void:
 	name_lbl.text = "%s — %s" % [bdef.get("label", "?"), pname]
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", 10)
-	name_lbl.add_theme_color_override("font_color", TEXT)
+	name_lbl.add_theme_color_override("font_color", TEXT if is_active else DIM)
 	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	top.add_child(name_lbl)
 
 	var pct_lbl := Label.new()
-	pct_lbl.text = "%.0f%%" % (progress * 100.0)
+	if is_active:
+		pct_lbl.text = "%.0f%%" % (progress * 100.0)
+		pct_lbl.add_theme_color_override("font_color", GREEN)
+	else:
+		pct_lbl.text = "queued"
+		pct_lbl.add_theme_color_override("font_color", Color(0.65, 0.55, 0.25))
 	pct_lbl.add_theme_font_size_override("font_size", 10)
-	pct_lbl.add_theme_color_override("font_color", GREEN)
-	pct_lbl.custom_minimum_size = Vector2(36, 0)
+	pct_lbl.custom_minimum_size = Vector2(42, 0)
 	pct_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	top.add_child(pct_lbl)
 
@@ -209,13 +222,13 @@ func _add_queue_item(item: Dictionary, index: int) -> void:
 
 	# Progress bar
 	var bar_bg := ColorRect.new()
-	bar_bg.custom_minimum_size = Vector2(0, 6)
+	bar_bg.custom_minimum_size = Vector2(0, 5)
 	bar_bg.color = BAR_BG
 	container.add_child(bar_bg)
 
 	var bar_fill := ColorRect.new()
-	bar_fill.custom_minimum_size = Vector2(progress * 300.0, 6)
-	bar_fill.color = BAR_FILL
+	bar_fill.custom_minimum_size = Vector2(progress * 290.0, 5)
+	bar_fill.color = BAR_FILL if is_active else Color(0.45, 0.40, 0.20, 0.60)
 	bar_fill.position = Vector2.ZERO
 	bar_bg.add_child(bar_fill)
 

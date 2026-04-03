@@ -87,9 +87,8 @@ const BUILDING_TYPES: Dictionary = {
 	},
 }
 
-# Max simultaneous constructions scales with GDP
-const BASE_MAX_QUEUE: int = 2
-const GDP_PER_EXTRA_SLOT: float = 5000.0  # +1 slot per $5T GDP
+# No hard queue cap — limited by budget allocation instead.
+# Per-province: only 1 building constructs at a time; rest wait in line.
 
 # Terrain build speed modifiers
 const TERRAIN_BUILD_SPEED: Dictionary = {
@@ -187,14 +186,9 @@ func can_build(building_type: String, province_id: String, country_iso: String) 
 	for item: Dictionary in GameState.construction_queue.get(country_iso, []):
 		if item.get("province", "") == province_id and item.get("type", "") == building_type:
 			return false
-	# Treasury check
+	# Treasury check — need enough for the initial cost
 	var treasury: float = float(GameState.get_country(country_iso).get("treasury", 0.0))
 	if treasury < bdef.get("cost", 999.0):
-		return false
-	# Queue capacity
-	var queue: Array = GameState.construction_queue.get(country_iso, [])
-	var max_queue: int = _get_max_queue(country_iso)
-	if queue.size() >= max_queue:
 		return false
 	return true
 
@@ -334,26 +328,33 @@ func get_building_effects(country_iso: String) -> Dictionary:
 
 # ── Private ───────────────────────────────────────────────────────────────────
 
-func _get_max_queue(country_iso: String) -> int:
-	var gdp: float = float(GameState.get_country(country_iso).get("gdp_raw_billions", 1.0))
-	return BASE_MAX_QUEUE + int(gdp / GDP_PER_EXTRA_SLOT)
-
-
 func _advance_construction() -> void:
 	for iso: String in GameState.construction_queue:
 		var queue: Array = GameState.construction_queue[iso]
+		if queue.is_empty():
+			continue
 		var cdata: Dictionary = GameState.get_country(iso)
 		var infra: float = float(cdata.get("infrastructure", 50)) / 100.0
 		var stab: float = float(cdata.get("stability", 50)) / 100.0
 		var speed_mod: float = (0.5 + infra * 0.5) * (0.7 + stab * 0.3)
 
+		# Track which provinces already have an active build this tick
+		# Only the FIRST queued item per province advances; rest wait in line
+		var active_provinces: Dictionary = {}
 		var completed: Array = []
+
 		for i: int in queue.size():
 			var item: Dictionary = queue[i]
+			var pid: String = item.get("province", "")
 			var btype: String = item.get("type", "")
 			var bdef: Dictionary = BUILDING_TYPES.get(btype, {})
+
+			# Per-province queue: skip if another build is already active here
+			if active_provinces.has(pid):
+				continue
+			active_provinces[pid] = true
+
 			var build_months: float = float(bdef.get("build_months", 3))
-			var pid: String = item.get("province", "")
 			var terrain: String = ProvinceDB.get_province_terrain(pid)
 			var terrain_speed: float = TERRAIN_BUILD_SPEED.get(terrain, 0.8)
 
@@ -364,7 +365,7 @@ func _advance_construction() -> void:
 				completed.append(i)
 				_complete_building(pid, btype, iso)
 
-		# Remove completed items (reverse order to preserve indices)
+		# Remove completed (reverse order)
 		for i: int in range(completed.size() - 1, -1, -1):
 			queue.remove_at(completed[i])
 
