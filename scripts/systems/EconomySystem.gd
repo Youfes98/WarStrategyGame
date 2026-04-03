@@ -76,9 +76,8 @@ func _init_budget(iso: String) -> void:
 	data["tax_max"] = float(profile[2]) / 100.0
 
 	# Default budget allocation (% of discretionary, must sum to 100)
-	data["budget_military"] = 20.0
-	data["budget_infrastructure"] = 25.0
-	data["budget_social"] = 30.0
+	data["budget_military"] = 25.0
+	data["budget_infrastructure"] = 45.0
 	data["budget_research"] = 25.0
 
 	# Seed treasury: N months of revenue based on power tier
@@ -270,15 +269,13 @@ func set_tax_rate(iso: String, rate: float) -> void:
 
 
 func set_budget(iso: String, military: float, infrastructure: float,
-		social: float, research: float) -> void:
-	var total: float = military + infrastructure + social + research
+		research: float) -> void:
+	var total: float = military + infrastructure + research
 	if total < 0.01:
 		return
-	# Normalise to 100
 	var data: Dictionary = GameState.countries.get(iso, {})
 	data["budget_military"] = military / total * 100.0
 	data["budget_infrastructure"] = infrastructure / total * 100.0
-	data["budget_social"] = social / total * 100.0
 	data["budget_research"] = research / total * 100.0
 	GameState.country_data_changed.emit(iso)
 

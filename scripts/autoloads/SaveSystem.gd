@@ -77,10 +77,9 @@ func _serialize_countries() -> Dictionary:
 			"tax_rate": c.get("tax_rate", 0.25),
 			"tax_min": c.get("tax_min", 0.10),
 			"tax_max": c.get("tax_max", 0.45),
-			"budget_military": c.get("budget_military", 20.0),
-			"budget_infrastructure": c.get("budget_infrastructure", 25.0),
-			"budget_social": c.get("budget_social", 30.0),
-			"budget_research": c.get("budget_research", 25.0),
+			"budget_military": c.get("budget_military", 25.0),
+			"budget_infrastructure": c.get("budget_infrastructure", 45.0),
+			"budget_research": c.get("budget_research", 30.0),
 		}
 	return out
 

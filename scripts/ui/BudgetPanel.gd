@@ -7,11 +7,9 @@ var _tax_slider:    HSlider = null
 var _tax_lbl:       Label   = null
 var _mil_slider:    HSlider = null
 var _infra_slider:  HSlider = null
-var _social_slider: HSlider = null
 var _res_slider:    HSlider = null
 var _mil_pct:       Label   = null
 var _infra_pct:     Label   = null
-var _social_pct:    Label   = null
 var _res_pct:       Label   = null
 var _breakdown_lbl: Label   = null
 var _updating:      bool    = false
@@ -72,7 +70,7 @@ func _ready() -> void:
 	alloc_hdr.add_theme_color_override("font_color", HEADER_COLOR)
 	vbox.add_child(alloc_hdr)
 
-	# 4 budget sliders — controls ministerial auto-build priority
+	# 3 budget sliders — Military, Infrastructure (includes social), Research
 	var mil_row := _make_slider_row(vbox, "Military")
 	_mil_slider = mil_row[0]; _mil_pct = mil_row[1]
 	_mil_slider.value_changed.connect(_on_budget_changed)
@@ -80,10 +78,6 @@ func _ready() -> void:
 	var infra_row := _make_slider_row(vbox, "Infrastructure")
 	_infra_slider = infra_row[0]; _infra_pct = infra_row[1]
 	_infra_slider.value_changed.connect(_on_budget_changed)
-
-	var social_row := _make_slider_row(vbox, "Social")
-	_social_slider = social_row[0]; _social_pct = social_row[1]
-	_social_slider.value_changed.connect(_on_budget_changed)
 
 	var res_row := _make_slider_row(vbox, "Research")
 	_res_slider = res_row[0]; _res_pct = res_row[1]
@@ -161,10 +155,9 @@ func _load_from_data() -> void:
 	_tax_slider.value = tax_pct
 	_tax_lbl.text = "%.0f%%" % tax_pct
 
-	_mil_slider.value = float(data.get("budget_military", 20))
-	_infra_slider.value = float(data.get("budget_infrastructure", 25))
-	_social_slider.value = float(data.get("budget_social", 30))
-	_res_slider.value = float(data.get("budget_research", 25))
+	_mil_slider.value = float(data.get("budget_military", 25))
+	_infra_slider.value = float(data.get("budget_infrastructure", 45))
+	_res_slider.value = float(data.get("budget_research", 30))
 	_update_pct_labels()
 	_updating = false
 	_refresh_breakdown()
@@ -187,25 +180,21 @@ func _on_budget_changed(_value: float) -> void:
 	if _updating:
 		return
 	var bdata: Dictionary = GameState.get_country(GameState.player_iso)
-	var total: float = _mil_slider.value + _infra_slider.value \
-					   + _social_slider.value + _res_slider.value
+	var total: float = _mil_slider.value + _infra_slider.value + _res_slider.value
 	if total > 0.01:
 		bdata["budget_military"] = _mil_slider.value / total * 100.0
 		bdata["budget_infrastructure"] = _infra_slider.value / total * 100.0
-		bdata["budget_social"] = _social_slider.value / total * 100.0
 		bdata["budget_research"] = _res_slider.value / total * 100.0
 	GameState.country_data_changed.emit(GameState.player_iso)
 	_refresh_breakdown()
 
 
 func _update_pct_labels() -> void:
-	var total: float = _mil_slider.value + _infra_slider.value \
-					   + _social_slider.value + _res_slider.value
+	var total: float = _mil_slider.value + _infra_slider.value + _res_slider.value
 	if total < 0.01:
 		total = 1.0
 	_mil_pct.text = "%.0f%%" % (_mil_slider.value / total * 100.0)
 	_infra_pct.text = "%.0f%%" % (_infra_slider.value / total * 100.0)
-	_social_pct.text = "%.0f%%" % (_social_slider.value / total * 100.0)
 	_res_pct.text = "%.0f%%" % (_res_slider.value / total * 100.0)
 
 
