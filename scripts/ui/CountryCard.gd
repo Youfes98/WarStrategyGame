@@ -30,6 +30,7 @@ const TIER_COLORS: Dictionary = {
 var _picking_mode: bool = false
 
 var _vbox:        VBoxContainer = null
+var _detail_lbl:  Label = null  # Extra info shown only in picking mode
 var _flag_lbl:    Label = null
 var _flag_tex:    TextureRect = null
 var _name_lbl:    Label = null
@@ -251,6 +252,18 @@ func _make_bar_row(parent: Node, label_text: String, max_val: int) -> Array:
 
 
 func _build_actions() -> void:
+	# Detailed info (only visible in picking mode)
+	_detail_lbl = Label.new()
+	_detail_lbl.add_theme_font_size_override("font_size", 11)
+	_detail_lbl.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
+	_detail_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail_lbl.visible = false
+	var detail_margin := MarginContainer.new()
+	detail_margin.add_theme_constant_override("margin_left", 12)
+	detail_margin.add_theme_constant_override("margin_right", 12)
+	detail_margin.add_child(_detail_lbl)
+	_vbox.add_child(detail_margin)
+
 	var div := ColorRect.new()
 	div.color = COL_DIVIDER
 	div.custom_minimum_size = Vector2(0, 1)
@@ -308,6 +321,7 @@ func _make_action_btn(btn_text: String, col: Color) -> Button:
 
 func set_picking_mode(enabled: bool) -> void:
 	_picking_mode = enabled
+	custom_minimum_size.x = 320 if enabled else 260
 
 
 func _on_selected(iso: String) -> void:
@@ -375,7 +389,28 @@ func _refresh(iso: String, data: Dictionary) -> void:
 		_confirm_btn.visible = true
 		_war_btn.visible = false
 		_peace_btn.visible = false
+		# Show detailed info
+		if _detail_lbl:
+			_detail_lbl.visible = true
+			var capital: String = data.get("capital", "Unknown")
+			var debt: float = data.get("debt_to_gdp", 0.0)
+			var infra: int = int(data.get("infrastructure", 0))
+			var literacy: int = int(data.get("literacy_rate", 0))
+			var area: float = data.get("area_km2", 0.0)
+			var landlocked: bool = data.get("landlocked", false)
+			var n_provs: int = ProvinceDB.get_country_province_ids(iso).size()
+			var neighbors: Array = data.get("borders", [])
+			var area_str: String = "%dK km²" % int(area / 1000) if area >= 1000 else "%d km²" % int(area)
+			_detail_lbl.text = (
+				"Capital: %s\n" % capital +
+				"Area: %s  |  Provinces: %d\n" % [area_str, n_provs] +
+				"Debt/GDP: %.0f%%  |  Infrastructure: %d%%\n" % [debt, infra] +
+				"Literacy: %d%%  |  %s\n" % [literacy, "Landlocked" if landlocked else "Sea access"] +
+				"Neighbors: %d countries" % neighbors.size()
+			)
 	elif not GameState.player_iso.is_empty() and iso != GameState.player_iso:
+		if _detail_lbl:
+			_detail_lbl.visible = false
 		var ter_owner: String = GameState.get_country_owner(iso)
 		if ter_owner == GameState.player_iso:
 			_war_btn.visible = false
