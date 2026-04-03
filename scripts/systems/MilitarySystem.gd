@@ -815,32 +815,37 @@ func get_recruit_location(type: String, preferred: String = "") -> String:
 	if player.is_empty():
 		return ""
 
+	var bs: Node = Engine.get_singleton("BuildingSystem") if Engine.has_singleton("BuildingSystem") else get_node_or_null("/root/BuildingSystem")
+	if bs == null:
+		# Fallback: capital only (BuildingSystem not loaded yet)
+		return ProvinceDB.get_capital_province(player)
+
 	# Find which building types unlock this unit
 	var required_buildings: Array = []
-	for btype: String in BuildingSystem.BUILDING_TYPES:
-		var bdef: Dictionary = BuildingSystem.BUILDING_TYPES[btype]
+	for btype: String in bs.BUILDING_TYPES:
+		var bdef: Dictionary = bs.BUILDING_TYPES[btype]
 		var unlocks: Array = bdef.get("unlocks_recruit", [])
 		if type in unlocks:
 			required_buildings.append(btype)
 
 	if required_buildings.is_empty():
-		return ""  # No building can produce this unit
+		return ""
 
 	# Check preferred location first
 	if not preferred.is_empty():
 		var ter_owner: String = GameState.territory_owner.get(preferred, "")
 		if ter_owner == player:
 			for btype: String in required_buildings:
-				if BuildingSystem.has_building(preferred, btype):
+				if bs.has_building(preferred, btype):
 					return preferred
 
 	# Fallback: find any province with the required building
 	for btype: String in required_buildings:
-		var provinces: Array = BuildingSystem.get_provinces_with_building(player, btype)
+		var provinces: Array = bs.get_provinces_with_building(player, btype)
 		if not provinces.is_empty():
 			return provinces[0]
 
-	return ""  # No building available — can't recruit
+	return ""
 
 
 func can_recruit(type: String) -> bool:
@@ -863,11 +868,13 @@ func can_recruit_at(type: String, location: String) -> bool:
 	var player: String = GameState.player_iso
 	if GameState.territory_owner.get(location, "") != player:
 		return false
-	# Check if this location has a building that unlocks this unit type
-	for btype: String in BuildingSystem.BUILDING_TYPES:
-		var bdef: Dictionary = BuildingSystem.BUILDING_TYPES[btype]
+	var bs: Node = get_node_or_null("/root/BuildingSystem")
+	if bs == null:
+		return location == ProvinceDB.get_capital_province(player)
+	for btype: String in bs.BUILDING_TYPES:
+		var bdef: Dictionary = bs.BUILDING_TYPES[btype]
 		if type in bdef.get("unlocks_recruit", []):
-			if BuildingSystem.has_building(location, btype):
+			if bs.has_building(location, btype):
 				return true
 	return false
 

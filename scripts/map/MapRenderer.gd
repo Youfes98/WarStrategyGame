@@ -351,6 +351,12 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	emit_signal("country_clicked", card_iso)
 	GameState.select_country(card_iso)
 
+	# Show province info panel if this is a province (not country-level)
+	if ProvinceDB.province_data.has(rid):
+		var pip: Node = get_tree().get_first_node_in_group("province_info_panel")
+		if pip != null and pip.has_method("show_province"):
+			pip.show_province(rid)
+
 func _hit_test(mp: Vector2) -> String:
 	for iso: String in _polygons:
 		if Geometry2D.is_point_in_polygon(mp, (_polygons[iso] as Polygon2D).polygon):

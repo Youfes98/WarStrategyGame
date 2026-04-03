@@ -1,0 +1,197 @@
+## ProvinceInfoPanel.gd
+## Rectangle info card shown when clicking a province.
+## Shows: province name, country, population estimate, GDP contribution,
+## terrain, buildings, and build options.
+extends PanelContainer
+
+var _province_id: String = ""
+var _vbox: VBoxContainer = null
+var _name_lbl: Label = null
+var _country_lbl: Label = null
+var _terrain_lbl: Label = null
+var _pop_lbl: Label = null
+var _buildings_list: VBoxContainer = null
+
+const BG_COLOR:     Color = Color(0.07, 0.07, 0.09, 0.94)
+const HEADER_COLOR: Color = Color(0.85, 0.75, 0.45)
+const TEXT_COLOR:   Color = Color(0.85, 0.86, 0.90)
+const DIM_COLOR:    Color = Color(0.50, 0.52, 0.55)
+const TERRAIN_COLORS: Dictionary = {
+	"plains": Color(0.45, 0.75, 0.40),
+	"forest": Color(0.30, 0.65, 0.30),
+	"mountain": Color(0.65, 0.55, 0.45),
+	"desert": Color(0.85, 0.75, 0.45),
+	"jungle": Color(0.25, 0.55, 0.25),
+	"tundra": Color(0.60, 0.70, 0.80),
+}
+
+
+func _ready() -> void:
+	custom_minimum_size = Vector2(250, 0)
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	add_to_group("province_info_panel")
+	visible = false
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = BG_COLOR
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 8
+	style.content_margin_bottom = 8
+	add_theme_stylebox_override("panel", style)
+
+	_vbox = VBoxContainer.new()
+	_vbox.add_theme_constant_override("separation", 3)
+	add_child(_vbox)
+
+	# Province name
+	_name_lbl = Label.new()
+	_name_lbl.add_theme_font_size_override("font_size", 13)
+	_name_lbl.add_theme_color_override("font_color", HEADER_COLOR)
+	_vbox.add_child(_name_lbl)
+
+	# Country + owner
+	_country_lbl = Label.new()
+	_country_lbl.add_theme_font_size_override("font_size", 10)
+	_country_lbl.add_theme_color_override("font_color", DIM_COLOR)
+	_vbox.add_child(_country_lbl)
+
+	_vbox.add_child(HSeparator.new())
+
+	# Terrain
+	_terrain_lbl = Label.new()
+	_terrain_lbl.add_theme_font_size_override("font_size", 10)
+	_vbox.add_child(_terrain_lbl)
+
+	# Population estimate
+	_pop_lbl = Label.new()
+	_pop_lbl.add_theme_font_size_override("font_size", 10)
+	_pop_lbl.add_theme_color_override("font_color", TEXT_COLOR)
+	_vbox.add_child(_pop_lbl)
+
+	_vbox.add_child(HSeparator.new())
+
+	# Buildings section
+	var bld_hdr := Label.new()
+	bld_hdr.text = "BUILDINGS"
+	bld_hdr.add_theme_font_size_override("font_size", 9)
+	bld_hdr.add_theme_color_override("font_color", DIM_COLOR)
+	_vbox.add_child(bld_hdr)
+
+	_buildings_list = VBoxContainer.new()
+	_buildings_list.add_theme_constant_override("separation", 1)
+	_vbox.add_child(_buildings_list)
+
+	# Listen for province clicks
+	GameState.country_selected.connect(_on_country_selected)
+	GameState.country_deselected.connect(func() -> void: visible = false)
+
+
+func _on_country_selected(_iso: String) -> void:
+	# We need the actual province ID, not just the country
+	# This gets called via MapRenderer — check if we have a province click
+	pass
+
+
+## Called externally by MapRenderer when a province is clicked.
+func show_province(province_id: String) -> void:
+	_province_id = province_id
+	visible = true
+	_refresh()
+
+
+func _refresh() -> void:
+	if _province_id.is_empty():
+		visible = false
+		return
+
+	var pdata: Dictionary = ProvinceDB.province_data.get(_province_id, {})
+	if pdata.is_empty():
+		visible = false
+		return
+
+	var parent_iso: String = pdata.get("parent_iso", "")
+	var ter_owner: String = GameState.territory_owner.get(_province_id, parent_iso)
+	var owner_data: Dictionary = GameState.get_country(ter_owner)
+	var parent_data: Dictionary = GameState.get_country(parent_iso)
+
+	# Name
+	_name_lbl.text = pdata.get("name", _province_id)
+
+	# Country info
+	var country_name: String = parent_data.get("name", parent_iso)
+	if ter_owner != parent_iso and not ter_owner.is_empty():
+		var owner_name: String = owner_data.get("name", ter_owner)
+		_country_lbl.text = "%s (occupied by %s)" % [country_name, owner_name]
+	else:
+		_country_lbl.text = country_name
+
+	# Terrain
+	var terrain: String = pdata.get("terrain", "plains")
+	_terrain_lbl.text = "Terrain: %s" % terrain.capitalize()
+	_terrain_lbl.add_theme_color_override("font_color",
+		TERRAIN_COLORS.get(terrain, TEXT_COLOR))
+
+	# Population estimate (distribute country pop across provinces)
+	var country_pop: int = int(owner_data.get("population", 100000))
+	var prov_count: int = maxi(ProvinceDB.get_country_province_ids(ter_owner).size(), 1)
+	var est_pop: int = country_pop / prov_count
+	_pop_lbl.text = "Population: ~%s" % _fmt_pop(est_pop)
+
+	# Buildings
+	for child: Node in _buildings_list.get_children():
+		child.queue_free()
+
+	var bs: Node = get_node_or_null("/root/BuildingSystem")
+	var buildings: Array = bs.get_buildings_at(_province_id) if bs != null else []
+
+	if buildings.is_empty():
+		var none := Label.new()
+		none.text = "No buildings"
+		none.add_theme_font_size_override("font_size", 9)
+		none.add_theme_color_override("font_color", Color(0.50, 0.45, 0.45))
+		_buildings_list.add_child(none)
+	else:
+		for b: Dictionary in buildings:
+			var btype: String = b.get("type", "")
+			var bdef: Dictionary = {}
+			if bs != null:
+				bdef = bs.BUILDING_TYPES.get(btype, {})
+			var lbl := Label.new()
+			lbl.text = "• %s" % bdef.get("label", btype.capitalize())
+			lbl.add_theme_font_size_override("font_size", 10)
+			lbl.add_theme_color_override("font_color", TEXT_COLOR)
+			_buildings_list.add_child(lbl)
+
+	# Build button (only if player owns this province)
+	if ter_owner == GameState.player_iso:
+		var build_btn := Button.new()
+		build_btn.text = "Build Here (V)"
+		build_btn.add_theme_font_size_override("font_size", 10)
+		build_btn.pressed.connect(func() -> void:
+			var bp: Control = get_parent().get_node_or_null("BuildPanel")
+			if bp != null:
+				bp.visible = true
+				if bp.has_method("_show_type_list"):
+					bp._show_type_list()
+		)
+		_buildings_list.add_child(build_btn)
+
+	# Coastal indicator
+	if pdata.get("coastal", false):
+		var coast := Label.new()
+		coast.text = "Coastal province"
+		coast.add_theme_font_size_override("font_size", 9)
+		coast.add_theme_color_override("font_color", Color(0.40, 0.70, 1.0))
+		_buildings_list.add_child(coast)
+
+
+func _fmt_pop(p: int) -> String:
+	if p >= 1_000_000_000: return "%.2fB" % (float(p) / 1_000_000_000.0)
+	if p >= 1_000_000:     return "%.1fM" % (float(p) / 1_000_000.0)
+	if p >= 1_000:         return "%.0fK" % (float(p) / 1_000.0)
+	return str(p)

@@ -156,7 +156,8 @@ func _tick_country(iso: String) -> void:
 	treasury += balance
 
 	# Apply building effects
-	var bfx: Dictionary = BuildingSystem.get_building_effects(iso)
+	var bs: Node = get_node_or_null("/root/BuildingSystem")
+	var bfx: Dictionary = bs.get_building_effects(iso) if bs != null else {}
 	if bfx.get("gdp_bonus", 0.0) > 0.0:
 		gdp_raw = maxf(gdp_raw * (1.0 + float(bfx["gdp_bonus"])), 0.01)
 		data["gdp_raw_billions"] = gdp_raw

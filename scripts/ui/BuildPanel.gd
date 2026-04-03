@@ -44,8 +44,14 @@ func _ready() -> void:
 
 	_show_type_list()
 
-	BuildingSystem.building_completed.connect(func(_p: String, _t: String) -> void: _refresh())
-	BuildingSystem.construction_started.connect(func(_p: String, _t: String) -> void: _refresh())
+	call_deferred("_connect_signals")
+
+
+func _connect_signals() -> void:
+	var bs: Node = get_node_or_null("/root/BuildingSystem")
+	if bs != null:
+		bs.building_completed.connect(func(_p: String, _t: String) -> void: _refresh())
+		bs.construction_started.connect(func(_p: String, _t: String) -> void: _refresh())
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -81,7 +87,7 @@ func _show_type_list() -> void:
 	_detail_panel.add_child(title)
 
 	# Show construction queue first
-	var queue: Array = BuildingSystem.get_queue(GameState.player_iso)
+	var queue: Array = get_node("/root/BuildingSystem").get_queue(GameState.player_iso)
 	if not queue.is_empty():
 		var q_hdr := Label.new()
 		q_hdr.text = "IN PROGRESS (%d)" % queue.size()
@@ -91,7 +97,7 @@ func _show_type_list() -> void:
 
 		for i: int in queue.size():
 			var item: Dictionary = queue[i]
-			var bdef: Dictionary = BuildingSystem.BUILDING_TYPES.get(item.get("type", ""), {})
+			var bdef: Dictionary = get_node("/root/BuildingSystem").BUILDING_TYPES.get(item.get("type", ""), {})
 			var pname: String = ProvinceDB.province_data.get(item.get("province", ""), {}).get("name", "?")
 			var progress: float = float(item.get("progress", 0.0))
 
@@ -117,8 +123,8 @@ func _show_type_list() -> void:
 
 	# Building type buttons grouped by category
 	var last_cat: String = ""
-	for btype: String in BuildingSystem.BUILDING_TYPES:
-		var bdef: Dictionary = BuildingSystem.BUILDING_TYPES[btype]
+	for btype: String in get_node("/root/BuildingSystem").BUILDING_TYPES:
+		var bdef: Dictionary = get_node("/root/BuildingSystem").BUILDING_TYPES[btype]
 		var cat: String = bdef.get("category", "")
 
 		if cat != last_cat:
@@ -149,7 +155,7 @@ func _show_type_list() -> void:
 func _show_province_list(building_type: String) -> void:
 	_clear()
 	_selected_type = building_type
-	var bdef: Dictionary = BuildingSystem.BUILDING_TYPES.get(building_type, {})
+	var bdef: Dictionary = get_node("/root/BuildingSystem").BUILDING_TYPES.get(building_type, {})
 	var player: String = GameState.player_iso
 
 	# Header
@@ -177,7 +183,7 @@ func _show_province_list(building_type: String) -> void:
 	_detail_panel.add_child(_back_btn)
 
 	# Ranked province list
-	var ranked: Array = BuildingSystem.get_ranked_provinces(building_type, player)
+	var ranked: Array = get_node("/root/BuildingSystem").get_ranked_provinces(building_type, player)
 
 	if ranked.is_empty():
 		var none := Label.new()
@@ -221,7 +227,7 @@ func _show_province_list(building_type: String) -> void:
 
 func _on_build(building_type: String, province_id: String) -> void:
 	var player: String = GameState.player_iso
-	if BuildingSystem.start_build(building_type, province_id, player):
+	if get_node("/root/BuildingSystem").start_build(building_type, province_id, player):
 		GameState.country_data_changed.emit(player)
 		_show_type_list()  # Go back to main view
 
