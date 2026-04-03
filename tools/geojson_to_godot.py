@@ -477,6 +477,24 @@ def main():
     else:
         print("    WARNING: dose_v2.csv not found in cache/")
 
+    # Also load Kummu per-capita data as fallback for countries not in DOSE
+    kummu_path = Path(__file__).parent / "cache" / "adm1_gdp_percapita.csv"
+    kummu_data: dict = {}  # iso3 → {region_name_lower: gdp_per_capita}
+    if kummu_path.exists():
+        with open(kummu_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                iso = row.get("iso3", "")
+                name = row.get("Subnat", "NA")
+                if name == "NA" or not iso:
+                    continue
+                gdppc = float(row.get("2022", "0") or "0")
+                if gdppc > 0:
+                    if iso not in kummu_data:
+                        kummu_data[iso] = {}
+                    kummu_data[iso][name.lower().strip()] = gdppc
+        print(f"    Loaded Kummu GDP/capita fallback for {len(kummu_data)} countries")
+
     TERRAIN_GDP_MULT = {
         "plains": 1.2, "forest": 1.0, "desert": 0.5,
         "mountain": 0.6, "jungle": 0.7, "tundra": 0.4,
@@ -500,46 +518,64 @@ def main():
         if n == 0:
             continue
 
-        real_data = subnat_data.get(iso, {})
+        dose_data = subnat_data.get(iso, {})
+        kummu = kummu_data.get(iso, {})
         matched = 0
 
-        # First pass: try exact name matching for GDP + population
         gdp_weights = []
         pop_weights = []
         for prov in provs:
             prov_name = prov.get("name", "").lower().strip()
-            best_match = None
+            best_dose = None
+            best_kummu_gdppc = 0.0
 
-            if real_data:
-                # Exact match
-                if prov_name in real_data:
-                    best_match = real_data[prov_name]
+            # 1) Try DOSE (has real total GDP + population)
+            if dose_data:
+                if prov_name in dose_data:
+                    best_dose = dose_data[prov_name]
                 else:
-                    # Fuzzy: check if province name is substring of region or vice versa
-                    for region_name, rdata in real_data.items():
+                    for region_name, rdata in dose_data.items():
                         if prov_name in region_name or region_name in prov_name:
-                            if best_match is None or rdata["gdp_total_b"] > best_match["gdp_total_b"]:
-                                best_match = rdata
+                            if best_dose is None or rdata["gdp_total_b"] > best_dose["gdp_total_b"]:
+                                best_dose = rdata
 
-            if best_match is not None:
-                gdp_weights.append(best_match["gdp_total_b"])
-                pop_weights.append(best_match["pop"])
+            if best_dose is not None:
+                gdp_weights.append(best_dose["gdp_total_b"])
+                pop_weights.append(best_dose["pop"])
                 matched += 1
-            else:
-                # Fallback: terrain + coastal + capital estimate
-                w = 1.0
-                terrain = prov.get("terrain", "plains")
-                w *= TERRAIN_GDP_MULT.get(terrain, 1.0)
-                if prov.get("coastal", False):
-                    w *= 1.5
-                cx, cy = prov["centroid"]
-                cap_x, cap_y = capital_centroid[0], capital_centroid[1]
-                dist = ((cx - cap_x)**2 + (cy - cap_y)**2)**0.5
-                if dist < 100: w *= 3.5
-                elif dist < 300: w *= 1.8
-                elif dist < 600: w *= 1.3
+                continue
+
+            # 2) Try Kummu GDP per capita (no population, but better than nothing)
+            if kummu:
+                for region_name, gdppc in kummu.items():
+                    if prov_name in region_name or region_name in prov_name:
+                        if gdppc > best_kummu_gdppc:
+                            best_kummu_gdppc = gdppc
+
+            if best_kummu_gdppc > 0:
+                # Use GDP/capita as relative weight (blended with base)
+                avg_gdppc = sum(kummu.values()) / max(len(kummu), 1)
+                ratio = best_kummu_gdppc / max(avg_gdppc, 1.0)
+                w = 0.5 + min(ratio, 3.0) * 0.5
                 gdp_weights.append(w)
-                pop_weights.append(w)
+                pop_weights.append(1.0 / max(ratio, 0.3))  # inverse: richer = fewer people per share
+                matched += 1
+                continue
+
+            # 3) Fallback: terrain + coastal + capital proximity
+            w = 1.0
+            terrain = prov.get("terrain", "plains")
+            w *= TERRAIN_GDP_MULT.get(terrain, 1.0)
+            if prov.get("coastal", False):
+                w *= 1.5
+            cx, cy = prov["centroid"]
+            cap_x, cap_y = capital_centroid[0], capital_centroid[1]
+            dist = ((cx - cap_x)**2 + (cy - cap_y)**2)**0.5
+            if dist < 100: w *= 3.5
+            elif dist < 300: w *= 1.8
+            elif dist < 600: w *= 1.3
+            gdp_weights.append(w)
+            pop_weights.append(w)
 
         # Normalize to sum to national totals
         gdp_sum = sum(gdp_weights)
