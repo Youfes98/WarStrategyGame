@@ -28,7 +28,7 @@ COUNTRIES_OUT    = OUT_DIR / "countries.json"
 ADJACENCIES_OUT  = OUT_DIR / "adjacencies.json"
 
 # API requires ?fields= and rejects too many fields at once — fetch in two batches
-REST_COUNTRIES_URL_A = "https://restcountries.com/v3.1/all?fields=name,cca3,cca2,capital,region,subregion"
+REST_COUNTRIES_URL_A = "https://restcountries.com/v3.1/all?fields=name,cca3,cca2,capital,capitalInfo,region,subregion"
 REST_COUNTRIES_URL_B = "https://restcountries.com/v3.1/all?fields=cca3,population,area,latlng,landlocked,borders"
 
 MAP_WIDTH  = 16384
@@ -333,6 +333,14 @@ def build_countries() -> tuple[list, dict]:
         gdp    = gdp_raw.get(iso3, 1.0)
         mil    = MILITARY_ESTIMATES.get(iso3, max(1.0, gdp * 0.02))
 
+        # Capital city coordinates (separate from geographic center)
+        cap_info = entry.get("capitalInfo", {})
+        cap_latlng = cap_info.get("latlng", [])
+        if cap_latlng and len(cap_latlng) >= 2:
+            capital_centroid = lat_lon_to_pixel(cap_latlng[0], cap_latlng[1])
+        else:
+            capital_centroid = lat_lon_to_pixel(lat, lon)  # fallback to geo center
+
         gdp_norm = log_scale(gdp, gdp_min, gdp_max)
         pop_norm = log_scale(pop, pop_min, pop_max)
         mil_norm = log_scale(mil, 0.1, 1000.0)
@@ -345,6 +353,7 @@ def build_countries() -> tuple[list, dict]:
             "iso2":              entry.get("cca2", ""),
             "name":              name,
             "capital":           (entry.get("capital") or [""])[0],
+            "capital_centroid":  capital_centroid,
             "region":            entry.get("region", ""),
             "subregion":         entry.get("subregion", ""),
             "population":        pop,

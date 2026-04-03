@@ -266,10 +266,11 @@ func get_nearest_coast(country_iso: String) -> String:
 	return ""
 
 
-## Get the capital province for a country (closest province to capital coords).
+## Get the capital province for a country (closest province to actual capital city).
 func get_capital_province(country_iso: String) -> String:
 	var cdata: Dictionary = country_map_data.get(country_iso, {})
-	var cap_centroid: Array = cdata.get("centroid", [])
+	# Use capital_centroid (actual capital city coords) if available, fall back to centroid
+	var cap_centroid: Array = cdata.get("capital_centroid", cdata.get("centroid", []))
 	if cap_centroid.size() < 2:
 		return get_main_province(country_iso)
 	var cap_pos: Vector2 = Vector2(cap_centroid[0], cap_centroid[1])
