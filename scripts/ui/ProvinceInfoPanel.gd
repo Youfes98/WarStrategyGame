@@ -10,6 +10,7 @@ var _name_lbl: Label = null
 var _country_lbl: Label = null
 var _terrain_lbl: Label = null
 var _pop_lbl: Label = null
+var _gdp_lbl: Label = null
 var _buildings_list: VBoxContainer = null
 
 const BG_COLOR:     Color = Color(0.07, 0.07, 0.09, 0.94)
@@ -72,6 +73,12 @@ func _ready() -> void:
 	_pop_lbl.add_theme_font_size_override("font_size", 10)
 	_pop_lbl.add_theme_color_override("font_color", TEXT_COLOR)
 	_vbox.add_child(_pop_lbl)
+
+	# GDP contribution
+	_gdp_lbl = Label.new()
+	_gdp_lbl.add_theme_font_size_override("font_size", 10)
+	_gdp_lbl.add_theme_color_override("font_color", TEXT_COLOR)
+	_vbox.add_child(_gdp_lbl)
 
 	_vbox.add_child(HSeparator.new())
 
@@ -142,12 +149,29 @@ func _refresh() -> void:
 	var est_pop: int = country_pop / prov_count
 	_pop_lbl.text = "Population: ~%s" % _fmt_pop(est_pop)
 
+	# GDP contribution
+	var country_gdp: float = float(owner_data.get("gdp_raw_billions", 1.0))
+	var base_gdp: float = country_gdp / float(prov_count)
+	# Buildings boost province GDP
+	var bs: Node = get_node_or_null("/root/BuildingSystem")
+	var prov_buildings: Array = bs.get_buildings_at(_province_id) if bs != null else []
+	var gdp_mult: float = 1.0
+	for b: Dictionary in prov_buildings:
+		var btype: String = b.get("type", "")
+		if btype == "civilian_factory": gdp_mult += 0.3
+		elif btype == "port": gdp_mult += 0.15
+		elif btype == "power_plant": gdp_mult += 0.2
+	var prov_gdp: float = base_gdp * gdp_mult
+	var contribution_pct: float = prov_gdp / maxf(country_gdp, 0.01) * 100.0
+
+	_gdp_lbl.text = "GDP: ~%s (%.1f%% of national)" % [_fmt_money(prov_gdp), contribution_pct]
+	_gdp_lbl.add_theme_color_override("font_color", Color(0.5, 0.85, 0.5) if gdp_mult > 1.0 else TEXT_COLOR)
+
 	# Buildings
 	for child: Node in _buildings_list.get_children():
 		child.queue_free()
 
-	var bs: Node = get_node_or_null("/root/BuildingSystem")
-	var buildings: Array = bs.get_buildings_at(_province_id) if bs != null else []
+	var buildings: Array = prov_buildings  # already fetched above
 
 	if buildings.is_empty():
 		var none := Label.new()
@@ -195,3 +219,10 @@ func _fmt_pop(p: int) -> String:
 	if p >= 1_000_000:     return "%.1fM" % (float(p) / 1_000_000.0)
 	if p >= 1_000:         return "%.0fK" % (float(p) / 1_000.0)
 	return str(p)
+
+
+func _fmt_money(b: float) -> String:
+	if absf(b) >= 1000.0: return "$%.1fT" % (b / 1000.0)
+	if absf(b) >= 1.0:    return "$%.1fB" % b
+	if absf(b) >= 0.01:   return "$%.0fM" % (b * 1000.0)
+	return "$0"
