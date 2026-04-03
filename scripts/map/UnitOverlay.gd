@@ -103,26 +103,40 @@ func _draw() -> void:
 	var vp_size: Vector2 = get_viewport_rect().size
 	var cam_pos: Vector2 = _cam.global_position
 
-	# Gather units
-	var loc_armies: Dictionary = {}
+	# Gather units by army, track interpolated world positions
+	var army_data: Dictionary = {}   # army_id → {units, owner, world_pos}
 	var army_paths: Dictionary = {}
+
+	var hour_frac: float = float(GameClock.date.hour) / 24.0
 
 	for uid: String in MilitarySystem.units:
 		var u: Dictionary = MilitarySystem.units[uid]
 		var is_player: bool = u.owner == player
 		if not is_player and not _visible_provinces.has(u.location):
 			continue
-		var loc: String = u.location
-		var aid: String = u.get("army_id", "")
-		if not loc_armies.has(loc):
-			loc_armies[loc] = {}
-		if not loc_armies[loc].has(aid):
-			loc_armies[loc][aid] = {"units": [], "owner": u.owner}
-		(loc_armies[loc][aid]["units"] as Array).append(u)
-		if is_player:
+		var aid: String = u.get("army_id", uid)
+		if not army_data.has(aid):
+			# Compute interpolated world position for this army
+			var loc: String = u.location
 			var path: Array = u.get("path", [])
-			if not path.is_empty() and not army_paths.has(aid):
-				army_paths[aid] = {"from": loc, "path": path}
+			var world_pos: Vector2 = ProvinceDB.get_centroid(loc)
+
+			if not path.is_empty() and world_pos != Vector2.ZERO:
+				var next_prov: String = path[0]
+				var next_pos: Vector2 = ProvinceDB.get_centroid(next_prov)
+				if next_pos != Vector2.ZERO:
+					var total_days: float = float(u.get("travel_days_total", u.get("days_remaining", 1)))
+					if total_days < 1.0:
+						total_days = 1.0
+					var remaining: float = float(u.get("days_remaining", 0)) - hour_frac
+					var progress: float = clampf(1.0 - remaining / total_days, 0.0, 1.0)
+					world_pos = world_pos.lerp(next_pos, progress)
+
+				if is_player:
+					army_paths[aid] = {"from": loc, "path": path}
+
+			army_data[aid] = {"units": [], "owner": u.owner, "world_pos": world_pos}
+		(army_data[aid]["units"] as Array).append(u)
 
 	var sel_army: String = MilitarySystem.selected_army_id
 
@@ -131,9 +145,10 @@ func _draw() -> void:
 		var info: Dictionary = army_paths[aid]
 		_draw_path_screen(info["from"], info["path"], aid == sel_army, cam_pos)
 
-	# Draw unit sprites at fixed screen pixel size
-	for loc: String in loc_armies:
-		var world_pos: Vector2 = ProvinceDB.get_centroid(loc)
+	# Draw each army at its interpolated position
+	for aid: String in army_data:
+		var ad: Dictionary = army_data[aid]
+		var world_pos: Vector2 = ad["world_pos"]
 		if world_pos == Vector2.ZERO:
 			continue
 
@@ -151,52 +166,39 @@ func _draw() -> void:
 		   or screen_pos.y < -60 or screen_pos.y > vp_size.y + 60:
 			continue
 
-		var armies: Dictionary = loc_armies[loc]
-		var army_keys: Array = armies.keys()
-		var n: int = army_keys.size()
-		var draw_n: int = mini(n, 6)
-		var total_w: float = (draw_n - 1) * UNIT_SPACING
-		var start_x: float = screen_pos.x - total_w * 0.5
-		var base_y: float = screen_pos.y - SPRITE_SIZE * 0.8
+		var army_units: Array = ad["units"]
+		var owner_iso: String = ad["owner"]
 
-		for i: int in draw_n:
-			var aid: String = army_keys[i]
-			var army_data: Dictionary = armies[aid]
-			var army_units: Array = army_data["units"]
-			var owner_iso: String = army_data["owner"]
+		# Compute army stats
+		var type_counts: Dictionary = {}
+		var total_str: float = 0.0
+		var total_mor: float = 0.0
+		var total_n: int = 0
+		for u: Dictionary in army_units:
+			var t: String = u.get("type", "infantry")
+			type_counts[t] = int(type_counts.get(t, 0)) + 1
+			total_str += float(u.get("strength", 100))
+			total_mor += float(u.get("morale", 80))
+			total_n += 1
 
-			# Compute army stats
-			var type_counts: Dictionary = {}
-			var total_str: float = 0.0
-			var total_mor: float = 0.0
-			var total_n: int = 0
-			for u: Dictionary in army_units:
-				var t: String = u.get("type", "infantry")
-				type_counts[t] = int(type_counts.get(t, 0)) + 1
-				total_str += float(u.get("strength", 100))
-				total_mor += float(u.get("morale", 80))
-				total_n += 1
+		var dominant_type: String = "infantry"
+		var max_count: int = 0
+		for t: String in type_counts:
+			if int(type_counts[t]) > max_count:
+				max_count = type_counts[t]
+				dominant_type = t
 
-			var dominant_type: String = "infantry"
-			var max_count: int = 0
-			for t: String in type_counts:
-				if int(type_counts[t]) > max_count:
-					max_count = type_counts[t]
-					dominant_type = t
+		var avg_str: float = total_str / maxf(total_n, 1)
+		var avg_mor: float = total_mor / maxf(total_n, 1)
 
-			var avg_str: float = total_str / maxf(total_n, 1)
-			var avg_mor: float = total_mor / maxf(total_n, 1)
+		var odata: Dictionary = GameState.get_country(owner_iso)
+		var omc: Array = odata.get("map_color", [80, 120, 180])
+		var owner_col: Color = Color(omc[0] / 255.0, omc[1] / 255.0, omc[2] / 255.0)
 
-			var odata: Dictionary = GameState.get_country(owner_iso)
-			var omc: Array = odata.get("map_color", [80, 120, 180])
-			var owner_col: Color = Color(omc[0] / 255.0, omc[1] / 255.0, omc[2] / 255.0)
+		var is_sel: bool = MilitarySystem.is_army_selected(aid)
 
-			var cx: float = start_x + i * UNIT_SPACING
-			var cy: float = base_y
-			var is_sel: bool = MilitarySystem.is_army_selected(aid)
-
-			_draw_unit_at(Vector2(cx, cy), dominant_type, total_n, avg_str, avg_mor,
-				owner_col, is_sel)
+		_draw_unit_at(screen_pos - Vector2(0, SPRITE_SIZE * 0.5), dominant_type,
+			total_n, avg_str, avg_mor, owner_col, is_sel)
 
 
 func _draw_unit_at(pos: Vector2, unit_type: String, count: int,

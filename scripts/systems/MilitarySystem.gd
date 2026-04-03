@@ -396,6 +396,7 @@ func _order_army_move(army_id: String, path: Array) -> void:
 		if u.get("army_id", "") == army_id:
 			u.path = path.duplicate()
 			u.days_remaining = travel_days
+			u.travel_days_total = travel_days  # Store total for interpolation
 	units_changed.emit()
 
 
