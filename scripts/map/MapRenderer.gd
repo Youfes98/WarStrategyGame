@@ -347,6 +347,7 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 		rid = _hit_test(mp)
 	if rid.is_empty():
 		_highlight_province("")  # Clear highlight
+		MilitarySystem.recruit_iso = ""
 		if not MilitarySystem.selected_army_ids.is_empty():
 			MilitarySystem.deselect()
 		else:
@@ -365,13 +366,12 @@ func _handle_click(vp: Vector2, shift: bool = false) -> void:
 	if not GameState.player_iso.is_empty():
 		MilitarySystem.handle_territory_click(rid, shift)
 
-	# Set recruit location
+	# Clear recruit mode when clicking map (recruit is set by the Recruit button only)
 	var parent: String = ProvinceDB.get_parent_iso(rid)
 	var ter_owner: String = GameState.territory_owner.get(rid, parent)
-	if ter_owner == GameState.player_iso:
-		MilitarySystem.recruit_iso = rid
-	else:
+	if not MilitarySystem.recruit_iso.is_empty():
 		MilitarySystem.recruit_iso = ""
+		MilitarySystem.selection_changed.emit()
 
 	# Show country card
 	var card_iso: String = ter_owner if not ter_owner.is_empty() else parent
