@@ -3,6 +3,8 @@
 ## Serialises GameState + MilitarySystem to JSON for fast playtesting iteration.
 extends Node
 
+signal game_loaded()
+
 const SAVE_DIR:  String = "user://saves/"
 const QUICK_SAVE: String = "user://saves/quicksave.json"
 
@@ -45,6 +47,7 @@ func quickload() -> void:
 		return
 	file.close()
 	_deserialize(json.get_data())
+	game_loaded.emit()
 	UIManager.push_notification("Game loaded.", "info")
 
 
@@ -195,6 +198,7 @@ func load_game(slot_name: String) -> bool:
 		return false
 	file.close()
 	_deserialize(json.get_data())
+	game_loaded.emit()
 	return true
 
 

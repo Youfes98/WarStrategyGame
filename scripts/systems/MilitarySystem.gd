@@ -72,6 +72,10 @@ func _ready() -> void:
 
 
 func _on_player_set(iso: String) -> void:
+	# Don't spawn units if they already exist (save was loaded)
+	if not units.is_empty():
+		units_changed.emit()
+		return
 	var tier: String = GameState.get_country(iso).get("power_tier", "C")
 	var army_id: String = _new_army_id()
 	var spawn_loc: String = _find_home_province(iso)

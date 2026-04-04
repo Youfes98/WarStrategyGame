@@ -26,23 +26,40 @@ func _ready() -> void:
 	GameClock.set_paused(true)
 	_country_card.set_picking_mode(true)
 	_country_card.country_confirmed.connect(_on_country_confirmed)
+	# Listen for save loads that skip the picker
+	SaveSystem.game_loaded.connect(_on_game_loaded)
 
 
 func _on_country_confirmed(iso: String) -> void:
+	_enter_game(iso, true)
+
+
+func _on_game_loaded() -> void:
+	# Save was loaded — skip picker if player_iso is set
+	if not GameState.player_iso.is_empty():
+		_enter_game(GameState.player_iso, false)
+
+
+func _enter_game(iso: String, is_new_game: bool) -> void:
 	_country_card.set_picking_mode(false)
 	_pick_banner.visible = false
 
-	# Center camera on the chosen country with smooth transition
+	# Center camera on the country
 	var centroid: Vector2 = ProvinceDB.get_centroid(iso)
 	if centroid != Vector2.ZERO:
 		var cam := get_viewport().get_camera_2d()
 		if cam:
-			var tween: Tween = create_tween()
-			tween.set_parallel(true)
-			tween.tween_property(cam, "position", centroid, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-			tween.tween_property(cam, "zoom", Vector2(1.0, 1.0), 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+			if is_new_game:
+				var tween: Tween = create_tween()
+				tween.set_parallel(true)
+				tween.tween_property(cam, "position", centroid, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+				tween.tween_property(cam, "zoom", Vector2(1.0, 1.0), 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+			else:
+				cam.position = centroid
+				cam.zoom = Vector2(1.0, 1.0)
 
-	GameState.set_player_country(iso)
+	if is_new_game:
+		GameState.set_player_country(iso)
 	GameState.deselect()
 	UIManager.push_notification(
 		"Welcome, %s. The world is watching." % GameState.get_country(iso).get("name", iso),
