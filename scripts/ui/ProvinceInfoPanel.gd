@@ -212,12 +212,16 @@ func _refresh() -> void:
 		build_btn.custom_minimum_size = Vector2(0, 28)
 		build_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		build_btn.add_theme_font_size_override("font_size", 11)
+		var build_pid: String = _province_id
 		build_btn.pressed.connect(func() -> void:
-			var bp: Control = get_parent().get_node_or_null("BuildPanel")
+			var bp: Node = get_parent().get_node_or_null("BuildPanel")
 			if bp != null:
-				bp.visible = true
-				if bp.has_method("_show_type_list"):
-					bp._show_type_list())
+				if not bp.visible:
+					bp.visible = true
+				if bp.has_method("_show_province_builds"):
+					bp._show_province_builds(build_pid)
+				elif bp.has_method("_show_main"):
+					bp._show_main())
 		btn_row.add_child(build_btn)
 
 		var recruit_btn := Button.new()

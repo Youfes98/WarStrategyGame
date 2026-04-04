@@ -81,6 +81,66 @@ func _bs() -> Node:
 	return get_node_or_null("/root/BuildingSystem")
 
 
+# ── PROVINCE-SPECIFIC BUILD VIEW ──────────────────────────────────────────────
+
+func _show_province_builds(province_id: String) -> void:
+	_clear()
+	_selected_type = ""
+	var bs: Node = _bs()
+	if bs == null:
+		return
+	var player: String = GameState.player_iso
+	var pdata: Dictionary = ProvinceDB.province_data.get(province_id, {})
+	var pname: String = pdata.get("name", province_id)
+
+	# Title
+	var title := Label.new()
+	title.text = "BUILD AT %s" % pname.to_upper()
+	title.add_theme_font_size_override("font_size", 13)
+	title.add_theme_color_override("font_color", HEADER)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_main_vbox.add_child(title)
+
+	_main_vbox.add_child(HSeparator.new())
+
+	# Show all building types that can be built HERE
+	var any_available: bool = false
+	var treasury: float = float(GameState.get_country(player).get("treasury", 0))
+
+	for btype: String in bs.BUILDING_TYPES:
+		var bdef: Dictionary = bs.BUILDING_TYPES[btype]
+		if not bs.can_build(btype, province_id, player):
+			continue
+		any_available = true
+
+		var cost: float = bdef.get("cost", 1.0)
+		var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000)
+		var btn := Button.new()
+		btn.text = "%s  —  %s  (%d mo)" % [bdef["label"], cost_str, bdef["build_months"]]
+		btn.add_theme_font_size_override("font_size", 10)
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.disabled = treasury < cost
+		var bt: String = btype
+		var pid: String = province_id
+		btn.pressed.connect(func() -> void: _on_build(bt, pid))
+		_main_vbox.add_child(btn)
+
+	if not any_available:
+		var none := Label.new()
+		none.text = "No buildings available here"
+		none.add_theme_font_size_override("font_size", 10)
+		none.add_theme_color_override("font_color", DIM)
+		_main_vbox.add_child(none)
+
+	_main_vbox.add_child(HSeparator.new())
+
+	var close_btn := Button.new()
+	close_btn.text = "Close"
+	close_btn.add_theme_font_size_override("font_size", 10)
+	close_btn.pressed.connect(func() -> void: visible = false)
+	_main_vbox.add_child(close_btn)
+
+
 # ── MAIN VIEW: Queue + Building Categories ────────────────────────────────────
 
 func _show_main() -> void:
