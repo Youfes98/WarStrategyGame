@@ -274,17 +274,11 @@ func _build_polygon_map() -> void:
 # ── Input ─────────────────────────────────────────────────────────────────────
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Don't process map input when mouse is over a UI panel
+	# Don't process map input when mouse is over ANY UI control
 	if event is InputEventMouse:
-		var gui_control := get_viewport().gui_get_focus_owner()
-		# Check if any visible HUD control is under the mouse
-		var hud: CanvasLayer = get_parent().get_node_or_null("../HUD")
-		if hud != null:
-			for child: Node in hud.get_children():
-				if child is Control and (child as Control).visible:
-					var c: Control = child as Control
-					if c.get_global_rect().has_point((event as InputEventMouse).position):
-						return  # Mouse is over UI — don't zoom/click/drag
+		var hovered: Control = get_viewport().gui_get_hovered_control()
+		if hovered != null:
+			return  # Mouse is over a UI element — block all map input
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		match mb.button_index:

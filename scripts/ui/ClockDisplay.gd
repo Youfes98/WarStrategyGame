@@ -41,7 +41,7 @@ const SPEED_COUNT: int = 5
 func _ready() -> void:
 	custom_minimum_size = Vector2(PANEL_W, PANEL_H)
 	_font = ThemeDB.fallback_font
-	mouse_filter = MOUSE_FILTER_IGNORE
+	mouse_filter = MOUSE_FILTER_STOP
 
 	_pause_btn = _make_btn("||", Vector2(10, 58), Vector2(32, 22))
 	_pause_btn.pressed.connect(GameClock.toggle_pause)
