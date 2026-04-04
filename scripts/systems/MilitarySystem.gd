@@ -181,6 +181,74 @@ func _get_army_unit_ids(army_id: String) -> Array:
 	return result
 
 
+## Get the dominant domain of an army (land/sea/air based on majority of units).
+func _get_army_domain(army_id: String) -> String:
+	var domain_counts: Dictionary = {"land": 0, "sea": 0, "air": 0}
+	for id: String in units:
+		var u: Dictionary = units[id]
+		if u.get("army_id", "") == army_id:
+			var d: String = UNIT_TYPES.get(u.type, {}).get("domain", "land")
+			domain_counts[d] = int(domain_counts.get(d, 0)) + 1
+	var best: String = "land"
+	var best_n: int = 0
+	for d: String in domain_counts:
+		if int(domain_counts[d]) > best_n:
+			best_n = domain_counts[d]
+			best = d
+	return best
+
+
+## Get air support power for a battle at a given territory.
+## Checks all air units owned by the given country within range.
+func get_air_support(territory_iso: String, country_iso: String) -> float:
+	var air_power: float = 0.0
+	var target_centroid: Vector2 = ProvinceDB.get_centroid(territory_iso)
+	if target_centroid == Vector2.ZERO:
+		return 0.0
+
+	for uid: String in units:
+		var u: Dictionary = units[uid]
+		if u.owner != country_iso:
+			continue
+		var utype: String = u.get("type", "")
+		var tdata: Dictionary = UNIT_TYPES.get(utype, {})
+		if tdata.get("domain", "") != "air":
+			continue
+		var unit_range: int = int(tdata.get("range", 0))
+		if unit_range <= 0:
+			continue
+
+		# Check if unit is within range (BFS hop distance)
+		var unit_loc: String = u.location
+		var dist: int = _bfs_distance(unit_loc, territory_iso, unit_range + 1)
+		if dist <= unit_range:
+			var power: float = float(tdata.get("power", 10))
+			power *= float(u.get("strength", 100)) / 100.0
+			power *= float(u.get("morale", 80)) / 100.0
+			air_power += power
+
+	return air_power
+
+
+## BFS distance between two provinces (capped at max_dist).
+func _bfs_distance(from: String, to: String, max_dist: int) -> int:
+	if from == to:
+		return 0
+	var visited: Dictionary = {from: true}
+	var frontier: Array = [from]
+	for dist: int in range(1, max_dist + 1):
+		var next_frontier: Array = []
+		for pid: String in frontier:
+			for nb: String in ProvinceDB.get_neighbors(pid):
+				if nb == to:
+					return dist
+				if not visited.has(nb):
+					visited[nb] = true
+					next_frontier.append(nb)
+		frontier = next_frontier
+	return max_dist + 1  # Out of range
+
+
 func _get_army_travel_days(army_id: String) -> int:
 	var slowest: int = 1
 	for id: String in units:
@@ -212,8 +280,8 @@ func is_army_selected(army_id: String) -> bool:
 	return army_id in selected_army_ids
 
 
-## Dijkstra pathfinding weighted by terrain cost.
-func find_path(from: String, to: String, mover_iso: String = "") -> Array:
+## Dijkstra pathfinding weighted by terrain cost. Domain-aware for naval/air.
+func find_path(from: String, to: String, mover_iso: String = "", domain: String = "land") -> Array:
 	if from == to:
 		return []
 	# dist[node] = best cost so far, prev[node] = previous node
@@ -247,7 +315,7 @@ func find_path(from: String, to: String, mover_iso: String = "") -> Array:
 				node = prev[node]
 			return path
 
-		for neighbor: String in ProvinceDB.get_neighbors(current):
+		for neighbor: String in ProvinceDB.get_neighbors_for_domain(current, domain):
 			if visited.has(neighbor):
 				continue
 			if not mover_iso.is_empty() and not _can_enter(mover_iso, neighbor):
@@ -373,7 +441,8 @@ func handle_move_order(target_iso: String) -> bool:
 		var army_loc: String = _get_army_location(aid)
 		if army_loc.is_empty() or army_loc == target_iso:
 			continue
-		var path: Array = find_path(army_loc, target_iso, player)
+		var army_domain: String = _get_army_domain(aid)
+		var path: Array = find_path(army_loc, target_iso, player, army_domain)
 		if path.is_empty():
 			continue
 		_order_army_move(aid, path)
@@ -558,6 +627,10 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 
 	atk_power *= atk_supply
 
+	# Air support: add power from nearby air units (fighters/bombers/drones)
+	var atk_air: float = get_air_support(territory_iso, attacker_iso)
+	atk_power += atk_air
+
 	# ── Phase 2: Calculate defender power ──
 	var defender_ids: Array = []
 	var def_power: float = 0.0
@@ -575,6 +648,10 @@ func _resolve_battle(attacker_ids: Array, territory_iso: String,
 	var has_real_defenders: bool = not defender_ids.is_empty()
 	if not has_real_defenders:
 		def_power = get_garrison_power(territory_iso) * 0.3
+
+	# Defender air support
+	var def_air: float = get_air_support(territory_iso, defender_iso)
+	def_power += def_air
 
 	# Apply terrain defense bonus and supply
 	def_power *= terrain_def * def_supply

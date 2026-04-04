@@ -604,6 +604,42 @@ def main():
         json.dump(province_adj, f, indent=2)
     print(f"  OK: Wrote province_adjacencies.json  ({len(province_adj)} entries)")
 
+    # ── Generate sea adjacencies (coastal-to-coastal connections) ──────────────
+    print("  Building sea adjacencies...")
+    SEA_MAX_DIST = 800.0  # max pixel distance for sea connection (~2000km)
+    coastal_provs = [p for p in provinces if p.get("coastal", False)]
+    sea_adj: dict = {}
+    connections = 0
+
+    for i, pa in enumerate(coastal_provs):
+        pid_a = pa["id"]
+        cx_a, cy_a = pa["centroid"]
+        if pid_a not in sea_adj:
+            sea_adj[pid_a] = []
+
+        for j in range(i + 1, len(coastal_provs)):
+            pb = coastal_provs[j]
+            pid_b = pb["id"]
+            # Skip if same country (land adjacency already handles this)
+            if pa.get("parent_iso", "") == pb.get("parent_iso", "") and \
+               pid_b in province_adj.get(pid_a, []):
+                continue
+            cx_b, cy_b = pb["centroid"]
+            dist = ((cx_a - cx_b)**2 + (cy_a - cy_b)**2)**0.5
+            if dist <= SEA_MAX_DIST:
+                if pid_b not in sea_adj:
+                    sea_adj[pid_b] = []
+                if pid_b not in sea_adj[pid_a]:
+                    sea_adj[pid_a].append(pid_b)
+                if pid_a not in sea_adj[pid_b]:
+                    sea_adj[pid_b].append(pid_a)
+                connections += 1
+
+    sea_adj_path = DATA_DIR / "sea_adjacencies.json"
+    with open(sea_adj_path, "w", encoding="utf-8") as f:
+        json.dump(sea_adj, f, indent=2)
+    print(f"  OK: {connections} sea connections across {len(sea_adj)} coastal provinces")
+
     with open(COUNTRIES_JSON, "w", encoding="utf-8") as f:
         json.dump(countries, f, indent=2, ensure_ascii=False)
     print(f"  OK: Updated countries.json")

@@ -13,6 +13,7 @@ var adjacencies:        Dictionary = {}   # iso  → [iso, ...] (country-level b
 # Province-level data loaded from provinces.json (optional)
 var province_data:       Dictionary = {}   # pid  → province dict
 var province_adjacencies: Dictionary = {}  # pid  → [pid, ...]
+var sea_adjacencies:      Dictionary = {}  # coastal pid → [coastal pid, ...]
 var country_provinces:   Dictionary = {}   # iso  → [pid, ...] (reverse index)
 
 # Pixel lookup: color_key → province_id or country_iso
@@ -119,6 +120,16 @@ func _load_provinces() -> void:
 		if aj.parse(af.get_as_text()) == OK:
 			province_adjacencies = aj.get_data()
 		af.close()
+
+	# Sea adjacency (coastal-to-coastal connections)
+	const SEA_ADJ_PATH: String = "res://data/sea_adjacencies.json"
+	if FileAccess.file_exists(SEA_ADJ_PATH):
+		var sf: FileAccess = FileAccess.open(SEA_ADJ_PATH, FileAccess.READ)
+		var sj: JSON = JSON.new()
+		if sj.parse(sf.get_as_text()) == OK:
+			sea_adjacencies = sj.get_data()
+		sf.close()
+		print("ProvinceDB: Loaded %d sea adjacency entries." % sea_adjacencies.size())
 
 	GameState.init_provinces(parray)
 	print("ProvinceDB: Loaded %d provinces for %d countries." % [parray.size(), country_provinces.size()])
@@ -245,6 +256,26 @@ func _make_color_key(rgb: Array) -> String:
 
 func _color_to_key(color: Color) -> String:
 	return "%d_%d_%d" % [roundi(color.r * 255), roundi(color.g * 255), roundi(color.b * 255)]
+
+
+## Get neighbors for a specific unit domain.
+func get_neighbors_for_domain(id: String, domain: String) -> Array:
+	match domain:
+		"sea":
+			# Naval: use sea adjacencies (coastal-to-coastal)
+			# Also include land neighbors that are coastal (for docking)
+			var sea_nb: Array = sea_adjacencies.get(id, [])
+			# Add coastal land neighbors too (so ships can move along coast)
+			for nb: String in province_adjacencies.get(id, []):
+				if is_coastal(nb) and nb not in sea_nb:
+					sea_nb.append(nb)
+			return sea_nb
+		"air":
+			# Air doesn't pathfind — uses range-based projection
+			return []
+		_:
+			# Land: normal adjacency only
+			return get_neighbors(id)
 
 
 ## Terrain type for a province (baked into provinces.json by pipeline).
