@@ -22,11 +22,17 @@ const DOMAIN_COLORS: Dictionary = {
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(290, 0)
+	custom_minimum_size = Vector2(240, 0)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_child(scroll)
+
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
-	add_child(vbox)
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vbox)
 
 	var title := Label.new()
 	title.text = "MILITARY FORCES"

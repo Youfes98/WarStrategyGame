@@ -6,6 +6,7 @@ extends Node
 signal building_completed(province_id: String, building_type: String)
 signal construction_started(province_id: String, building_type: String)
 signal construction_cancelled(province_id: String, building_type: String)
+signal construction_updated()  # Fires after monthly progress tick
 
 # ── Building Type Definitions ─────────────────────────────────────────────────
 # category: "military", "economic", "infrastructure", "research", "special"
@@ -129,6 +130,7 @@ func _on_player_set(_iso: String) -> void:
 
 func _on_month(_date: Dictionary) -> void:
 	_advance_construction()
+	construction_updated.emit()
 	# Building effects are applied by EconomySystem (it calls get_building_effects)
 
 

@@ -61,9 +61,9 @@ script        = ExtResource("7")
 anchor_top    = 1.0
 anchor_bottom = 1.0
 offset_left   = 8.0
-offset_top    = -212.0
-offset_right  = 292.0
-offset_bottom = -52.0
+offset_top    = -340.0
+offset_right  = 250.0
+offset_bottom = -8.0
 visible       = false
 
 [node name="RankingsPanel" type="PanelContainer" parent="HUD"]
@@ -86,9 +86,9 @@ visible       = false
 script        = ExtResource("14")
 anchor_top    = 1.0
 anchor_bottom = 1.0
-offset_left   = 270.0
-offset_top    = -240.0
-offset_right  = 530.0
+offset_left   = 258.0
+offset_top    = -300.0
+offset_right  = 520.0
 visible       = false
 
 [node name="BuildPanel" type="PanelContainer" parent="HUD"]

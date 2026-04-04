@@ -45,10 +45,6 @@ func _ready() -> void:
 	add_child(_main_vbox)
 
 	call_deferred("_connect_signals")
-	# Refresh every month to update progress bars
-	GameClock.tick_month.connect(func(_d: Dictionary) -> void:
-		if visible:
-			_refresh())
 
 
 func _connect_signals() -> void:
@@ -56,6 +52,8 @@ func _connect_signals() -> void:
 	if bs != null:
 		bs.building_completed.connect(func(_p: String, _t: String) -> void: _refresh())
 		bs.construction_started.connect(func(_p: String, _t: String) -> void: _refresh())
+		bs.construction_updated.connect(func() -> void:
+			if visible: _refresh())
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
