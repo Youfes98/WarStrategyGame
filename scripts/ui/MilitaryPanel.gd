@@ -188,18 +188,23 @@ func _refresh() -> void:
 	if recruit_loc.is_empty() and not MilitarySystem.selected_army_ids.is_empty():
 		recruit_loc = MilitarySystem._get_army_location(MilitarySystem.selected_army_ids[0])
 
-	# Determine which domains are available at this location
-	var capital: String = ProvinceDB.get_capital_province(player)
-	var at_capital: bool = recruit_loc == capital
-	var at_coast: bool = not recruit_loc.is_empty() and ProvinceDB.is_coastal(recruit_loc)
+	# Show/hide domain sections based on what's actually recruitable here
+	var has_land: bool = false
+	var has_sea: bool = false
+	var has_air: bool = false
+	if not recruit_loc.is_empty():
+		for ut: String in MilitarySystem.UNIT_TYPES:
+			if MilitarySystem.can_recruit_at(ut, recruit_loc):
+				match MilitarySystem.UNIT_TYPES[ut].get("domain", "land"):
+					"land": has_land = true
+					"sea":  has_sea = true
+					"air":  has_air = true
+	else:
+		has_land = true  # Fallback: show land if no location
 
-	# Hide/show domain sections based on what can be built here
-	# Land: always show (infantry recruitable at capital)
-	(_sections["land"]["container"] as Control).visible = true
-	# Sea: only show if at a coastal province
-	(_sections["sea"]["container"] as Control).visible = at_coast
-	# Air: only show at capital (until airfields exist)
-	(_sections["air"]["container"] as Control).visible = at_capital
+	(_sections["land"]["container"] as Control).visible = has_land
+	(_sections["sea"]["container"] as Control).visible = has_sea
+	(_sections["air"]["container"] as Control).visible = has_air
 
 	# Update all visible sections
 	for domain: String in _sections:
@@ -308,7 +313,15 @@ func _on_selection_changed() -> void:
 
 
 func _on_territory_selected(iso: String) -> void:
-	if iso.is_empty() and MilitarySystem.recruit_iso.is_empty():
+	# If in recruit mode, show the recruit province
+	if not MilitarySystem.recruit_iso.is_empty():
+		var rpdata: Dictionary = ProvinceDB.province_data.get(MilitarySystem.recruit_iso, {})
+		_sel_label.visible = true
+		_sel_label.text = "Recruiting at: %s" % rpdata.get("name", MilitarySystem.recruit_iso)
+		_hint.text = "Select units to recruit at this province"
+		return
+
+	if iso.is_empty():
 		_sel_label.visible = false
 		_hint.text = "Left-click your territory to select\nRight-click to move"
 		return
