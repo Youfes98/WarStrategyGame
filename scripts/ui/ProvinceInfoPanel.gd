@@ -214,10 +214,12 @@ func _refresh() -> void:
 		build_btn.add_theme_font_size_override("font_size", 11)
 		var build_pid: String = _province_id
 		build_btn.pressed.connect(func() -> void:
+			# Close other panels first
+			_close_panel("MilitaryPanel")
+			MilitarySystem.recruit_iso = ""
 			var bp: Node = get_parent().get_node_or_null("BuildPanel")
 			if bp != null:
-				if not bp.visible:
-					bp.visible = true
+				bp.visible = true
 				if bp.has_method("_show_province_builds"):
 					bp._show_province_builds(build_pid)
 				elif bp.has_method("_show_main"):
@@ -229,7 +231,6 @@ func _refresh() -> void:
 		recruit_btn.custom_minimum_size = Vector2(0, 28)
 		recruit_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		recruit_btn.add_theme_font_size_override("font_size", 11)
-		# Check if any recruitment is possible here
 		var can_recruit_here: bool = false
 		if bs != null:
 			for ut: String in MilitarySystem.UNIT_TYPES:
@@ -241,6 +242,8 @@ func _refresh() -> void:
 			recruit_btn.tooltip_text = "No military buildings at this province"
 		var pid: String = _province_id
 		recruit_btn.pressed.connect(func() -> void:
+			# Close other panels first
+			_close_panel("BuildPanel")
 			MilitarySystem.recruit_iso = pid
 			MilitarySystem.selection_changed.emit())
 		btn_row.add_child(recruit_btn)
@@ -252,6 +255,12 @@ func _refresh() -> void:
 		coast.add_theme_font_size_override("font_size", 9)
 		coast.add_theme_color_override("font_color", Color(0.40, 0.70, 1.0))
 		_buildings_list.add_child(coast)
+
+
+func _close_panel(panel_name: String) -> void:
+	var panel: Control = get_parent().get_node_or_null(panel_name)
+	if panel != null:
+		panel.visible = false
 
 
 func _fmt_pop(p: int) -> String:
