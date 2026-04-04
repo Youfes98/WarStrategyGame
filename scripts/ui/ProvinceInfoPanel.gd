@@ -199,49 +199,47 @@ func _refresh() -> void:
 			lbl.add_theme_color_override("font_color", TEXT_COLOR)
 			_buildings_list.add_child(lbl)
 
-	# Actions (only if player owns this province)
+	# Action buttons (only if player owns this province)
 	if ter_owner == GameState.player_iso:
-		# Recruitment buttons for units this province can produce
-		var can_recruit_any: bool = false
-		if bs != null:
-			for unit_type: String in MilitarySystem.UNIT_TYPES:
-				if MilitarySystem.can_recruit_at(unit_type, _province_id):
-					can_recruit_any = true
-					var udata: Dictionary = MilitarySystem.UNIT_TYPES[unit_type]
-					var cost: float = float(udata.get("cost", 0))
-					var cost_str: String = "$%.1fB" % cost if cost >= 1.0 else "$%.0fM" % (cost * 1000)
-					var recruit_btn := Button.new()
-					recruit_btn.text = "Recruit %s  %s" % [udata["label"], cost_str]
-					recruit_btn.add_theme_font_size_override("font_size", 9)
-					var treasury: float = float(GameState.get_country(GameState.player_iso).get("treasury", 0))
-					recruit_btn.disabled = treasury < cost
-					var ut: String = unit_type
-					var pid: String = _province_id
-					recruit_btn.pressed.connect(func() -> void:
-						MilitarySystem.recruit_unit(ut, pid)
-						_refresh())
-					_buildings_list.add_child(recruit_btn)
-
-		if not can_recruit_any:
-			var no_recruit := Label.new()
-			no_recruit.text = "No recruitment buildings"
-			no_recruit.add_theme_font_size_override("font_size", 9)
-			no_recruit.add_theme_color_override("font_color", DIM_COLOR)
-			_buildings_list.add_child(no_recruit)
-
 		_buildings_list.add_child(HSeparator.new())
 
+		var btn_row := HBoxContainer.new()
+		btn_row.add_theme_constant_override("separation", 6)
+		_buildings_list.add_child(btn_row)
+
 		var build_btn := Button.new()
-		build_btn.text = "Build Here (V)"
-		build_btn.add_theme_font_size_override("font_size", 10)
+		build_btn.text = "Build"
+		build_btn.custom_minimum_size = Vector2(0, 28)
+		build_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		build_btn.add_theme_font_size_override("font_size", 11)
 		build_btn.pressed.connect(func() -> void:
 			var bp: Control = get_parent().get_node_or_null("BuildPanel")
 			if bp != null:
 				bp.visible = true
 				if bp.has_method("_show_type_list"):
-					bp._show_type_list()
-		)
-		_buildings_list.add_child(build_btn)
+					bp._show_type_list())
+		btn_row.add_child(build_btn)
+
+		var recruit_btn := Button.new()
+		recruit_btn.text = "Recruit"
+		recruit_btn.custom_minimum_size = Vector2(0, 28)
+		recruit_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		recruit_btn.add_theme_font_size_override("font_size", 11)
+		# Check if any recruitment is possible here
+		var can_recruit_here: bool = false
+		if bs != null:
+			for ut: String in MilitarySystem.UNIT_TYPES:
+				if MilitarySystem.can_recruit_at(ut, _province_id):
+					can_recruit_here = true
+					break
+		recruit_btn.disabled = not can_recruit_here
+		if not can_recruit_here:
+			recruit_btn.tooltip_text = "No military buildings at this province"
+		var pid: String = _province_id
+		recruit_btn.pressed.connect(func() -> void:
+			MilitarySystem.recruit_iso = pid
+			MilitarySystem.selection_changed.emit())
+		btn_row.add_child(recruit_btn)
 
 	# Coastal indicator
 	if pdata.get("coastal", false):

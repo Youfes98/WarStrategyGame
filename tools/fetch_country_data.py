@@ -318,18 +318,35 @@ def build_countries() -> tuple[list, dict]:
     raw = raw_a
     total = len(raw)
 
+    # Load IMF 2025 GDP data (overrides hardcoded GDP_ESTIMATES)
+    imf_gdp_path = CACHE_DIR / "imf_gdp_2025.json"
+    imf_gdp: dict = {}
+    if imf_gdp_path.exists():
+        with open(imf_gdp_path, encoding="utf-8") as f:
+            imf_gdp = json.load(f)
+        print(f"  Loaded IMF 2025 GDP for {len(imf_gdp)} countries")
+
+    # Load IMF 2025 debt-to-GDP ratios
+    imf_debt_path = CACHE_DIR / "imf_debt_2025.json"
+    imf_debt: dict = {}
+    if imf_debt_path.exists():
+        with open(imf_debt_path, encoding="utf-8") as f:
+            imf_debt = json.load(f)
+        print(f"  Loaded IMF 2025 debt data for {len(imf_debt)} countries")
+
     # First pass: compute raw GDP for normalization bounds
     gdp_raw: dict[str, float] = {}
     pop_raw: dict[str, int]   = {}
     for entry in raw:
         iso3 = entry.get("cca3", "")
         pop  = entry.get("population", 100000)
-        gdp  = GDP_ESTIMATES.get(iso3, max(0.5, pop / 1_000_000 * 1.5))
+        # Priority: IMF 2025 → hardcoded estimates → population-based fallback
+        gdp  = imf_gdp.get(iso3, GDP_ESTIMATES.get(iso3, max(0.5, pop / 1_000_000 * 1.5)))
         gdp_raw[iso3] = gdp
         pop_raw[iso3] = pop
 
-    # Normalization bounds
-    gdp_min, gdp_max = 0.05, 28000.0
+    # Normalization bounds (updated for 2025 scale)
+    gdp_min, gdp_max = 0.05, 32000.0
     pop_min, pop_max = 800, 1_400_000_000
 
     countries    = []
@@ -388,7 +405,7 @@ def build_countries() -> tuple[list, dict]:
             "flag_emoji":        "",   # filled by geojson_to_godot.py from flag SVG name
             # Economy starting values
             "gdp_raw_billions":  round(gdp, 2),
-            "debt_to_gdp":       round(random.uniform(20, 80), 1),
+            "debt_to_gdp":       imf_debt.get(iso3, round(random.uniform(30, 70), 1)),
             "credit_rating":     max(10, min(100, int(gdp_norm / 10))),
             "infrastructure":    max(10, min(95, int(gdp_norm / 12 + 20))),
             "literacy_rate":     _get_literacy(iso3, gdp_norm),
