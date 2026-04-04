@@ -218,7 +218,11 @@ func _restore_province_lut(pid: String) -> void:
 		return
 	var col: Color = _compute_color(pid)
 	_base_colors[idx] = col
-	_set_lut(idx, col)
+	# Keep highlight if this is the selected province
+	if pid == _selected_province:
+		_set_lut(idx, col.lightened(0.25))
+	else:
+		_set_lut(idx, col)
 
 func _restore_country_lut(ciso: String) -> void:
 	for pid: String in ProvinceDB.get_country_province_ids(ciso):
@@ -485,7 +489,7 @@ func _clear_selected() -> void:
 
 func _set_hover(id: String) -> void:
 	if _shader_mode:
-		if not _hover_id.is_empty() and _hover_id != _mil_sel_iso:
+		if not _hover_id.is_empty() and _hover_id != _mil_sel_iso and _hover_id != _selected_province:
 			_restore_province_lut(_hover_id)
 		_hover_id = id
 		if not id.is_empty() and id != _mil_sel_iso:
