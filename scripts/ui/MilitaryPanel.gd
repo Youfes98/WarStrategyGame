@@ -302,8 +302,8 @@ func _refresh() -> void:
 
 
 func _on_selection_changed() -> void:
-	# Only show panel when an army is actively selected
-	visible = not MilitarySystem.selected_army_ids.is_empty()
+	# Show when army is selected OR recruit location is set (from province Recruit button)
+	visible = not MilitarySystem.selected_army_ids.is_empty() or not MilitarySystem.recruit_iso.is_empty()
 	_refresh()
 
 
